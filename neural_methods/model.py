@@ -160,7 +160,7 @@ class TSCAN(nn.Module):
 
 
 class MTTS_CAN(nn.Module):
-    """MTTS_CAN is the multi-task (respiration) version of TS-CAN"""
+    """MTTS_CAN is the multitask (respiration) version of TS-CAN"""
 
     def __init__(self, in_channels=3, nb_filters1=32, nb_filters2=64, kernel_size=3, dropout_rate1=0.25,
                  dropout_rate2=0.5, pool_size=(2, 2), nb_dense=128, frame_depth=20):
