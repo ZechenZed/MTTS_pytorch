@@ -6,12 +6,12 @@ from scipy.sparse import spdiags
 import matplotlib.pyplot as plt
 
 
-def preprocess_raw_video(videoFilePath, dim=36):
+def preprocess_raw_video(video_file_path, dim=36):
     # set up
-    print("***********Processing " + videoFilePath[-12:] + "***********")
+    print("***********Processing " + video_file_path[-12:] + "***********")
     t = []
     i = 0
-    vidObj = cv2.VideoCapture(videoFilePath)
+    vidObj = cv2.VideoCapture(video_file_path)
     totalFrames = int(vidObj.get(cv2.CAP_PROP_FRAME_COUNT))
     Xsub = np.zeros((totalFrames, dim, dim, 3), dtype=np.float32)
     success, img = vidObj.read()
@@ -29,7 +29,7 @@ def preprocess_raw_video(videoFilePath, dim=36):
 
         # # Without considering the ratio
         #
-        vidLxL = cv2.resize(img_as_float(img[:, :, :]), (dim, dim), interpolation=cv2.INTER_AREA)
+        # vidLxL = cv2.resize(img_as_float(img[:, :, :]), (dim, dim), interpolation=cv2.INTER_AREA)
 
         # Face cropping
         # Add black edge around each frame of picture
@@ -64,29 +64,31 @@ def preprocess_raw_video(videoFilePath, dim=36):
 
         success, img = vidObj.read()
         i = i + 1
+
+    # # Plot an example of data after preprocess
     # plt.imshow(Xsub[100])
     # plt.title('Sample Preprocessed Frame')
     # plt.show()
     # Normalized Frames in the motion branch
+
+    # Normalize raw frames in the apperance branch
     normalized_len = len(t) - 1
     dXsub = np.zeros((normalized_len, dim, dim, 3), dtype=np.float32)
     for j in range(normalized_len - 1):
         dXsub[j, :, :, :] = (Xsub[j + 1, :, :, :] - Xsub[j, :, :, :]) / (Xsub[j + 1, :, :, :] + Xsub[j, :, :, :])
     dXsub = dXsub / np.std(dXsub)
-    # Normalize raw frames in the apperance branch
     Xsub = Xsub - np.mean(Xsub)
     Xsub = Xsub / np.std(Xsub)
     Xsub = Xsub[:totalFrames - 1, :, :, :]
-    # Plot an example of data after preprocess
     dXsub = np.concatenate((dXsub, Xsub), axis=3)
     return dXsub
 
 
-def count_frames(videoFilePath):
-    print("***********Processing " + videoFilePath[-12:] + "***********")
+def count_frames(video_file_path):
+    print("***********Processing " + video_file_path[-12:] + "***********")
     t = []
     i = 0
-    vidObj = cv2.VideoCapture(videoFilePath)
+    vidObj = cv2.VideoCapture(video_file_path)
     success, img = vidObj.read()
     rows, cols, _ = img.shape
     while success:
