@@ -19,7 +19,7 @@ parser.add_argument('-BP', '--BP_type', type=str, default='systolic',
 parser.add_argument('-image', '--image_type', type=str, default='face_large',
                     help='choose from 1) ratio, 2) face_large, 3) face')
 parser.add_argument('-device', '--device_type', type=str, default='remote',
-                    help='device type')
+                    help='Local / Remote device')
 parser.add_argument('-g', '--nb_epoch', type=int, default=30,
                     help='nb_epoch')
 parser.add_argument('--nb_batch', type=int, default=6,
