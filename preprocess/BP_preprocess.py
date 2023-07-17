@@ -1,5 +1,5 @@
 import os
-print(os.cpu_count())
+# print(os.cpu_count())
 import argparse
 import numpy as np
 from statistics import mean
@@ -56,7 +56,7 @@ def data_process(data_type, device_type, image=str(), dim=72):
     frame_ind = 0
     for i in range(num_video):
         temp_BP = np.loadtxt(BP_folder_path + BP_file_path[i])  # BP loading
-        current_frames = videos[i].shape[0] // 250 * 250
+        current_frames = videos[i].shape[0] // 10 * 10
         temp_BP_lf = np.zeros(current_frames)
         # Down-sample BP 1000Hz --> 25Hz
         for j in range(0, current_frames):
