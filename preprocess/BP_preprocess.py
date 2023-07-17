@@ -32,6 +32,7 @@ def data_process(data_type, device_type, image=str(), dim=72):
     for path in sorted(os.listdir(video_folder_path)):
         if os.path.isfile(os.path.join(video_folder_path, path)):
             video_file_path.append(path)
+    video_file_path = video_file_path[0:2]
     num_video = len(video_file_path)
     print('Processing ' + str(num_video) + ' Videos')
 
@@ -89,4 +90,6 @@ def data_process(data_type, device_type, image=str(), dim=72):
     np.save(saving_path + data_type + '_BP_systolic.npy', BP_lf)
 
 
-data_process('train', 'local','face_large')
+if __name__ == '__main__':
+    data_process('train', 'remote', 'face_large')
+    data_process('valid', 'remote', 'face_large')
