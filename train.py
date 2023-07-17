@@ -18,7 +18,7 @@ parser.add_argument('-BP', '--BP_type', type=str, default='systolic',
                     help='Choose type of BP from mean, systolic and diastolic')
 parser.add_argument('-image', '--image_type', type=str, default='face_large',
                     help='choose from 1) ratio, 2) face_large, 3) face')
-parser.add_argument('-device', '--device_type', type=str, default='local',
+parser.add_argument('-device', '--device_type', type=str, default='remote',
                     help='device type')
 parser.add_argument('-g', '--nb_epoch', type=int, default=30,
                     help='nb_epoch')
