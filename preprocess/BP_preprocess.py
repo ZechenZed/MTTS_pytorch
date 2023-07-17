@@ -1,4 +1,5 @@
 import os
+print(os.cpu_count())
 import argparse
 import numpy as np
 from statistics import mean
@@ -32,11 +33,11 @@ def data_process(data_type, device_type, image=str(), dim=72):
     for path in sorted(os.listdir(video_folder_path)):
         if os.path.isfile(os.path.join(video_folder_path, path)):
             video_file_path.append(path)
-    video_file_path = video_file_path[0:5]
+    # video_file_path = video_file_path[0:5]
     num_video = len(video_file_path)
     print('Processing ' + str(num_video) + ' Videos')
 
-    videos = [Parallel(n_jobs=8)(
+    videos = [Parallel(n_jobs=-1)(
         delayed(preprocess_raw_video)(video_folder_path + video, dim) for video in video_file_path)]
     videos = videos[0]
 
@@ -91,5 +92,6 @@ def data_process(data_type, device_type, image=str(), dim=72):
 
 
 if __name__ == '__main__':
-    data_process('train', 'remote', 'face_large')
-    data_process('valid', 'remote', 'face_large')
+    data_process('train', 'local', 'face_large')
+    data_process('valid', 'local', 'face_large')
+    data_process('test', 'local', 'face_large')
