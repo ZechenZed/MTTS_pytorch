@@ -6,7 +6,7 @@ from scipy.sparse import spdiags
 import matplotlib.pyplot as plt
 
 
-def preprocess_raw_video(video_file_path, dim=36):
+def preprocess_raw_video(video_file_path, dim=72, plot=False, face_crop=True):
     # set up
     print("***********Processing " + video_file_path[-12:] + "***********")
     t = []
@@ -24,37 +24,30 @@ def preprocess_raw_video(video_file_path, dim=36):
     while success:
         t.append(vidObj.get(cv2.CAP_PROP_POS_MSEC))
 
-        # # Experimental
-        # vidLxL = cv2.resize(img_as_float(img[200:1240, :, :]), (dim, dim), interpolation=cv2.INTER_AREA)
+        # Without considering the ratio
+        vidLxL = cv2.resize(img_as_float(img[:, :, :]), (dim, dim), interpolation=cv2.INTER_AREA)
 
-        # # Without considering the ratio
-        #
-        # vidLxL = cv2.resize(img_as_float(img[:, :, :]), (dim, dim), interpolation=cv2.INTER_AREA)
+        if face_crop:
+            # Face cropping with black edge around each frame of picture
+            width_edge = 300
+            height_edge = height * (width_edge / width)
+            original_cf = np.float32([[0, 0], [width - 1, 0], [(width - 1) / 2, height - 1]])
+            transed_cf = np.float32([[width_edge - 1, height_edge - 1], [width - width_edge - 1, height_edge - 1],
+                                     [(width - 1) / 2, height - height_edge - 1]])
+            matrix = cv2.getAffineTransform(original_cf, transed_cf)
+            img = cv2.warpAffine(img, matrix, (cols, rows))
 
-        # Face cropping
-        # Add black edge around each frame of picture
-        width_edge = 300
-        height_edge = height * (width_edge / width)
-        original_cf = np.float32([[0, 0], [width - 1, 0], [(width - 1) / 2, height - 1]])
-        transed_cf = np.float32([[width_edge - 1, height_edge - 1], [width - width_edge - 1, height_edge - 1],
-                                 [(width - 1) / 2, height - height_edge - 1]])
-        matrix = cv2.getAffineTransform(original_cf, transed_cf)
-        img = cv2.warpAffine(img, matrix, (cols, rows))
+            # Face detection in gray scale image
+            gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+            faces = face_cascade.detectMultiScale(gray, 1.3, 5)
 
-        # Face detection in gray scale image
-        gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-        faces = face_cascade.detectMultiScale(gray, 1.3, 5)
+            # Cropping out ROI from the original image based on the "1:1:1"ish face ratio
+            roi = 0
+            for (x, y, w, h) in faces:
+                roi = img_as_float(img[int(y - 0.25 * h):int(y + 1.05 * h), int(x - 0.15 * w):int(x + 1.15 * w), :])
 
-        # Cropping out ROI from the original image based on the "1:1:1"ish face ratio
-        roi = 0
-        for (x, y, w, h) in faces:
-            roi = img_as_float(img[int(y - 0.25 * h):int(y + 1.05 * h), int(x - 0.15 * w):int(x + 1.15 * w), :])
-
-        # for (x, y, w, h) in faces:
-        #     roi = img_as_float(img[int(y):int(y + h), int(x):int(x + w), :])
-
-        # Original resizing from MTTS_CAN
-        vidLxL = cv2.resize(roi, (dim, dim), interpolation=cv2.INTER_AREA)
+            # Original resizing from MTTS_CAN
+            vidLxL = cv2.resize(roi, (dim, dim), interpolation=cv2.INTER_AREA)
 
         # vidLxL = cv2.rotate(vidLxL, cv2.ROTATE_90_CLOCKWISE)
         vidLxL = cv2.cvtColor(vidLxL.astype('float32'), cv2.COLOR_BGR2RGB)
@@ -65,11 +58,11 @@ def preprocess_raw_video(video_file_path, dim=36):
         success, img = vidObj.read()
         i = i + 1
 
-    # # Plot an example of data after preprocess
-    # plt.imshow(Xsub[100])
-    # plt.title('Sample Preprocessed Frame')
-    # plt.show()
-    # Normalized Frames in the motion branch
+    if plot:
+        # Plot an example of data after preprocess
+        plt.imshow(Xsub[100])
+        plt.title('Sample Preprocessed Frame')
+        plt.show()
 
     # Normalize raw frames in the apperance branch
     normalized_len = len(t) - 1
@@ -81,6 +74,11 @@ def preprocess_raw_video(video_file_path, dim=36):
     Xsub = Xsub / np.std(Xsub)
     Xsub = Xsub[:totalFrames - 1, :, :, :]
     dXsub = np.concatenate((dXsub, Xsub), axis=3)
+
+    # Video array transpose
+    transposed_arr = np.transpose(dXsub, (0, 3, 1, 2))
+    dXsub = transposed_arr.reshape((normalized_len, 6, dim, dim))
+    normalized_len = normalized_len // 25 * 25
     return dXsub
 
 
