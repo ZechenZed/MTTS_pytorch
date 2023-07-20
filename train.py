@@ -25,7 +25,10 @@ class TSCAN_trainer:
         self.criterion = MSELoss()
         self.min_valid_loss = None
         self.best_epoch = 43
-        self.model_dir = 'C:/Users/Zed/Desktop/MTTS_pytorch/model_ckpts/'
+        if setup.device_type == 'local':
+            self.model_dir = 'C:/Users/Zed/Desktop/MTTS_pytorch/model_ckpts/'
+        else:
+            self.model_dir = '/edrive2/zechenzh/model_ckpts/'
         self.model_file_name = f'TSCAN_{setup.image_type}'
         self.base_len = setup.nb_device * self.frame_depth
         self.batch_size = setup.nb_batch
