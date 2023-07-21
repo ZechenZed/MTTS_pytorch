@@ -38,7 +38,7 @@ class TSCAN_trainer:
         if setup.device_type == 'local':
             data_folder_path = 'C:/Users/Zed/Desktop/V4V/preprocessed_v4v/'
         else:
-            data_folder_path = '/edrive2/zechenzh/preprocessed_v4v_batch/preprocessed_v4v/'
+            data_folder_path = '/edrive2/zechenzh/preprocessed_v4v/'
         model = TSCAN(frame_depth=self.frame_depth, img_size=72).to(self.device)
         self.model = torch.nn.DataParallel(model, device_ids=list(range(setup.nb_device)))
         if setup.data_type == 'train':
@@ -182,21 +182,21 @@ class TSCAN_trainer:
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('-data', '--data_type', type=str, default='test',
+    parser.add_argument('-data', '--data_type', type=str, default='train',
                         help='data type')
     parser.add_argument('-BP', '--BP_type', type=str, default='systolic',
                         help='Choose type of BP from mean, systolic and diastolic')
     parser.add_argument('-image', '--image_type', type=str, default='face_large',
                         help='choose from 1) ratio, 2) face_large, 3) face')
-    parser.add_argument('-device', '--device_type', type=str, default='remote',
+    parser.add_argument('-device', '--device_type', type=str, default='local',
                         help='Local / Remote device')
-    parser.add_argument('-g', '--nb_epoch', type=int, default=50,
+    parser.add_argument('-g', '--nb_epoch', type=int, default=60,
                         help='nb_epoch')
     parser.add_argument('--nb_batch', type=int, default=4,
                         help='nb_batch')
-    parser.add_argument('--gpu', type=str, default='0,1,2',
+    parser.add_argument('--gpu', type=str, default='0',
                         help='List of GPUs used')
-    parser.add_argument('--nb_device', type=int, default=3,
+    parser.add_argument('--nb_device', type=int, default=1,
                         help='Total number of device')
     parser.add_argument('-lr', '--lr', type=float, default=9e-3,
                         help='learning rate')
