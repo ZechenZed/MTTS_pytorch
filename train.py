@@ -48,7 +48,7 @@ class TSCAN_trainer:
                                            shuffle=True, num_workers=1)
             self.valid_loader = DataLoader(dataset=v4v_data_valid, batch_size=self.batch_size,
                                            shuffle=True, num_workers=1)
-            self.optimizer = optim.AdamW(model.parameters(), lr=self.lr, weight_decay=0)
+            self.optimizer = optim.AdamW(self.model.parameters(), lr=self.lr, weight_decay=0)
             self.scheduler = OneCycleLR(self.optimizer, max_lr=self.lr,
                                         epochs=self.nb_epoch, steps_per_epoch=len(self.train_loader))
         else:
