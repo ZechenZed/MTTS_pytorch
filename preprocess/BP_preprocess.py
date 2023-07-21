@@ -1,6 +1,6 @@
 import os
-# print(os.cpu_count())
-import argparse
+print(os.cpu_count())
+os.environ['CUDA_VISIBLE_DEVICES'] = '6,7'
 import numpy as np
 from statistics import mean
 import matplotlib.pyplot as plt

@@ -33,8 +33,7 @@ class TSCAN_trainer:
         self.base_len = setup.nb_device * self.frame_depth
         self.batch_size = setup.nb_batch
         self.USE_LAST_EPOCH = False
-
-        self.plot_pred = True
+        self.plot_pred = False
         ################### Load data ###################
         if setup.device_type == 'local':
             data_folder_path = 'C:/Users/Zed/Desktop/V4V/preprocessed_v4v/'
