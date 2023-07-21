@@ -42,12 +42,15 @@ class TSCAN_trainer:
         self.model = TSCAN(frame_depth=self.frame_depth, img_size=72).to(self.device)
         # self.model = torch.nn.DataParallel(model, device_ids=list(range(setup.nb_device)))
         if setup.data_type == 'train':
+            print('Loading Data')
             v4v_data_train = V4V_Dataset(data_folder_path, 'train', setup.image_type, setup.BP_type)
             v4v_data_valid = V4V_Dataset(data_folder_path, 'valid', setup.image_type, setup.BP_type)
             self.train_loader = DataLoader(dataset=v4v_data_train, batch_size=self.batch_size,
                                            shuffle=True, num_workers=1)
             self.valid_loader = DataLoader(dataset=v4v_data_valid, batch_size=self.batch_size,
                                            shuffle=True, num_workers=1)
+            if self.train_loader and self.valid_loader:
+                print('Successfully loaded')
             self.optimizer = optim.AdamW(self.model.parameters(), lr=self.lr, weight_decay=0)
             self.scheduler = OneCycleLR(self.optimizer, max_lr=self.lr,
                                         epochs=self.nb_epoch, steps_per_epoch=len(self.train_loader))
