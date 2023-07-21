@@ -45,9 +45,9 @@ class TSCAN_trainer:
             v4v_data_train = V4V_Dataset(data_folder_path, 'train', setup.image_type, setup.BP_type)
             v4v_data_valid = V4V_Dataset(data_folder_path, 'valid', setup.image_type, setup.BP_type)
             self.train_loader = DataLoader(dataset=v4v_data_train, batch_size=self.batch_size,
-                                           shuffle=True, num_workers=0)
+                                           shuffle=True, num_workers=1)
             self.valid_loader = DataLoader(dataset=v4v_data_valid, batch_size=self.batch_size,
-                                           shuffle=True, num_workers=0)
+                                           shuffle=True, num_workers=1)
             self.optimizer = optim.AdamW(model.parameters(), lr=self.lr, weight_decay=0)
             self.scheduler = OneCycleLR(self.optimizer, max_lr=self.lr,
                                         epochs=self.nb_epoch, steps_per_epoch=len(self.train_loader))
