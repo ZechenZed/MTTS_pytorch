@@ -39,7 +39,7 @@ class TSCAN_trainer:
             data_folder_path = 'C:/Users/Zed/Desktop/V4V/preprocessed_v4v/'
         else:
             data_folder_path = '/edrive2/zechenzh/preprocessed_v4v/'
-        model = TSCAN(frame_depth=self.frame_depth, img_size=72).to(self.device)
+        self.model = TSCAN(frame_depth=self.frame_depth, img_size=72).to(self.device)
         # self.model = torch.nn.DataParallel(model, device_ids=list(range(setup.nb_device)))
         if setup.data_type == 'train':
             v4v_data_train = V4V_Dataset(data_folder_path, 'train', setup.image_type, setup.BP_type)
