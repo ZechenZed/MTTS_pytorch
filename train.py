@@ -193,7 +193,7 @@ if __name__ == '__main__':
                         help='choose from 1) ratio, 2) face_large, 3) face')
     parser.add_argument('-device', '--device_type', type=str, default='local',
                         help='Local / Remote device')
-    parser.add_argument('-g', '--nb_epoch', type=int, default=50,
+    parser.add_argument('-g', '--nb_epoch', type=int, default=70,
                         help='nb_epoch')
     parser.add_argument('--nb_batch', type=int, default=6,
                         help='nb_batch')
