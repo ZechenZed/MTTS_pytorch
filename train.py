@@ -36,7 +36,7 @@ class TSCAN_trainer:
         self.plot_pred = True
         self.drop_rate1 = 0.1
         self.drop_rate2 = 0.25
-        self.kernel = 4
+        self.kernel = 3
         ################### Load data ###################
         if setup.device_type == 'local':
             data_folder_path = 'C:/Users/Zed/Desktop/V4V/preprocessed_v4v/'
@@ -206,7 +206,7 @@ if __name__ == '__main__':
                         help='Local / Remote device')
     parser.add_argument('-g', '--nb_epoch', type=int, default=100,
                         help='nb_epoch')
-    parser.add_argument('--nb_batch', type=int, default=3,
+    parser.add_argument('--nb_batch', type=int, default=9,
                         help='nb_batch')
     parser.add_argument('--gpu', type=str, default='0',
                         help='List of GPUs used')
