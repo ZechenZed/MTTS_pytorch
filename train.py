@@ -204,7 +204,7 @@ if __name__ == '__main__':
                         help='choose from 1) ratio, 2) face_large, 3) face')
     parser.add_argument('-device', '--device_type', type=str, default='local',
                         help='Local / Remote device')
-    parser.add_argument('-g', '--nb_epoch', type=int, default=200,
+    parser.add_argument('-g', '--nb_epoch', type=int, default=100,
                         help='nb_epoch')
     parser.add_argument('--nb_batch', type=int, default=6,
                         help='nb_batch')
@@ -212,7 +212,7 @@ if __name__ == '__main__':
                         help='List of GPUs used')
     parser.add_argument('--nb_device', type=int, default=1,
                         help='Total number of device')
-    parser.add_argument('-lr', '--lr', type=float, default=9e-4,
+    parser.add_argument('-lr', '--lr', type=float, default=9e-3,
                         help='learning rate')
     parser.add_argument('-fd', '--frame_depth', type=int, default=10,
                         help='frame depth')
