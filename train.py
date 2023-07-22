@@ -24,7 +24,7 @@ class TSCAN_trainer:
         self.lr = setup.lr
         self.criterion = MSELoss()
         self.min_valid_loss = None
-        self.best_epoch = 143
+        self.best_epoch = 136
         if setup.device_type == 'local':
             self.model_dir = 'C:/Users/Zed/Desktop/MTTS_pytorch/model_ckpts/'
         else:
@@ -37,13 +37,15 @@ class TSCAN_trainer:
         self.drop_rate1 = 0.1
         self.drop_rate2 = 0.1
         self.kernel = 3
+        self.pool_size = (8,8)
         ################### Load data ###################
         if setup.device_type == 'local':
             data_folder_path = 'C:/Users/Zed/Desktop/V4V/preprocessed_v4v/'
         else:
             data_folder_path = '/edrive2/zechenzh/preprocessed_v4v/'
         self.model = TSCAN(frame_depth=self.frame_depth, img_size=72, dropout_rate1=self.drop_rate1,
-                           dropout_rate2=self.drop_rate2,kernel_size=self.kernel).to(self.device)
+                           dropout_rate2=self.drop_rate2,kernel_size=self.kernel,
+                           pool_size=self.pool_size).to(self.device)
         # self.model = torch.nn.DataParallel(self.model, device_ids=list(range(setup.nb_device)))
         if setup.data_type == 'train':
             print('Loading Data')
