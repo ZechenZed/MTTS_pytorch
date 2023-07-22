@@ -24,7 +24,7 @@ class TSCAN_trainer:
         self.lr = setup.lr
         self.criterion = MSELoss()
         self.min_valid_loss = None
-        self.best_epoch = 55
+        self.best_epoch = 69
         if setup.device_type == 'local':
             self.model_dir = 'C:/Users/Zed/Desktop/MTTS_pytorch/model_ckpts/'
         else:
@@ -44,11 +44,15 @@ class TSCAN_trainer:
         if setup.data_type == 'train':
             print('Loading Data')
             v4v_data_train = V4V_Dataset(data_folder_path, 'train', setup.image_type, setup.BP_type)
-            v4v_data_valid = V4V_Dataset(data_folder_path, 'valid', setup.image_type, setup.BP_type)
             self.train_loader = DataLoader(dataset=v4v_data_train, batch_size=self.batch_size,
                                            shuffle=True, num_workers=1)
+            v4v_data_valid = V4V_Dataset(data_folder_path, 'valid', setup.image_type, setup.BP_type)
             self.valid_loader = DataLoader(dataset=v4v_data_valid, batch_size=self.batch_size,
                                            shuffle=True, num_workers=1)
+            test = iter(self.valid_loader)
+            first_test = next(test)
+            index, x, y = first_test
+            print(index, type(x), type(y))
             if self.train_loader and self.valid_loader:
                 print('Successfully loaded')
             self.optimizer = optim.AdamW(self.model.parameters(), lr=self.lr, weight_decay=0)
@@ -69,9 +73,11 @@ class TSCAN_trainer:
             self.model.train()
             # Model Training
             tbar = tqdm(self.train_loader, ncols=80)
-            for idx, batch in enumerate(tbar):
+            for idx, (_, data, labels) in enumerate(tbar):
+                # print(ind, type(data), type(labels))
                 tbar.set_description("Train epoch %s" % epoch)
-                data, labels = batch[0].to(self.device), batch[1].to(self.device)
+                data = data.to(self.device)
+                labels = labels.to(self.device)
                 N, D, C, H, W = data.shape
                 data = data.view(N * D, C, H, W)
                 labels = labels.view(-1, 1)
@@ -91,7 +97,7 @@ class TSCAN_trainer:
                 train_loss.append(loss.item())
                 tbar.set_postfix(loss=loss.item())
             self.save_model(epoch)
-            valid_loss = self.valid(self.valid_loader)
+            valid_loss = self.valid()
             print('validation loss: ', valid_loss)
             if self.min_valid_loss is None:
                 self.min_valid_loss = valid_loss
@@ -104,18 +110,18 @@ class TSCAN_trainer:
         print("")
         print("Best trained epoch: {}, min_val_loss: {}".format(self.best_epoch, self.min_valid_loss))
 
-    def valid(self, data_loader):
+    def valid(self):
         print('')
         print("===Validating===")
         valid_loss = []
         self.model.eval()
         valid_step = 0
         with torch.no_grad():
-            vbar = tqdm(data_loader, ncols=80)
-            for valid_idx, valid_batch in enumerate(vbar):
+            vbar = tqdm(self.valid_loader, ncols=80)
+            for valid_idx, (_, val_data, val_labels) in enumerate(vbar):
                 vbar.set_description("Validation")
-                data_valid, labels_valid = valid_batch[0].to(
-                    self.device), valid_batch[1].to(self.device)
+                data_valid = val_data.to(self.device)
+                labels_valid = val_labels.to(self.device)
                 N, D, C, H, W = data_valid.shape
                 data_valid = data_valid.view(N * D, C, H, W)
                 labels_valid = labels_valid.view(-1, 1)

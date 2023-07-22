@@ -14,4 +14,4 @@ class V4V_Dataset(Dataset):
         return self.X.size(dim=1)
 
     def __getitem__(self, index):
-        return self.X[index], self.Y[index]
+        return index, self.X[index], self.Y[index]
