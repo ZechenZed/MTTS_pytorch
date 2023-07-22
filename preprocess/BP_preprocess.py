@@ -37,7 +37,7 @@ def data_process(data_type, device_type, image=str(), dim=72):
     num_video = len(video_file_path)
     print('Processing ' + str(num_video) + ' Videos')
 
-    videos = [Parallel(n_jobs=14)(
+    videos = [Parallel(n_jobs=10)(
         delayed(preprocess_raw_video)(video_folder_path + video, dim) for video in video_file_path)]
     videos = videos[0]
 
@@ -93,6 +93,6 @@ def data_process(data_type, device_type, image=str(), dim=72):
 
 
 if __name__ == '__main__':
-    # data_process('train', 'remote', 'face_large')
+    data_process('train', 'remote', 'face_large')
     data_process('valid', 'remote', 'face_large')
-    # data_process('test', 'remote', 'face_large')
+    data_process('test', 'remote', 'face_large')
