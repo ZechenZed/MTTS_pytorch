@@ -24,7 +24,7 @@ class TSCAN_trainer:
         self.lr = setup.lr
         self.criterion = MSELoss()
         self.min_valid_loss = None
-        self.best_epoch = 100
+        self.best_epoch = 143
         if setup.device_type == 'local':
             self.model_dir = 'C:/Users/Zed/Desktop/MTTS_pytorch/model_ckpts/'
         else:
