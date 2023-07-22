@@ -135,14 +135,14 @@ class TSCAN(nn.Module):
         d4 = self.dropout_1(d3)
 
         r3 = self.avg_pooling_2(r2)
-        r4 = self.dropout_2(r3)
+        # r4 = self.dropout_2(r3)
 
         d4 = self.TSM_3(d4)
         d5 = torch.tanh(self.motion_conv3(d4))
         d5 = self.TSM_4(d5)
         d6 = torch.tanh(self.motion_conv4(d5))
 
-        r5 = torch.tanh(self.apperance_conv3(r4))
+        r5 = torch.tanh(self.apperance_conv3(r3))
         r6 = torch.tanh(self.apperance_conv4(r5))
 
         g2 = torch.sigmoid(self.apperance_att_conv2(r6))
