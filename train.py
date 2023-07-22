@@ -36,7 +36,7 @@ class TSCAN_trainer:
         self.plot_pred = True
         self.drop_rate1 = 0.1
         self.drop_rate2 = 0.25
-        self.kernel = 12
+        self.kernel = 6
         ################### Load data ###################
         if setup.device_type == 'local':
             data_folder_path = 'C:/Users/Zed/Desktop/V4V/preprocessed_v4v/'
