@@ -24,7 +24,7 @@ class TSCAN_trainer:
         self.lr = setup.lr
         self.criterion = MSELoss()
         self.min_valid_loss = None
-        self.best_epoch = 478
+        self.best_epoch = 92
         if setup.device_type == 'local':
             self.model_dir = 'C:/Users/Zed/Desktop/MTTS_pytorch/model_ckpts/'
         else:
@@ -36,7 +36,7 @@ class TSCAN_trainer:
         self.plot_pred = True
         self.drop_rate1 = 0.1
         self.drop_rate2 = 0.25
-        self.kernel = 3
+        self.kernel = 5
         ################### Load data ###################
         if setup.device_type == 'local':
             data_folder_path = 'C:/Users/Zed/Desktop/V4V/preprocessed_v4v/'
