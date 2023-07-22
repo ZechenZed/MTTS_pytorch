@@ -34,13 +34,16 @@ class TSCAN_trainer:
         self.batch_size = setup.nb_batch
         self.USE_LAST_EPOCH = False
         self.plot_pred = True
+        self.drop_rate1 = 0.1
+        self.drop_rate2 = 0.25
         ################### Load data ###################
         if setup.device_type == 'local':
             data_folder_path = 'C:/Users/Zed/Desktop/V4V/preprocessed_v4v/'
         else:
             data_folder_path = '/edrive2/zechenzh/preprocessed_v4v/'
-        model = TSCAN(frame_depth=self.frame_depth, img_size=72).to(self.device)
-        self.model = torch.nn.DataParallel(model, device_ids=list(range(setup.nb_device)))
+        self.model = TSCAN(frame_depth=self.frame_depth, img_size=72, dropout_rate1=self.drop_rate1,
+                           dropout_rate2=self.drop_rate2).to(self.device)
+        # self.model = torch.nn.DataParallel(model, device_ids=list(range(setup.nb_device)))
         if setup.data_type == 'train':
             print('Loading Data')
             v4v_data_train = V4V_Dataset(data_folder_path, 'train', setup.image_type, setup.BP_type)
@@ -162,9 +165,10 @@ class TSCAN_trainer:
         self.model = self.model.to(self.device)
         self.model.eval()
         with torch.no_grad():
-            for _, test_batch in enumerate(self.test_loader):
-                batch_size = test_batch[0].shape[0]
-                data_test, labels_test = test_batch[0].to(self.device), test_batch[1].to(self.device)
+            for ind, (_, data_test, test_labels) in enumerate(self.test_loader):
+                # batch_size = test_batch[0].shape[0]
+                data_test = data_test.to(self.device)
+                labels_test = test_labels.to(self.device)
                 N, D, C, H, W = data_test.shape
                 data_test = data_test.view(N * D, C, H, W)
                 labels_test = labels_test.view(-1, 1)
@@ -199,7 +203,7 @@ if __name__ == '__main__':
                         help='choose from 1) ratio, 2) face_large, 3) face')
     parser.add_argument('-device', '--device_type', type=str, default='local',
                         help='Local / Remote device')
-    parser.add_argument('-g', '--nb_epoch', type=int, default=70,
+    parser.add_argument('-g', '--nb_epoch', type=int, default=200,
                         help='nb_epoch')
     parser.add_argument('--nb_batch', type=int, default=6,
                         help='nb_batch')
@@ -207,7 +211,7 @@ if __name__ == '__main__':
                         help='List of GPUs used')
     parser.add_argument('--nb_device', type=int, default=1,
                         help='Total number of device')
-    parser.add_argument('-lr', '--lr', type=float, default=9e-3,
+    parser.add_argument('-lr', '--lr', type=float, default=9e-4,
                         help='learning rate')
     parser.add_argument('-fd', '--frame_depth', type=int, default=10,
                         help='frame depth')
