@@ -17,19 +17,20 @@ import matplotlib.pyplot as plt
 class TSCAN_trainer:
     def __init__(self, setup):
         ################### Env setup ###################
+        if setup.device_type == 'local':
+            self.model_dir = 'C:/Users/Zed/Desktop/MTTS_pytorch/model_ckpts/'
+        else:
+            self.model_dir = '/edrive2/zechenzh/model_ckpts/'
+        self.model_file_name = f'TSCAN_{setup.image_type}'
         os.environ['CUDA_VISIBLE_DEVICES'] = setup.gpu
         self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+
         self.frame_depth = setup.frame_depth
         self.nb_epoch = setup.nb_epoch
         self.lr = setup.lr
         self.criterion = MSELoss()
         self.min_valid_loss = None
         self.best_epoch = 149
-        if setup.device_type == 'local':
-            self.model_dir = 'C:/Users/Zed/Desktop/MTTS_pytorch/model_ckpts/'
-        else:
-            self.model_dir = '/edrive2/zechenzh/model_ckpts/'
-        self.model_file_name = f'TSCAN_{setup.image_type}'
         self.base_len = setup.nb_device * self.frame_depth
         self.batch_size = setup.nb_batch
         self.USE_LAST_EPOCH = False
@@ -38,6 +39,7 @@ class TSCAN_trainer:
         self.drop_rate2 = 0.1
         self.kernel = 3
         self.pool_size = (2,2)
+
         ################### Load data ###################
         if setup.device_type == 'local':
             data_folder_path = 'C:/Users/Zed/Desktop/V4V/preprocessed_v4v/'
