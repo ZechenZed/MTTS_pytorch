@@ -6,15 +6,15 @@ from scipy.ndimage import gaussian_filter, percentile_filter
 from sklearn.metrics import mean_squared_error
 from scipy.signal import butter, filtfilt
 
-# valid = np.load('C:/Users/Zed/Desktop/V4V/preprocessed_v4v/train_BP_systolic_full.npy')
-# valid = valid.reshape(-1, 1)
-# fs = 25
-# after_valid = gaussian_filter(valid, sigma=20 * 25)
-# # after_valid = percentile_filter(after_valid, 90, size=90)
-# print(mean_squared_error(valid, after_valid))
-# plt.plot(valid, label='before')
+valid = np.load('C:/Users/Zed/Desktop/V4V/preprocessed_v4v/train_BP_systolic_full.npy')
+valid = valid.reshape(-1, 1)
+fs = 25
+after_valid = gaussian_filter(valid, sigma=20 * 25)
+# after_valid = percentile_filter(after_valid, 90, size=90)
+print(mean_squared_error(valid, after_valid))
+plt.plot(valid, label='before')
 # plt.plot(after_valid, label='after')
-# plt.show()
+plt.show()
 
 # data_folder_path = "C:/Users/Zed/Desktop/V4V/"
 # # video_folder_path = f'{data_folder_path}Phase1_data/Videos/train/'

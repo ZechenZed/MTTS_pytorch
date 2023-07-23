@@ -30,13 +30,13 @@ class TSCAN_trainer:
         self.lr = setup.lr
         self.criterion = MSELoss()
         self.min_valid_loss = None
-        self.best_epoch = 149
+        self.best_epoch = 147
         self.base_len = setup.nb_device * self.frame_depth
         self.batch_size = setup.nb_batch
         self.USE_LAST_EPOCH = False
         self.plot_pred = True
-        self.drop_rate1 = 0.1
-        self.drop_rate2 = 0.1
+        self.drop_rate1 = 0.25
+        self.drop_rate2 = 0.5
         self.kernel = 3
         self.pool_size = (2, 2)
 
