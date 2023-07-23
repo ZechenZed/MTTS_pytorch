@@ -30,7 +30,7 @@ class TSCAN_trainer:
         self.lr = setup.lr
         self.criterion = MSELoss()
         self.min_valid_loss = None
-        self.best_epoch = 99
+        self.best_epoch = 60
         self.base_len = setup.nb_device * self.frame_depth
         self.batch_size = setup.nb_batch
         self.USE_LAST_EPOCH = False
@@ -70,7 +70,7 @@ class TSCAN_trainer:
                                         epochs=self.nb_epoch, steps_per_epoch=len(self.train_loader))
         else:
             v4v_data_test = V4V_Dataset(data_folder_path, 'test', setup.image_type, setup.BP_type)
-            self.test_loader = DataLoader(dataset=v4v_data_test, batch_size=self.batch_size,
+            self.test_loader = DataLoader(dataset=v4v_data_test, batch_size=100,
                                           shuffle=True, num_workers=0)
             self.chunk_len = len(self.test_loader)
 
@@ -212,7 +212,7 @@ if __name__ == '__main__':
                         help='Local / Remote device')
     parser.add_argument('-g', '--nb_epoch', type=int, default=100,
                         help='nb_epoch')
-    parser.add_argument('--nb_batch', type=int, default=3,
+    parser.add_argument('--nb_batch', type=int, default=32,
                         help='nb_batch')
     parser.add_argument('--gpu', type=str, default='0',
                         help='List of GPUs used')
