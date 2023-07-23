@@ -80,7 +80,7 @@ def data_process(data_type, device_type, image=str(), dim=72):
         frames[frame_ind:frame_ind + current_frames, :, :, :] = videos[i][0:current_frames, :, :, :]
         frame_ind += current_frames
 
-    BP_lf = gaussian_filter(BP_lf, sigma=25)
+    BP_lf = gaussian_filter(BP_lf, sigma=25*20)
     frames = frames.reshape((-1, 10, 6, dim, dim))
     BP_lf = BP_lf.reshape((-1, 10))
     ############## Save the preprocessed model ##############
