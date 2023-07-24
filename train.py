@@ -30,7 +30,7 @@ class TSCAN_trainer:
         self.lr = setup.lr
         self.criterion = MSELoss()
         self.min_valid_loss = None
-        self.best_epoch = 398
+        self.best_epoch = 1
         self.base_len = setup.nb_device * self.frame_depth
         self.batch_size = setup.nb_batch
         self.USE_LAST_EPOCH = False
@@ -180,7 +180,7 @@ class TSCAN_trainer:
                 N, D, C, H, W = data_test.shape
                 data_test = data_test.view(N * D, C, H, W)
                 labels_test = labels_test.view(-1, 1)
-                print(labels_test.shape)
+                # print(labels_test.shape)
                 data_test = data_test[:(N * D) // self.base_len * self.base_len]
                 labels_test = labels_test[:(N * D) // self.base_len * self.base_len]
                 pred_ppg_test = self.model(data_test)
@@ -195,6 +195,7 @@ class TSCAN_trainer:
                 #     labels[subj_index][sort_index] = labels_test[idx * self.chunk_len:(idx + 1) * self.chunk_len]
             if self.plot_pred:
                 pred = pred_ppg_test.detach().cpu().numpy()
+                print(pred[0:5])
                 label = labels_test.detach().cpu().numpy()
                 plt.plot(pred, 'r')
                 plt.plot(label, 'g')
@@ -217,6 +218,8 @@ if __name__ == '__main__':
                         help='nb_batch')
     parser.add_argument('--gpu', type=str, default='0',
                         help='List of GPUs used')
+    parser.add_argument('--kernel', type=int, default=3,
+                        help='Kernel size')
     parser.add_argument('--nb_device', type=int, default=1,
                         help='Total number of device')
     parser.add_argument('-lr', '--lr', type=float, default=9e-3,
