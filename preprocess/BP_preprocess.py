@@ -34,7 +34,7 @@ def data_process(data_type, device_type, image=str(), dim=36):
     for path in sorted(os.listdir(video_folder_path)):
         if os.path.isfile(os.path.join(video_folder_path, path)):
             video_file_path.append(path)
-    video_file_path = video_file_path[6:10]
+    video_file_path = video_file_path[0:10]
     num_video = len(video_file_path)
     print('Processing ' + str(num_video) + ' Videos')
 
@@ -51,7 +51,7 @@ def data_process(data_type, device_type, image=str(), dim=36):
     for path in sorted(os.listdir(BP_folder_path)):
         if os.path.isfile(os.path.join(BP_folder_path, path)):
             BP_file_path.append(path)
-    BP_file_path = BP_file_path[6:10]
+    # BP_file_path = BP_file_path[6:10]
 
     frames = np.zeros(shape=(tt_frame, 6, dim, dim))
     BP_lf = np.zeros(shape=tt_frame)
@@ -83,8 +83,8 @@ def data_process(data_type, device_type, image=str(), dim=36):
         frame_ind += current_frames
 
     BP_lf = gaussian_filter(BP_lf, sigma=25)
-    frames = frames.reshape((-1, 10, 6, dim, dim))[0:12]
-    BP_lf = BP_lf.reshape((-1, 10))[0:120]
+    frames = frames.reshape((-1, 10, 6, dim, dim))
+    BP_lf = BP_lf.reshape((-1, 10))
     ############## Save the preprocessed model ##############
     if device_type == "remote":
         saving_path = '/edrive2/zechenzh/preprocessed_v4v/'

@@ -12,6 +12,7 @@ from evaluation.metrics import calculate_metrics
 from torch.optim.lr_scheduler import OneCycleLR
 from torch.nn import MSELoss
 import matplotlib.pyplot as plt
+from sklearn.metrics import mean_squared_error, mean_absolute_error
 
 
 class TSCAN_trainer:
@@ -30,7 +31,7 @@ class TSCAN_trainer:
         self.lr = setup.lr
         self.criterion = MSELoss()
         self.min_valid_loss = None
-        self.best_epoch = 1
+        self.best_epoch = 11
         self.base_len = setup.nb_device * self.frame_depth
         self.batch_size = setup.nb_batch
         self.USE_LAST_EPOCH = False
@@ -39,7 +40,7 @@ class TSCAN_trainer:
         self.nb_filters1 = 64
         self.drop_rate1 = 0.25
         self.drop_rate2 = 0.5
-        self.kernel = 3
+        self.kernel = 6
         self.pool_size = (2, 2)
 
         ################### Load data ###################
@@ -153,8 +154,8 @@ class TSCAN_trainer:
     def test(self):
         print('')
         print("===Testing===")
-        predictions = dict()
-        labels = dict()
+        predictions = list()
+        labels = list()
 
         if self.USE_LAST_EPOCH:
             last_epoch_model_path = os.path.join(
@@ -174,7 +175,6 @@ class TSCAN_trainer:
         with torch.no_grad():
             for test_ind, (data_test, test_labels) in enumerate(self.test_loader):
                 # batch_size = test_batch[0].shape[0]
-                print(test_ind)
                 data_test = data_test.to(self.device)
                 labels_test = test_labels.to(self.device)
                 N, D, C, H, W = data_test.shape
@@ -193,13 +193,16 @@ class TSCAN_trainer:
                 #     predictions[subj_index][sort_index] = pred_ppg_test[idx * self.chunk_len:
                 #                                                         (idx + 1) * self.chunk_len]
                 #     labels[subj_index][sort_index] = labels_test[idx * self.chunk_len:(idx + 1) * self.chunk_len]
-            if self.plot_pred:
                 pred = pred_ppg_test.detach().cpu().numpy()
-                print(pred[0:5])
+                predictions.append(pred)
                 label = labels_test.detach().cpu().numpy()
-                plt.plot(pred, 'r')
-                plt.plot(label, 'g')
-                plt.show()
+                labels.append(label)
+            predictions = np.array(predictions).reshape(-1, 1)
+            labels = np.array(labels).reshape(-1, 1)
+            print(f'Current MAE:{mean_absolute_error(pred, label)}')
+            plt.plot(predictions, 'r')
+            plt.plot(labels, 'g')
+            plt.show()
 
 
 if __name__ == '__main__':
