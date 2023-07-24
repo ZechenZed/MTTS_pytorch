@@ -13,6 +13,7 @@ from torch.optim.lr_scheduler import OneCycleLR
 from torch.nn import MSELoss
 import matplotlib.pyplot as plt
 from sklearn.metrics import mean_squared_error, mean_absolute_error
+from scipy.ndimage import gaussian_filter
 
 
 class TSCAN_trainer:
@@ -198,6 +199,7 @@ class TSCAN_trainer:
                 label = labels_test.detach().cpu().numpy()
                 labels.append(label)
             predictions = np.array(predictions).reshape(-1, 1)
+            predictions = gaussian_filter(predictions, sigma=25)
             labels = np.array(labels).reshape(-1, 1)
             print(f'Current MAE:{mean_absolute_error(pred, label)}')
             plt.plot(predictions, 'r')
