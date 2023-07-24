@@ -150,11 +150,11 @@ class TSCAN(nn.Module):
         gated2 = d6 * g2
 
         d7 = self.avg_pooling_3(gated2)
-        # d8 = self.dropout_3(d7)
-        d9 = d7.view(d7.size(0), -1)
+        d8 = self.dropout_3(d7)
+        d9 = d7.view(d8.size(0), -1)
         d10 = torch.tanh(self.final_dense_1(d9))
-        # d11 = self.dropout_4(d10)
-        out = self.final_dense_2(d10)
+        d11 = self.dropout_4(d10)
+        out = self.final_dense_2(d11)
 
         return out
 
