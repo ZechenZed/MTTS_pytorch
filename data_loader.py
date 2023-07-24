@@ -11,7 +11,7 @@ class V4V_Dataset(Dataset):
         self.Y = torch.from_numpy(BP)
 
     def __len__(self):
-        return self.X.size(dim=1)
+        return self.X.shape[0]
 
     def __getitem__(self, index):
-        return index, self.X[index], self.Y[index]
+        return self.X[index], self.Y[index]

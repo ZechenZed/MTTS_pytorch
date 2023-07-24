@@ -30,7 +30,7 @@ class TSCAN_trainer:
         self.lr = setup.lr
         self.criterion = MSELoss()
         self.min_valid_loss = None
-        self.best_epoch = 43
+        self.best_epoch = 398
         self.base_len = setup.nb_device * self.frame_depth
         self.batch_size = setup.nb_batch
         self.USE_LAST_EPOCH = False
@@ -70,8 +70,8 @@ class TSCAN_trainer:
                                         epochs=self.nb_epoch, steps_per_epoch=len(self.train_loader))
         else:
             v4v_data_test = V4V_Dataset(data_folder_path, 'test', setup.image_type, setup.BP_type)
-            self.test_loader = DataLoader(dataset=v4v_data_test, batch_size=100,
-                                          shuffle=True, num_workers=0)
+            self.test_loader = DataLoader(dataset=v4v_data_test, batch_size=self.batch_size,
+                                          shuffle=False, num_workers=0)
             self.chunk_len = len(self.test_loader)
 
     def train(self):
@@ -83,7 +83,7 @@ class TSCAN_trainer:
             self.model.train()
             # Model Training
             tbar = tqdm(self.train_loader, ncols=80)
-            for idx, (_, data, labels) in enumerate(tbar):
+            for idx, (data, labels) in enumerate(tbar):
                 # print(ind, type(data), type(labels))
                 tbar.set_description("Train epoch %s" % epoch)
                 data = data.to(self.device)
@@ -128,7 +128,7 @@ class TSCAN_trainer:
         valid_step = 0
         with torch.no_grad():
             vbar = tqdm(self.valid_loader, ncols=80)
-            for valid_idx, (_, val_data, val_labels) in enumerate(vbar):
+            for valid_idx, (val_data, val_labels) in enumerate(vbar):
                 vbar.set_description("Validation")
                 data_valid = val_data.to(self.device)
                 labels_valid = val_labels.to(self.device)
@@ -172,13 +172,15 @@ class TSCAN_trainer:
         self.model = self.model.to(self.device)
         self.model.eval()
         with torch.no_grad():
-            for ind, (_, data_test, test_labels) in enumerate(self.test_loader):
+            for test_ind, (data_test, test_labels) in enumerate(self.test_loader):
                 # batch_size = test_batch[0].shape[0]
+                print(test_ind)
                 data_test = data_test.to(self.device)
                 labels_test = test_labels.to(self.device)
                 N, D, C, H, W = data_test.shape
                 data_test = data_test.view(N * D, C, H, W)
                 labels_test = labels_test.view(-1, 1)
+                print(labels_test.shape)
                 data_test = data_test[:(N * D) // self.base_len * self.base_len]
                 labels_test = labels_test[:(N * D) // self.base_len * self.base_len]
                 pred_ppg_test = self.model(data_test)
@@ -193,7 +195,6 @@ class TSCAN_trainer:
                 #     labels[subj_index][sort_index] = labels_test[idx * self.chunk_len:(idx + 1) * self.chunk_len]
             if self.plot_pred:
                 pred = pred_ppg_test.detach().cpu().numpy()
-                print(pred)
                 label = labels_test.detach().cpu().numpy()
                 plt.plot(pred, 'r')
                 plt.plot(label, 'g')
@@ -202,7 +203,7 @@ class TSCAN_trainer:
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('-data', '--data_type', type=str, default='train',
+    parser.add_argument('-data', '--data_type', type=str, default='test',
                         help='data type')
     parser.add_argument('-BP', '--BP_type', type=str, default='systolic',
                         help='Choose type of BP from mean, systolic and diastolic')

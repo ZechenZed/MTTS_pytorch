@@ -1,6 +1,6 @@
 import os
 print(os.cpu_count())
-os.environ['CUDA_VISIBLE_DEVICES'] = '0'
+os.environ['CUDA_VISIBLE_DEVICES'] = '1'
 import numpy as np
 from statistics import mean
 import matplotlib.pyplot as plt
@@ -34,6 +34,7 @@ def data_process(data_type, device_type, image=str(), dim=36):
     for path in sorted(os.listdir(video_folder_path)):
         if os.path.isfile(os.path.join(video_folder_path, path)):
             video_file_path.append(path)
+    video_file_path = video_file_path[0:2]
     num_video = len(video_file_path)
     print('Processing ' + str(num_video) + ' Videos')
 
@@ -43,20 +44,21 @@ def data_process(data_type, device_type, image=str(), dim=36):
 
     tt_frame = 0
     for i in range(num_video):
-        tt_frame += videos[i].shape[0] // 10 * 10
+        tt_frame += videos[i].shape[0] // 120 * 120
 
         ############## Systolic BP Extraction ##############
     BP_file_path = []
     for path in sorted(os.listdir(BP_folder_path)):
         if os.path.isfile(os.path.join(BP_folder_path, path)):
             BP_file_path.append(path)
+    # BP_file_path = BP_file_path[0:20]
 
     frames = np.zeros(shape=(tt_frame, 6, dim, dim))
     BP_lf = np.zeros(shape=tt_frame)
     frame_ind = 0
     for i in range(num_video):
         temp_BP = np.loadtxt(BP_folder_path + BP_file_path[i])  # BP loading
-        current_frames = videos[i].shape[0] // 10 * 10
+        current_frames = videos[i].shape[0] // 120 * 120
         temp_BP_lf = np.zeros(current_frames)
         # Down-sample BP 1000Hz --> 25Hz
         for j in range(0, current_frames):
@@ -80,7 +82,7 @@ def data_process(data_type, device_type, image=str(), dim=36):
         frames[frame_ind:frame_ind + current_frames, :, :, :] = videos[i][0:current_frames, :, :, :]
         frame_ind += current_frames
 
-    BP_lf = gaussian_filter(BP_lf, sigma=25*20)
+    BP_lf = gaussian_filter(BP_lf, sigma=25)
     frames = frames.reshape((-1, 10, 6, dim, dim))
     BP_lf = BP_lf.reshape((-1, 10))
     ############## Save the preprocessed model ##############
@@ -95,4 +97,4 @@ def data_process(data_type, device_type, image=str(), dim=36):
 if __name__ == '__main__':
     data_process('train', 'remote', 'face_large')
     data_process('valid', 'remote', 'face_large')
-    data_process('test', 'remote', 'face_large')
+    # data_process('test', 'local', 'face_large')
