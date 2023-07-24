@@ -35,10 +35,10 @@ class TSCAN_trainer:
         self.batch_size = setup.nb_batch
         self.USE_LAST_EPOCH = False
         self.plot_pred = True
-        self.nb_filters1 = 16
         self.nb_filters1 = 32
-        self.drop_rate1 = 0.1
-        self.drop_rate2 = 0.2
+        self.nb_filters1 = 64
+        self.drop_rate1 = 0.25
+        self.drop_rate2 = 0.5
         self.kernel = 3
         self.pool_size = (2, 2)
 
@@ -213,7 +213,7 @@ if __name__ == '__main__':
                         help='Local / Remote device')
     parser.add_argument('-g', '--nb_epoch', type=int, default=100,
                         help='nb_epoch')
-    parser.add_argument('--nb_batch', type=int, default=32,
+    parser.add_argument('--nb_batch', type=int, default=12,
                         help='nb_batch')
     parser.add_argument('--gpu', type=str, default='0',
                         help='List of GPUs used')
