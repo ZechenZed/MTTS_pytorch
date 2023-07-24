@@ -61,8 +61,8 @@ class TSCAN_trainer:
                                            shuffle=True, num_workers=1)
             test = iter(self.valid_loader)
             first_test = next(test)
-            index, x, y = first_test
-            print(index, type(x), type(y))
+            x, y = first_test
+            print(type(x), type(y))
             if self.train_loader and self.valid_loader:
                 print('Successfully loaded')
             self.optimizer = optim.AdamW(self.model.parameters(), lr=self.lr, weight_decay=0)
