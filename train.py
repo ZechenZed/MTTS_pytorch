@@ -36,11 +36,11 @@ class TSCAN_trainer:
         self.batch_size = setup.nb_batch
         self.USE_LAST_EPOCH = False
         self.plot_pred = True
-        self.nb_filters1 = 32
-        self.nb_filters1 = 64
-        self.drop_rate1 = 0.25
-        self.drop_rate2 = 0.5
-        self.kernel = 5
+        self.nb_filters1 = setup.nb_filter1
+        self.nb_filters1 = setup.nb_filter2
+        self.drop_rate1 = setup.drop_rate1
+        self.drop_rate2 = setup.drop_rate2
+        self.kernel = setup.kernel
         self.pool_size = (2, 2)
 
         ################### Load data ###################
@@ -232,6 +232,10 @@ if __name__ == '__main__':
     parser.add_argument('--drop_rate2', type=float, default=0.5,
                         help='Drop rate 2')
     parser.add_argument('--drop_rate1', type=float, default=0.25,
+                        help='Drop rate 1')
+    parser.add_argument('--nb_filter1', type=int, default=32,
+                        help='Drop rate 2')
+    parser.add_argument('--nb_filter2', type=int, default=64,
                         help='Drop rate 1')
     args = parser.parse_args()
     print('input args:\n', json.dumps(vars(args), indent=4, separators=(',', ':')))  # pretty print args
