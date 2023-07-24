@@ -50,7 +50,7 @@ class TSCAN_trainer:
         self.model = TSCAN(frame_depth=self.frame_depth, img_size=36, dropout_rate1=self.drop_rate1,
                            dropout_rate2=self.drop_rate2, kernel_size=self.kernel,
                            pool_size=self.pool_size).to(self.device)
-        # self.model = torch.nn.DataParallel(self.model, device_ids=list(range(setup.nb_device)))
+        self.model = torch.nn.DataParallel(self.model, device_ids=list(range(setup.nb_device)))
         if setup.data_type == 'train':
             print('Loading Data')
             v4v_data_train = V4V_Dataset(data_folder_path, 'train', setup.image_type, setup.BP_type)
