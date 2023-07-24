@@ -39,7 +39,7 @@ class TSCAN_trainer:
         self.nb_filters1 = 32
         self.drop_rate1 = 0.1
         self.drop_rate2 = 0.2
-        self.kernel = 8
+        self.kernel = 6
         self.pool_size = (2, 2)
 
         ################### Load data ###################
