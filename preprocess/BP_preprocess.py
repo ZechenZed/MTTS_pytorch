@@ -12,7 +12,7 @@ from scipy.ndimage import gaussian_filter
 from video_preprocess import preprocess_raw_video
 
 
-def data_process(data_type, device_type, image=str(), dim=72):
+def data_process(data_type, device_type, image=str(), dim=36):
     ############## Data folder path setting ##############
     if device_type == "local":
         data_folder_path = "C:/Users/Zed/Desktop/V4V/"
