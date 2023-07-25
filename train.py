@@ -14,6 +14,7 @@ from torch.nn import MSELoss
 import matplotlib.pyplot as plt
 from sklearn.metrics import mean_squared_error, mean_absolute_error
 from scipy.ndimage import gaussian_filter
+from scipy.stats import pearsonr
 
 
 class TSCAN_trainer:
@@ -32,7 +33,7 @@ class TSCAN_trainer:
         self.lr = setup.lr
         self.criterion = MSELoss()
         self.min_valid_loss = None
-        self.best_epoch = 6
+        self.best_epoch = 11
         self.base_len = setup.nb_device * self.frame_depth
         self.batch_size = setup.nb_batch
         self.USE_LAST_EPOCH = False
@@ -195,16 +196,19 @@ class TSCAN_trainer:
                 #                                                         (idx + 1) * self.chunk_len]
                 #     labels[subj_index][sort_index] = labels_test[idx * self.chunk_len:(idx + 1) * self.chunk_len]
                 pred = pred_ppg_test.detach().cpu().numpy()
+                pred = gaussian_filter(pred, sigma=25)
                 predictions.append(pred)
                 label = labels_test.detach().cpu().numpy()
                 labels.append(label)
-            predictions = np.array(predictions).reshape(-1, 1)
-            predictions = gaussian_filter(predictions, sigma=25)
-            labels = np.array(labels).reshape(-1, 1)
-            print(f'Current MAE:{mean_absolute_error(pred, label)}')
-            plt.plot(predictions, 'r')
-            plt.plot(labels, 'g')
-            plt.show()
+
+            predictions = np.array(predictions).reshape(-1)
+            labels = np.array(labels).reshape(-1)
+            print(f'Current Pearson correlation: {pearsonr(predictions,labels)[0]}')
+            print(f'Current MAE: {mean_absolute_error(pred, label)}')
+            if self.plot_pred:
+                plt.plot(predictions, 'r')
+                plt.plot(labels, 'g')
+                plt.show()
 
 
 if __name__ == '__main__':

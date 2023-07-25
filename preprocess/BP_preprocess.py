@@ -8,7 +8,6 @@ from scipy.signal import find_peaks, medfilt
 from joblib import Parallel, delayed
 from scipy.interpolate import interp1d
 from scipy.ndimage import gaussian_filter
-
 from video_preprocess import preprocess_raw_video
 
 
