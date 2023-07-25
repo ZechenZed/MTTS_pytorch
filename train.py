@@ -37,7 +37,7 @@ class TSCAN_trainer:
         self.base_len = setup.nb_device * self.frame_depth
         self.batch_size = setup.nb_batch
         self.USE_LAST_EPOCH = False
-        self.plot_pred = False
+        self.plot_pred = True
         self.nb_filters1 = setup.nb_filter1
         self.nb_filters1 = setup.nb_filter2
         self.drop_rate1 = setup.drop_rate1
@@ -196,18 +196,19 @@ class TSCAN_trainer:
                 #                                                         (idx + 1) * self.chunk_len]
                 #     labels[subj_index][sort_index] = labels_test[idx * self.chunk_len:(idx + 1) * self.chunk_len]
                 pred = pred_ppg_test.detach().cpu().numpy()
-                pred = gaussian_filter(pred, sigma=25)
+                pred = gaussian_filter(pred, sigma=120)
                 predictions.append(pred)
                 label = labels_test.detach().cpu().numpy()
+                pred = gaussian_filter(pred, sigma=120)
                 labels.append(label)
 
             predictions = np.array(predictions).reshape(-1)
             labels = np.array(labels).reshape(-1)
-            print(f'Current Pearson correlation: {pearsonr(predictions,labels)[0]}')
+            print(f'Current Pearson correlation: {pearsonr(predictions, labels)[0]}')
             print(f'Current MAE: {mean_absolute_error(pred, label)}')
             if self.plot_pred:
-                plt.plot(predictions, 'r')
-                plt.plot(labels, 'g')
+                plt.plot(predictions, 'r', label='Prediction')
+                plt.plot(labels, 'g', label='Ground truth')
                 plt.show()
 
 
