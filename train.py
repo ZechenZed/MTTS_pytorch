@@ -46,7 +46,7 @@ class TSCAN_trainer:
 
         ################### Load data ###################
         if setup.device_type == 'local':
-            data_folder_path = 'C:/Users/Zed/Desktop/V4V/preprocessed_v4v/'
+            data_folder_path = 'C:/Users/Zed/Desktop/V4V/preprocessed_v4v_minibatch/'
         else:
             data_folder_path = '/edrive2/zechenzh/preprocessed_v4v/'
         self.model = TSCAN(frame_depth=self.frame_depth, img_size=36, dropout_rate1=self.drop_rate1,
