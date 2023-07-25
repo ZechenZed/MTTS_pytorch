@@ -37,7 +37,7 @@ class TSCAN_trainer:
         self.base_len = setup.nb_device * self.frame_depth
         self.batch_size = setup.nb_batch
         self.USE_LAST_EPOCH = False
-        self.plot_pred = True
+        self.plot_pred = False
         self.nb_filters1 = setup.nb_filter1
         self.nb_filters1 = setup.nb_filter2
         self.drop_rate1 = setup.drop_rate1
