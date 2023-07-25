@@ -33,7 +33,7 @@ class TSCAN_trainer:
         self.lr = setup.lr
         self.criterion = MSELoss()
         self.min_valid_loss = None
-        self.best_epoch = 6
+        self.best_epoch = 11
         self.base_len = setup.nb_device * self.frame_depth
         self.batch_size = setup.nb_batch
         self.USE_LAST_EPOCH = False
@@ -196,10 +196,9 @@ class TSCAN_trainer:
                 #                                                         (idx + 1) * self.chunk_len]
                 #     labels[subj_index][sort_index] = labels_test[idx * self.chunk_len:(idx + 1) * self.chunk_len]
                 pred = pred_ppg_test.detach().cpu().numpy()
-                pred = gaussian_filter(pred, sigma=120)
+                pred = gaussian_filter(pred, sigma=70)
                 predictions.append(pred)
                 label = labels_test.detach().cpu().numpy()
-                pred = gaussian_filter(pred, sigma=120)
                 labels.append(label)
 
             predictions = np.array(predictions).reshape(-1)
