@@ -168,22 +168,22 @@ def only_BP(data_type, device_type, image=str(), dim=36):
         # Video Batches
         frame_ind += current_frames
 
-    plt.plot(BP_lf, label='sigma=120')
-    plt.legend()
-    plt.show()
+    # plt.plot(BP_lf, label='sigma=120')
+    # plt.legend()
+    # plt.show()
     BP_lf = BP_lf.reshape((-1, 10))
     ############## Save the preprocessed model ##############
     if device_type == "remote":
         saving_path = '/edrive2/zechenzh/preprocessed_v4v_minibatch/'
     else:
         saving_path = 'C:/Users/Zed/Desktop/V4V/preprocessed_v4v/'
-    np.save(saving_path + data_type + '_BP_systolic_a120.npy', BP_lf)
+    np.save(saving_path + data_type + '_BP_systolic.npy', BP_lf)
 
 
 if __name__ == '__main__':
     # data_process('train', 'remote', 'face_large')
     # data_process('valid', 'remote', 'face_large')
-    data_process('test', 'remote', 'face_large')
+    # data_process('test', 'remote', 'face_large')
     # only_BP('train', 'local', 'face_large')
     # only_BP('valid', 'remote', 'face_large')
-    # only_BP('test', 'local', 'face_large')
+    only_BP('test', 'remote', 'face_large')
