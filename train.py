@@ -33,7 +33,7 @@ class TSCAN_trainer:
         self.lr = setup.lr
         self.criterion = MSELoss()
         self.min_valid_loss = None
-        self.best_epoch = 13
+        self.best_epoch = 9
         self.base_len = setup.nb_device * self.frame_depth
         self.batch_size = setup.nb_batch
         self.USE_LAST_EPOCH = False
@@ -44,7 +44,7 @@ class TSCAN_trainer:
         self.drop_rate2 = setup.drop_rate2
         self.kernel = setup.kernel
         self.pool_size = (2, 2)
-
+        self.gaus_fil_type = 'a25'
         ################### Load data ###################
         if setup.device_type == 'local':
             data_folder_path = 'C:/Users/Zed/Desktop/V4V/preprocessed_v4v/'
@@ -56,10 +56,10 @@ class TSCAN_trainer:
         self.model = torch.nn.DataParallel(self.model, device_ids=list(range(setup.nb_device)))
         if setup.data_type == 'train':
             print('Loading Data')
-            v4v_data_train = V4V_Dataset(data_folder_path, 'train', setup.image_type, setup.BP_type)
+            v4v_data_train = V4V_Dataset(data_folder_path, 'train', setup.image_type, setup.BP_type, self.gaus_fil_type)
             self.train_loader = DataLoader(dataset=v4v_data_train, batch_size=self.batch_size,
                                            shuffle=True, num_workers=1)
-            v4v_data_valid = V4V_Dataset(data_folder_path, 'valid', setup.image_type, setup.BP_type)
+            v4v_data_valid = V4V_Dataset(data_folder_path, 'valid', setup.image_type, setup.BP_type, self.gaus_fil_type)
             self.valid_loader = DataLoader(dataset=v4v_data_valid, batch_size=self.batch_size,
                                            shuffle=True, num_workers=1)
             test = iter(self.valid_loader)
@@ -72,7 +72,7 @@ class TSCAN_trainer:
             self.scheduler = OneCycleLR(self.optimizer, max_lr=self.lr,
                                         epochs=self.nb_epoch, steps_per_epoch=len(self.train_loader))
         else:
-            v4v_data_test = V4V_Dataset(data_folder_path, 'train', setup.image_type, setup.BP_type)
+            v4v_data_test = V4V_Dataset(data_folder_path, 'test', setup.image_type, setup.BP_type, self.gaus_fil_type)
             self.test_loader = DataLoader(dataset=v4v_data_test, batch_size=self.batch_size,
                                           shuffle=False, num_workers=0)
             self.chunk_len = len(self.test_loader)
