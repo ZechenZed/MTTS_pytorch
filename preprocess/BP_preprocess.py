@@ -34,7 +34,7 @@ def data_process(data_type, device_type, image=str(), dim=36):
     for path in sorted(os.listdir(video_folder_path)):
         if os.path.isfile(os.path.join(video_folder_path, path)):
             video_file_path.append(path)
-    # video_file_path = video_file_path[0:10]
+    video_file_path = video_file_path[0:5]
     num_video = len(video_file_path)
     print('Processing ' + str(num_video) + ' Videos')
 
@@ -76,7 +76,7 @@ def data_process(data_type, device_type, image=str(), dim=36):
         y_interp = interp1d([prev_index, current_frames - 1], [temp_BP_lf[prev_index], temp_BP_lf[current_frames - 1]])
         for l in range(prev_index, current_frames):
             temp_BP_lf_systolic_inter[l] = y_interp(l)
-        temp_BP_lf_systolic_inter = gaussian_filter(temp_BP_lf_systolic_inter, sigma=120)
+        temp_BP_lf_systolic_inter = gaussian_filter(temp_BP_lf_systolic_inter, sigma=25)
         BP_lf[frame_ind:frame_ind + current_frames] = temp_BP_lf_systolic_inter
 
         # Video Batches
@@ -118,7 +118,7 @@ def only_BP(data_type, device_type, image=str(), dim=36):
     for path in sorted(os.listdir(video_folder_path)):
         if os.path.isfile(os.path.join(video_folder_path, path)):
             video_file_path.append(path)
-    # video_file_path = video_file_path[0:10]
+    # video_file_path = video_file_path[0:5]
     num_video = len(video_file_path)
     print('Processing ' + str(num_video) + ' Videos')
 
@@ -138,7 +138,8 @@ def only_BP(data_type, device_type, image=str(), dim=36):
     # BP_file_path = BP_file_path[6:10]
 
     BP_lf = np.zeros(shape=tt_frame)
-    # BP_lf_25 = np.zeros(shape=tt_frame)
+    BP_lf_25 = np.zeros(shape=tt_frame)
+    BP_lf_120 = np.zeros(shape=tt_frame)
 
     frame_ind = 0
     for i in range(num_video):
@@ -161,29 +162,42 @@ def only_BP(data_type, device_type, image=str(), dim=36):
         y_interp = interp1d([prev_index, current_frames - 1], [temp_BP_lf[prev_index], temp_BP_lf[current_frames - 1]])
         for l in range(prev_index, current_frames):
             temp_BP_lf_systolic_inter[l] = y_interp(l)
+
+        temp_BP_lf_systolic_inter_25 = gaussian_filter(temp_BP_lf_systolic_inter, sigma=25)
         temp_BP_lf_systolic_inter_120 = gaussian_filter(temp_BP_lf_systolic_inter, sigma=120)
-        if min(temp_BP_lf_systolic_inter_120) < 60:
-            print(f'Warning! {BP_file_path[i]}')
-        BP_lf[frame_ind:frame_ind + current_frames] = temp_BP_lf_systolic_inter_120
+
+        # if min(temp_BP_lf_systolic_inter_120) < 60:
+        #     print(f'Warning! {BP_file_path[i]}')
+
+        BP_lf[frame_ind:frame_ind + current_frames] = temp_BP_lf_systolic_inter
+        BP_lf_25[frame_ind:frame_ind + current_frames] = temp_BP_lf_systolic_inter_25
+        BP_lf_120[frame_ind:frame_ind + current_frames] = temp_BP_lf_systolic_inter_120
         # Video Batches
         frame_ind += current_frames
 
-    # plt.plot(BP_lf, label='sigma=120')
+    # plt.plot(BP_lf, label='original')
+    # plt.plot(BP_lf_25, label='sigma = 25')
+    # plt.plot(BP_lf_120, label='sigma = 120')
     # plt.legend()
     # plt.show()
-    BP_lf = BP_lf.reshape((-1, 10))
+
+    # BP_lf = BP_lf.reshape((-1, 10))
+    BP_lf_25 = BP_lf_25.reshape((-1, 10))
+    BP_lf_120 = BP_lf_120.reshape((-1, 10))
+
     ############## Save the preprocessed model ##############
     if device_type == "remote":
         saving_path = '/edrive2/zechenzh/preprocessed_v4v_minibatch/'
     else:
         saving_path = 'C:/Users/Zed/Desktop/V4V/preprocessed_v4v/'
-    np.save(saving_path + data_type + '_BP_systolic.npy', BP_lf)
+    np.save(saving_path + data_type + '_BP_systolic_a25.npy', BP_lf_25)
+    np.save(saving_path + data_type + '_BP_systolic_120.npy', BP_lf_120)
 
 
 if __name__ == '__main__':
-    # data_process('train', 'remote', 'face_large')
+    # data_process('train', 'local', 'face_large')
     # data_process('valid', 'remote', 'face_large')
-    data_process('test', 'remote', 'face_large')
+    # data_process('test', 'local', 'face_large')
     # only_BP('train', 'local', 'face_large')
     # only_BP('valid', 'remote', 'face_large')
-    # only_BP('test', 'remote', 'face_large')
+    only_BP('test', 'remote', 'face_large')
