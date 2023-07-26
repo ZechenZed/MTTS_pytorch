@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 
 def preprocess_raw_video(video_file_path, dim=72, plot=False, face_crop=True):
     # set up
-    print("***********Processing " + video_file_path[-12:] + "***********")
+    # print("***********Processing " + video_file_path[-12:] + "***********")
     t = []
     i = 0
     vidObj = cv2.VideoCapture(video_file_path)
