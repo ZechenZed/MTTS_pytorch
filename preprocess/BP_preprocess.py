@@ -77,8 +77,6 @@ def data_process(data_type, device_type, image=str(), dim=36):
         for l in range(prev_index, current_frames):
             temp_BP_lf_systolic_inter[l] = y_interp(l)
         temp_BP_lf_systolic_inter = gaussian_filter(temp_BP_lf_systolic_inter, sigma=120)
-        if min(temp_BP_lf_systolic_inter) < 60:
-            print(f'Warning! {BP_file_path[i]}')
         BP_lf[frame_ind:frame_ind + current_frames] = temp_BP_lf_systolic_inter
 
         # Video Batches
@@ -164,7 +162,9 @@ def only_BP(data_type, device_type, image=str(), dim=36):
         for l in range(prev_index, current_frames):
             temp_BP_lf_systolic_inter[l] = y_interp(l)
         # temp_BP_lf_systolic_inter_25 = gaussian_filter(temp_BP_lf_systolic_inter,sigma=25)
-        temp_BP_lf_systolic_inter_120 = gaussian_filter(temp_BP_lf_systolic_inter, sigma=25)
+        temp_BP_lf_systolic_inter_120 = gaussian_filter(temp_BP_lf_systolic_inter, sigma=120)
+        if min(temp_BP_lf_systolic_inter) < 60:
+            print(f'Warning! {BP_file_path[i]}')
         BP_lf[frame_ind:frame_ind + current_frames] = temp_BP_lf_systolic_inter_120
         # BP_lf_25[frame_ind:frame_ind + current_frames] = temp_BP_lf_systolic_inter_25
         # Video Batches
@@ -186,7 +186,7 @@ def only_BP(data_type, device_type, image=str(), dim=36):
 if __name__ == '__main__':
     # data_process('train', 'remote', 'face_large')
     # data_process('valid', 'remote', 'face_large')
-    data_process('test', 'remote', 'face_large')
+    # data_process('test', 'remote', 'face_large')
     # only_BP('train', 'local', 'face_large')
     # only_BP('valid', 'remote', 'face_large')
-    # only_BP('test', 'remote', 'face_large')
+    only_BP('test', 'remote', 'face_large')
