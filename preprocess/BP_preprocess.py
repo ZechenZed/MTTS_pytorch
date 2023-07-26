@@ -42,7 +42,6 @@ def data_process(data_type, device_type, image=str(), dim=36):
         delayed(preprocess_raw_video)(video_folder_path + video, dim) for video in video_file_path)]
     videos = videos[0]
 
-
     tt_frame = 0
     for i in range(num_video):
         tt_frame += videos[i].shape[0] // 120 * 120
@@ -78,7 +77,8 @@ def data_process(data_type, device_type, image=str(), dim=36):
         for l in range(prev_index, current_frames):
             temp_BP_lf_systolic_inter[l] = y_interp(l)
         temp_BP_lf_systolic_inter = gaussian_filter(temp_BP_lf_systolic_inter, sigma=120)
-        print(f'Warning! {BP_file_path[i]}')
+        if min(temp_BP_lf_systolic_inter) < 60:
+            print(f'Warning! {BP_file_path[i]}')
         BP_lf[frame_ind:frame_ind + current_frames] = temp_BP_lf_systolic_inter
 
         # Video Batches
@@ -130,7 +130,7 @@ def only_BP(data_type, device_type, image=str(), dim=36):
 
     tt_frame = 0
     for i in range(num_video):
-        tt_frame += videos[i]// 120 * 120
+        tt_frame += videos[i] // 120 * 120
 
         ############## Systolic BP Extraction ##############
     BP_file_path = []
@@ -190,5 +190,3 @@ if __name__ == '__main__':
     # only_BP('train', 'local', 'face_large')
     # only_BP('valid', 'remote', 'face_large')
     # only_BP('test', 'remote', 'face_large')
-
-
