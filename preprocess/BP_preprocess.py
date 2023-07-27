@@ -46,7 +46,7 @@ def data_process(data_type, device_type, image=str(), dim=36):
     for i in range(num_video):
         tt_frame += videos[i].shape[0] // 120 * 120
 
-        ############## Systolic BP Extraction ##############
+    ############## Systolic BP Extraction ##############
     BP_file_path = []
     for path in sorted(os.listdir(BP_folder_path)):
         if os.path.isfile(os.path.join(BP_folder_path, path)):
@@ -59,7 +59,7 @@ def data_process(data_type, device_type, image=str(), dim=36):
     deleted_frames = 0
     for i in range(num_video):
         temp_BP = np.loadtxt(BP_folder_path + BP_file_path[i])  # BP loading
-        temp_BP = np.where(temp_BP < 0, temp_BP, 0)
+        temp_BP = np.where(temp_BP > 0, temp_BP, 0)
         invalid_index = np.where(temp_BP == 0)
         temp_BP = np.delete(temp_BP, invalid_index)
         temp_video = np.delete(videos[i], invalid_index)
