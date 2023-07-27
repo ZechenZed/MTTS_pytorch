@@ -8,8 +8,12 @@ from scipy.signal import butter, filtfilt
 
 valid = np.load('C:/Users/Zed/Desktop/V4V/preprocessed_v4v/valid_BP_systolic_test.npy')
 # valid_120 = np.load('C:/Users/Zed/Desktop/V4V/preprocessed_v4v/test_BP_systolic_a120.npy')
-
-valid = valid.reshape(-1, 1)
+valid = valid.reshape(-1)
+valid = np.where(valid > 0, valid, 0)
+index = np.where(valid == 0)
+valid = np.delete(valid, index)
+index = np.where(valid == 0)[0]
+print(index)
 # valid_120 = valid_120.reshape(-1,1)
 fs = 25
 # after_valid = gaussian_filter(valid, sigma=120)
