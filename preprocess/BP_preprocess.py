@@ -34,7 +34,8 @@ def data_process(data_type, device_type, image=str(), dim=36):
     for path in sorted(os.listdir(video_folder_path)):
         if os.path.isfile(os.path.join(video_folder_path, path)):
             video_file_path.append(path)
-    # video_file_path = video_file_path[0:5]
+
+    video_file_path = video_file_path[0:2]
     num_video = len(video_file_path)
     print('Processing ' + str(num_video) + ' Videos')
 
@@ -56,20 +57,31 @@ def data_process(data_type, device_type, image=str(), dim=36):
     frames = np.zeros(shape=(tt_frame, 6, dim, dim))
     BP_lf = np.zeros(shape=tt_frame)
     frame_ind = 0
-    deleted_frames = 0
+
     for i in range(num_video):
         temp_BP = np.loadtxt(BP_folder_path + BP_file_path[i])  # BP loading
-        temp_BP = np.where(temp_BP > 0, temp_BP, 0)
-        invalid_index = np.where(temp_BP == 0)
-        temp_BP = np.delete(temp_BP, invalid_index)
-        temp_video = np.delete(videos[i], invalid_index)
-        deleted_frames += len(invalid_index)
+        temp_BP_lf = np.zeros((len(temp_BP) // 40))
+        # Down-sample BP 1000Hz --> 25Hz
+        for j in range(0, len(temp_BP_lf)):
+            temp_BP_lf[j] = mean(temp_BP[j * 40:(j + 1) * 40])
+
+        # Find incorrect BP values that is under 0 and delete them
+        invalid_index_BP = np.where(temp_BP_lf < 0)[0]
+
+        temp_video = np.zeros((len(temp_BP_lf) - len(invalid_index_BP), 6, 36, 36))
+        if invalid_index_BP:
+            print('Existing Invalid index')
+            temp_BP = np.delete(temp_BP_lf, invalid_index_BP)
+            skip = 0
+            # Set corresponding frames to 0 and delete them too
+            for i in range(videos[i].shape[0]):
+                if i in invalid_index_BP:
+                    skip += 1
+                    continue
+                else:
+                    temp_video[i - skip] = videos[i]
 
         current_frames = temp_video.shape[0] // 120 * 120
-        temp_BP_lf = np.zeros(current_frames)
-        # Down-sample BP 1000Hz --> 25Hz
-        for j in range(0, current_frames):
-            temp_BP_lf[j] = mean(temp_BP[j * 40:(j + 1) * 40])
 
         # Systolic BP finding and linear interp
         temp_BP_lf_systolic_peaks, _ = find_peaks(temp_BP_lf, distance=10)
@@ -90,7 +102,6 @@ def data_process(data_type, device_type, image=str(), dim=36):
         frames[frame_ind:frame_ind + current_frames, :, :, :] = videos[i][0:current_frames, :, :, :]
         frame_ind += current_frames
 
-    frames = frames[0:tt_frame-deleted_frames]
     frames = frames.reshape((-1, 10, 6, dim, dim))
     BP_lf = BP_lf.reshape((-1, 10))
 
@@ -125,7 +136,7 @@ def only_BP(data_type, device_type, image=str(), dim=36):
     for path in sorted(os.listdir(video_folder_path)):
         if os.path.isfile(os.path.join(video_folder_path, path)):
             video_file_path.append(path)
-    video_file_path = video_file_path[0:5]
+    # video_file_path = video_file_path[0:5]
     num_video = len(video_file_path)
     print('Processing ' + str(num_video) + ' Videos')
 
@@ -145,13 +156,18 @@ def only_BP(data_type, device_type, image=str(), dim=36):
     # BP_file_path = BP_file_path[6:10]
 
     BP_lf = np.zeros(shape=tt_frame)
-    BP_lf_25 = np.zeros(shape=tt_frame)
-    BP_lf_120 = np.zeros(shape=tt_frame)
-    BP_lf_med = np.zeros(shape=tt_frame)
+    # BP_lf_25 = np.zeros(shape=tt_frame)
+    # BP_lf_120 = np.zeros(shape=tt_frame)
+    # BP_lf_med = np.zeros(shape=tt_frame)
 
     frame_ind = 0
     for i in range(num_video):
+        print(f'Processing Video {BP_file_path[i]}')
         temp_BP = np.loadtxt(BP_folder_path + BP_file_path[i])  # BP loading
+        temp_BP = np.where(temp_BP > 0, temp_BP, 0)
+        invalid_index = np.where(temp_BP == 0)
+        temp_BP = np.delete(temp_BP, invalid_index)
+
         current_frames = videos[i] // 120 * 120
         temp_BP_lf = np.zeros(current_frames)
         # Down-sample BP 1000Hz --> 25Hz
@@ -172,40 +188,39 @@ def only_BP(data_type, device_type, image=str(), dim=36):
             temp_BP_lf_systolic_inter[l] = y_interp(l)
 
         # Different filtering
-        temp_BP_med = medfilt(temp_BP_lf_systolic_inter, 51)
-        temp_BP_lf_systolic_inter_25 = gaussian_filter(temp_BP_lf_systolic_inter, sigma=25)
-        temp_BP_lf_systolic_inter_120 = gaussian_filter(temp_BP_lf_systolic_inter, sigma=120)
-        BP_lf_med[frame_ind:frame_ind + current_frames] = temp_BP_med
-        BP_lf_25[frame_ind:frame_ind + current_frames] = temp_BP_lf_systolic_inter_25
-        BP_lf_120[frame_ind:frame_ind + current_frames] = temp_BP_lf_systolic_inter_120
+        # temp_BP_med = medfilt(temp_BP_lf_systolic_inter, 51)
+        # temp_BP_lf_systolic_inter_25 = gaussian_filter(temp_BP_lf_systolic_inter, sigma=25)
+        # temp_BP_lf_systolic_inter_120 = gaussian_filter(temp_BP_lf_systolic_inter, sigma=120)
+        # BP_lf_med[frame_ind:frame_ind + current_frames] = temp_BP_med
+        # BP_lf_25[frame_ind:frame_ind + current_frames] = temp_BP_lf_systolic_inter_25
+        # BP_lf_120[frame_ind:frame_ind + current_frames] = temp_BP_lf_systolic_inter_120
 
         BP_lf[frame_ind:frame_ind + current_frames] = temp_BP_lf_systolic_inter
         frame_ind += current_frames
 
-    # plt.plot(BP_lf, label='original')
+    plt.plot(BP_lf, label='original')
     # plt.plot(BP_lf_25, label='sigma = 25')
     # plt.plot(BP_lf_120, label='sigma = 120')
     # plt.plot(BP_lf_med, label='median 51')
-    # plt.legend()
-    # plt.show()
+    plt.legend()
+    plt.show()
 
     # BP_lf = BP_lf.reshape((-1, 10))
-    BP_lf_25 = BP_lf_25.reshape((-1, 10))
-    BP_lf_120 = BP_lf_120.reshape((-1, 10))
+    # BP_lf_25 = BP_lf_25.reshape((-1, 10))
+    # BP_lf_120 = BP_lf_120.reshape((-1, 10))
 
     ############## Save the preprocessed model ##############
     if device_type == "remote":
         saving_path = '/edrive2/zechenzh/preprocessed_v4v_minibatch/'
     else:
         saving_path = 'C:/Users/Zed/Desktop/V4V/preprocessed_v4v/'
-    np.save(saving_path + data_type + '_BP_systolic_a25.npy', BP_lf_25)
-    np.save(saving_path + data_type + '_BP_systolic_a120.npy', BP_lf_120)
+
 
 
 if __name__ == '__main__':
-    data_process('train', 'remote', 'face_large')
+    # data_process('train', 'local', 'face_large')
     data_process('valid', 'remote', 'face_large')
-    data_process('test', 'remote', 'face_large')
+    # data_process('test', 'remote', 'face_large')
     # only_BP('train', 'local', 'face_large')
     # only_BP('valid', 'remote', 'face_large')
     # only_BP('test', 'local', 'face_large')
