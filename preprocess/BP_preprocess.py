@@ -35,7 +35,7 @@ def data_process(data_type, device_type, image=str(), dim=36):
         if os.path.isfile(os.path.join(video_folder_path, path)):
             video_file_path.append(path)
 
-    # video_file_path = video_file_path[0:2]
+    # video_file_path = video_file_path[81:83]
     num_video = len(video_file_path)
     print('Processing ' + str(num_video) + ' Videos')
 
@@ -52,7 +52,7 @@ def data_process(data_type, device_type, image=str(), dim=36):
     for path in sorted(os.listdir(BP_folder_path)):
         if os.path.isfile(os.path.join(BP_folder_path, path)):
             BP_file_path.append(path)
-    # BP_file_path = BP_file_path[6:10]
+    # BP_file_path = BP_file_path[81:83]
 
     frames = np.zeros(shape=(tt_frame, 6, dim, dim))
     BP_lf = np.zeros(shape=tt_frame)
@@ -60,28 +60,31 @@ def data_process(data_type, device_type, image=str(), dim=36):
 
     for i in range(num_video):
         temp_BP = np.loadtxt(BP_folder_path + BP_file_path[i])  # BP loading
-        temp_BP_lf = np.zeros((len(temp_BP) // 40))
-        # Down-sample BP 1000Hz --> 25Hz
+        temp_BP_lf = np.zeros((len(temp_BP) // 40))  # Create new lf BP
+
+        # Down-sample BP 1000Hz --> 25Hz using moving mean window
         for j in range(0, len(temp_BP_lf)):
             temp_BP_lf[j] = mean(temp_BP[j * 40:(j + 1) * 40])
 
-        # Find incorrect BP values that is under 0 and delete them
-        invalid_index_BP = np.where(temp_BP_lf < 0)[0]
+        # Find incorrect BP values that is under 40
+        invalid_index_BP = np.where(temp_BP_lf < 40)[0]
 
+        # Create new video array with skipped frame size
         temp_video = np.zeros((len(temp_BP_lf) - len(invalid_index_BP), 6, 36, 36))
-        if invalid_index_BP:
+        if len(invalid_index_BP) != 0:
             print('Existing Invalid index')
-            temp_BP = np.delete(temp_BP_lf, invalid_index_BP)
+            temp_BP_lf = np.delete(temp_BP_lf, invalid_index_BP)
             skip = 0
-            # Set corresponding frames to 0 and delete them too
-            for i in range(videos[i].shape[0]):
-                if i in invalid_index_BP:
+            for frame in range(videos[i].shape[0]):
+                if frame in invalid_index_BP:
                     skip += 1
                     continue
                 else:
-                    temp_video[i - skip] = videos[i]
+                    temp_video[frame - skip] = videos[i][frame]
+            print(f'Skipped {skip} frames')
 
         current_frames = temp_video.shape[0] // 120 * 120
+        temp_BP_lf = temp_BP_lf[0:current_frames]
 
         # Systolic BP finding and linear interp
         temp_BP_lf_systolic_peaks, _ = find_peaks(temp_BP_lf, distance=10)
@@ -96,12 +99,15 @@ def data_process(data_type, device_type, image=str(), dim=36):
         for l in range(prev_index, current_frames):
             temp_BP_lf_systolic_inter[l] = y_interp(l)
 
+        # BP smoothing
         temp_BP_lf_systolic_inter = gaussian_filter(temp_BP_lf_systolic_inter, sigma=25)
         BP_lf[frame_ind:frame_ind + current_frames] = temp_BP_lf_systolic_inter
         # Video Batches
         frames[frame_ind:frame_ind + current_frames, :, :, :] = videos[i][0:current_frames, :, :, :]
         frame_ind += current_frames
 
+    print(f'Minimum of all BP is {min(BP_lf)}')
+    print(f'Frames size equals BP size is {BP_lf.shape[0] == frames.shape[0]}')
     frames = frames.reshape((-1, 10, 6, dim, dim))
     BP_lf = BP_lf.reshape((-1, 10))
 
@@ -214,7 +220,6 @@ def only_BP(data_type, device_type, image=str(), dim=36):
         saving_path = '/edrive2/zechenzh/preprocessed_v4v_minibatch/'
     else:
         saving_path = 'C:/Users/Zed/Desktop/V4V/preprocessed_v4v/'
-
 
 
 if __name__ == '__main__':
