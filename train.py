@@ -215,24 +215,27 @@ class TSCAN_trainer:
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
+
+    parser.add_argument('-device', '--device_type', type=str, default='local',
+                        help='Local / Remote device')
+    parser.add_argument('--gpu', type=str, default='0',
+                        help='List of GPUs used')
+    parser.add_argument('--nb_device', type=int, default=1,
+                        help='Total number of device')
+
+    parser.add_argument('-image', '--image_type', type=str, default='face_large',
+                        help='choose from 1) ratio, 2) face_large, 3) face')
     parser.add_argument('-data', '--data_type', type=str, default='test',
                         help='data type')
     parser.add_argument('-BP', '--BP_type', type=str, default='systolic',
                         help='Choose type of BP from mean, systolic and diastolic')
-    parser.add_argument('-image', '--image_type', type=str, default='face_large',
-                        help='choose from 1) ratio, 2) face_large, 3) face')
-    parser.add_argument('-device', '--device_type', type=str, default='local',
-                        help='Local / Remote device')
+
     parser.add_argument('-g', '--nb_epoch', type=int, default=100,
                         help='nb_epoch')
     parser.add_argument('--nb_batch', type=int, default=12,
                         help='nb_batch')
-    parser.add_argument('--gpu', type=str, default='0',
-                        help='List of GPUs used')
     parser.add_argument('--kernel', type=int, default=3,
                         help='Kernel size')
-    parser.add_argument('--nb_device', type=int, default=1,
-                        help='Total number of device')
     parser.add_argument('-lr', '--lr', type=float, default=9e-3,
                         help='learning rate')
     parser.add_argument('-fd', '--frame_depth', type=int, default=10,
