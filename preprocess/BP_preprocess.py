@@ -35,7 +35,7 @@ def data_process(data_type, device_type, image=str(), dim=36):
         if os.path.isfile(os.path.join(video_folder_path, path)):
             video_file_path.append(path)
 
-    # video_file_path = video_file_path[81:83]
+    video_file_path = video_file_path[81:83]
     num_video = len(video_file_path)
     print('Processing ' + str(num_video) + ' Videos')
 
@@ -52,15 +52,17 @@ def data_process(data_type, device_type, image=str(), dim=36):
     for path in sorted(os.listdir(BP_folder_path)):
         if os.path.isfile(os.path.join(BP_folder_path, path)):
             BP_file_path.append(path)
-    # BP_file_path = BP_file_path[81:83]
+    BP_file_path = BP_file_path[81:83]
 
     frames = np.zeros(shape=(tt_frame, 6, dim, dim))
     BP_lf = np.zeros(shape=tt_frame)
     frame_ind = 0
 
     for i in range(num_video):
+        print(f'BP process on {BP_file_path[i]}')
         temp_BP = np.loadtxt(BP_folder_path + BP_file_path[i])  # BP loading
-        temp_BP_lf = np.zeros((len(temp_BP) // 40))  # Create new lf BP
+        BP_lf_len = len(temp_BP) // 40
+        temp_BP_lf = np.zeros(BP_lf_len)  # Create new lf BP
 
         # Down-sample BP 1000Hz --> 25Hz using moving mean window
         for j in range(0, len(temp_BP_lf)):
@@ -68,23 +70,23 @@ def data_process(data_type, device_type, image=str(), dim=36):
 
         # Find incorrect BP values that is under 40
         invalid_index_BP = np.where(temp_BP_lf < 40)[0]
+        video_len = videos[i].shape[0]
+        current_frames = (min(BP_lf_len, video_len) - len(invalid_index_BP)) // 120 * 120
 
         # Create new video array with skipped frame size
-        temp_video = np.zeros((len(temp_BP_lf) - len(invalid_index_BP), 6, 36, 36))
+        temp_video = np.zeros((current_frames, 6, 36, 36))
+        temp_BP_lf = np.delete(temp_BP_lf, invalid_index_BP)
+        temp_BP_lf = temp_BP_lf[0:current_frames]
         if len(invalid_index_BP) != 0:
-            print('Existing Invalid index')
-            temp_BP_lf = np.delete(temp_BP_lf, invalid_index_BP)
             skip = 0
-            for frame in range(videos[i].shape[0]):
+            print('Existing Invalid index')
+            for frame in range(current_frames):
                 if frame in invalid_index_BP:
                     skip += 1
                     continue
                 else:
-                    temp_video[frame - skip] = videos[i][frame]
+                    temp_video[frame] = videos[i][frame + skip]
             print(f'Skipped {skip} frames')
-
-        current_frames = temp_video.shape[0] // 120 * 120
-        temp_BP_lf = temp_BP_lf[0:current_frames]
 
         # Systolic BP finding and linear interp
         temp_BP_lf_systolic_peaks, _ = find_peaks(temp_BP_lf, distance=10)
@@ -106,8 +108,8 @@ def data_process(data_type, device_type, image=str(), dim=36):
         frames[frame_ind:frame_ind + current_frames, :, :, :] = videos[i][0:current_frames, :, :, :]
         frame_ind += current_frames
 
-    print(f'Minimum of all BP is {min(BP_lf)}')
-    print(f'Frames size equals BP size is {BP_lf.shape[0] == frames.shape[0]}')
+    # print(f'Minimum of all BP is {min(BP_lf)}')
+    # print(f'Frames size equals BP size is {BP_lf.shape[0] == frames.shape[0]}')
     frames = frames.reshape((-1, 10, 6, dim, dim))
     BP_lf = BP_lf.reshape((-1, 10))
 
@@ -223,8 +225,8 @@ def only_BP(data_type, device_type, image=str(), dim=36):
 
 
 if __name__ == '__main__':
-    # data_process('train', 'local', 'face_large')
-    data_process('valid', 'remote', 'face_large')
+    data_process('train', 'local', 'face_large')
+    # data_process('valid', 'remote', 'face_large')
     # data_process('test', 'remote', 'face_large')
     # only_BP('train', 'local', 'face_large')
     # only_BP('valid', 'remote', 'face_large')
