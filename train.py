@@ -33,11 +33,11 @@ class TSCAN_trainer:
         self.lr = setup.lr
         self.criterion = MSELoss()
         self.min_valid_loss = None
-        self.best_epoch = 9
+        self.best_epoch = 11
         self.base_len = setup.nb_device * self.frame_depth
         self.batch_size = setup.nb_batch
         self.USE_LAST_EPOCH = False
-        self.plot_pred = True
+        self.plot_pred = False
         self.nb_filters1 = setup.nb_filter1
         self.nb_filters1 = setup.nb_filter2
         self.drop_rate1 = setup.drop_rate1
@@ -196,7 +196,7 @@ class TSCAN_trainer:
                 #                                                         (idx + 1) * self.chunk_len]
                 #     labels[subj_index][sort_index] = labels_test[idx * self.chunk_len:(idx + 1) * self.chunk_len]
                 pred = pred_ppg_test.detach().cpu().numpy()
-                pred = gaussian_filter(pred, sigma=25)
+                pred = gaussian_filter(pred, sigma=10)
                 predictions.append(pred)
                 label = labels_test.detach().cpu().numpy()
                 labels.append(label)
@@ -236,7 +236,7 @@ if __name__ == '__main__':
                         help='nb_batch')
     parser.add_argument('--kernel', type=int, default=3,
                         help='Kernel size')
-    parser.add_argument('-lr', '--lr', type=float, default=9e-3,
+    parser.add_argument('-lr', '--lr', type=float, default=0.009,
                         help='learning rate')
     parser.add_argument('-fd', '--frame_depth', type=int, default=10,
                         help='frame depth')
