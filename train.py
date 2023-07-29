@@ -37,7 +37,7 @@ class TSCAN_trainer:
         self.base_len = setup.nb_device * self.frame_depth
         self.batch_size = setup.nb_batch
         self.USE_LAST_EPOCH = False
-        self.plot_pred = False
+        self.plot_pred = True
         self.nb_filters1 = setup.nb_filter1
         self.nb_filters1 = setup.nb_filter2
         self.drop_rate1 = setup.drop_rate1
@@ -56,10 +56,12 @@ class TSCAN_trainer:
         self.model = torch.nn.DataParallel(self.model, device_ids=list(range(setup.nb_device)))
         if setup.data_type == 'train':
             print('Loading Data')
-            v4v_data_train = V4V_Dataset(data_folder_path, 'train', setup.image_type, setup.BP_type, self.gaus_fil_type)
+            v4v_data_train = V4V_Dataset(data_folder_path, 'train', setup.image_type,
+                                         setup.BP_type, self.gaus_fil_type)
             self.train_loader = DataLoader(dataset=v4v_data_train, batch_size=self.batch_size,
                                            shuffle=True, num_workers=1)
-            v4v_data_valid = V4V_Dataset(data_folder_path, 'valid', setup.image_type, setup.BP_type, self.gaus_fil_type)
+            v4v_data_valid = V4V_Dataset(data_folder_path, 'valid', setup.image_type,
+                                         setup.BP_type, self.gaus_fil_type)
             self.valid_loader = DataLoader(dataset=v4v_data_valid, batch_size=self.batch_size,
                                            shuffle=True, num_workers=1)
             test = iter(self.valid_loader)
@@ -72,7 +74,8 @@ class TSCAN_trainer:
             self.scheduler = OneCycleLR(self.optimizer, max_lr=self.lr,
                                         epochs=self.nb_epoch, steps_per_epoch=len(self.train_loader))
         else:
-            v4v_data_test = V4V_Dataset(data_folder_path, 'test', setup.image_type, setup.BP_type, self.gaus_fil_type)
+            v4v_data_test = V4V_Dataset(data_folder_path, 'test', setup.image_type,
+                                        setup.BP_type, self.gaus_fil_type)
             self.test_loader = DataLoader(dataset=v4v_data_test, batch_size=self.batch_size,
                                           shuffle=False, num_workers=0)
             self.chunk_len = len(self.test_loader)
@@ -141,6 +144,7 @@ class TSCAN_trainer:
                 data_valid = data_valid[:(N * D) // self.base_len * self.base_len]
                 labels_valid = labels_valid[:(N * D) // self.base_len * self.base_len]
                 pred_ppg_valid = self.model(data_valid)
+                pred_ppg_valid = gaussian_filter(pred_ppg_valid, sigma=25)
                 loss = self.criterion(pred_ppg_valid, labels_valid)
                 valid_loss.append(loss.item())
                 valid_step += 1
@@ -182,22 +186,16 @@ class TSCAN_trainer:
                 N, D, C, H, W = data_test.shape
                 data_test = data_test.view(N * D, C, H, W)
                 labels_test = labels_test.view(-1, 1)
-                # print(labels_test.shape)
+
                 data_test = data_test[:(N * D) // self.base_len * self.base_len]
                 labels_test = labels_test[:(N * D) // self.base_len * self.base_len]
+
                 pred_ppg_test = self.model(data_test)
-                # for idx in range(batch_size):
-                #     subj_index = test_batch[2][idx]
-                #     sort_index = int(test_batch[3][idx])
-                #     if subj_index not in predictions.keys():
-                #         predictions[subj_index] = dict()
-                #         labels[subj_index] = dict()
-                #     predictions[subj_index][sort_index] = pred_ppg_test[idx * self.chunk_len:
-                #                                                         (idx + 1) * self.chunk_len]
-                #     labels[subj_index][sort_index] = labels_test[idx * self.chunk_len:(idx + 1) * self.chunk_len]
+
                 pred = pred_ppg_test.detach().cpu().numpy()
-                pred = gaussian_filter(pred, sigma=10)
+                pred = gaussian_filter(pred, sigma=25)
                 predictions.append(pred)
+
                 label = labels_test.detach().cpu().numpy()
                 labels.append(label)
 
