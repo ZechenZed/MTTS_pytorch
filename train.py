@@ -144,7 +144,7 @@ class TSCAN_trainer:
                 data_valid = data_valid[:(N * D) // self.base_len * self.base_len]
                 labels_valid = labels_valid[:(N * D) // self.base_len * self.base_len]
                 pred_ppg_valid = self.model(data_valid)
-                pred_ppg_valid = gaussian_filter(pred_ppg_valid, sigma=25)
+                # pred_ppg_valid = gaussian_filter(pred_ppg_valid, sigma=25)
                 loss = self.criterion(pred_ppg_valid, labels_valid)
                 valid_loss.append(loss.item())
                 valid_step += 1
