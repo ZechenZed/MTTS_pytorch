@@ -6,8 +6,8 @@ from scipy.ndimage import gaussian_filter, percentile_filter
 from sklearn.metrics import mean_squared_error
 from scipy.signal import butter, filtfilt
 
-path = 'C:/Users/Zed/Desktop/V4V/preprocessed_v4v/'
-# path = '/edrive2/zechenzh/preprocessed_v4v_minibatch/'
+# path = 'C:/Users/Zed/Desktop/V4V/preprocessed_v4v/'
+path = '/edrive2/zechenzh/preprocessed_v4v_minibatch/'
 # train_frames = np.load(path + 'train_frames_face_large.npy')
 # train_BP = np.load(path + 'train_BP_systolic_a25.npy')
 #
