@@ -241,11 +241,11 @@ if __name__ == '__main__':
                         help='frame depth')
     parser.add_argument('--drop_rate2', type=float, default=0.1,
                         help='Drop rate 2')
-    parser.add_argument('--drop_rate1', type=float, default=0.2,
+    parser.add_argument('--drop_rate1', type=float, default=0.15,
                         help='Drop rate 1')
     parser.add_argument('--nb_filter1', type=int, default=16,
                         help='Drop rate 2')
-    parser.add_argument('--nb_filter2', type=int, default=24,
+    parser.add_argument('--nb_filter2', type=int, default=22,
                         help='Drop rate 1')
     args = parser.parse_args()
     print('input args:\n', json.dumps(vars(args), indent=4, separators=(',', ':')))  # pretty print args
