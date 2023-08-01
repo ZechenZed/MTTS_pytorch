@@ -34,7 +34,7 @@ class TSCAN_trainer:
         self.lr = setup.lr
         self.criterion = MSELoss()
         self.min_valid_loss = None
-        self.best_epoch = 10
+        self.best_epoch = 11
         self.base_len = setup.nb_device * self.frame_depth
         self.batch_size = setup.nb_batch
         self.USE_LAST_EPOCH = False
@@ -243,9 +243,9 @@ if __name__ == '__main__':
                         help='Drop rate 2')
     parser.add_argument('--drop_rate1', type=float, default=0.2,
                         help='Drop rate 1')
-    parser.add_argument('--nb_filter1', type=int, default=48,
+    parser.add_argument('--nb_filter1', type=int, default=16,
                         help='Drop rate 2')
-    parser.add_argument('--nb_filter2', type=int, default=64,
+    parser.add_argument('--nb_filter2', type=int, default=24,
                         help='Drop rate 1')
     args = parser.parse_args()
     print('input args:\n', json.dumps(vars(args), indent=4, separators=(',', ':')))  # pretty print args
