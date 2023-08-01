@@ -28,12 +28,13 @@ class TSCAN_trainer:
         os.environ['CUDA_VISIBLE_DEVICES'] = setup.gpu
         self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
+        ################ Hyperparameters ################
         self.frame_depth = setup.frame_depth
         self.nb_epoch = setup.nb_epoch
         self.lr = setup.lr
         self.criterion = MSELoss()
         self.min_valid_loss = None
-        self.best_epoch = 19
+        self.best_epoch = 10
         self.base_len = setup.nb_device * self.frame_depth
         self.batch_size = setup.nb_batch
         self.USE_LAST_EPOCH = False
@@ -242,7 +243,7 @@ if __name__ == '__main__':
                         help='Drop rate 2')
     parser.add_argument('--drop_rate1', type=float, default=0.2,
                         help='Drop rate 1')
-    parser.add_argument('--nb_filter1', type=int, default=32,
+    parser.add_argument('--nb_filter1', type=int, default=48,
                         help='Drop rate 2')
     parser.add_argument('--nb_filter2', type=int, default=64,
                         help='Drop rate 1')
