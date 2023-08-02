@@ -32,6 +32,7 @@ class TSCAN_trainer:
         self.frame_depth = setup.frame_depth
         self.nb_epoch = setup.nb_epoch
         self.lr = setup.lr
+        self.nb_dense = setup.nb_dense
         self.criterion = MSELoss()
         self.min_valid_loss = None
         self.best_epoch = 11
@@ -52,7 +53,7 @@ class TSCAN_trainer:
         else:
             data_folder_path = '/edrive2/zechenzh/preprocessed_v4v_minibatch/'
         self.model = TSCAN(frame_depth=self.frame_depth, img_size=36, dropout_rate1=self.drop_rate1,
-                           dropout_rate2=self.drop_rate2, kernel_size=self.kernel,
+                           dropout_rate2=self.drop_rate2, kernel_size=self.kernel, nb_dense=self.nb_dense,
                            pool_size=self.pool_size).to(self.device)
         self.model = torch.nn.DataParallel(self.model, device_ids=list(range(setup.nb_device)))
         if setup.data_type == 'train':
@@ -244,9 +245,11 @@ if __name__ == '__main__':
     parser.add_argument('--drop_rate1', type=float, default=0.25,
                         help='Drop rate 1')
     parser.add_argument('--nb_filter1', type=int, default=16,
-                        help='Drop rate 2')
+                        help='number of filter 1')
     parser.add_argument('--nb_filter2', type=int, default=24,
-                        help='Drop rate 1')
+                        help='number of filter 2')
+    parser.add_argument('--nb_dense', type=int, default=256,
+                        help='Number of dense layer')
     args = parser.parse_args()
     print('input args:\n', json.dumps(vars(args), indent=4, separators=(',', ':')))  # pretty print args
     trainer = TSCAN_trainer(args)
