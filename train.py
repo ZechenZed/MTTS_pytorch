@@ -35,7 +35,7 @@ class TSCAN_trainer:
         self.nb_dense = setup.nb_dense
         self.criterion = MSELoss()
         self.min_valid_loss = None
-        self.best_epoch = 11
+        self.best_epoch = 8
         self.base_len = setup.nb_device * self.frame_depth
         self.batch_size = setup.nb_batch
         self.USE_LAST_EPOCH = False
@@ -248,7 +248,7 @@ if __name__ == '__main__':
                         help='number of filter 1')
     parser.add_argument('--nb_filter2', type=int, default=24,
                         help='number of filter 2')
-    parser.add_argument('--nb_dense', type=int, default=320,
+    parser.add_argument('--nb_dense', type=int, default=384,
                         help='Number of dense layer')
     args = parser.parse_args()
     print('input args:\n', json.dumps(vars(args), indent=4, separators=(',', ':')))  # pretty print args
