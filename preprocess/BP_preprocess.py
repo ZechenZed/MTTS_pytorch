@@ -69,7 +69,7 @@ def data_process(data_type, device_type, image=str(), dim=36):
             temp_BP_lf[j] = mean(temp_BP[j * 40:(j + 1) * 40])
 
         # Find incorrect BP values that is under 40
-        invalid_index_BP = np.where(temp_BP_lf < 70 or temp_BP_lf > 200)[0]
+        invalid_index_BP = np.where((temp_BP_lf < 70) | (temp_BP_lf > 200))[0]
         video_len = videos[i].shape[0]
         current_frames = (min(BP_lf_len, video_len) - len(invalid_index_BP)) // 120 * 120
 
