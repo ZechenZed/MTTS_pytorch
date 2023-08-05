@@ -35,7 +35,7 @@ def data_process(data_type, device_type, image=str(), dim=36):
         if os.path.isfile(os.path.join(video_folder_path, path)):
             video_file_path.append(path)
 
-    video_file_path = video_file_path[40:45]
+    # video_file_path = video_file_path[40:45]
     num_video = len(video_file_path)
     print('Processing ' + str(num_video) + ' Videos')
 
@@ -52,7 +52,7 @@ def data_process(data_type, device_type, image=str(), dim=36):
     for path in sorted(os.listdir(BP_folder_path)):
         if os.path.isfile(os.path.join(BP_folder_path, path)):
             BP_file_path.append(path)
-    BP_file_path = BP_file_path[40:45]
+    # BP_file_path = BP_file_path[40:45]
 
     frames = np.zeros(shape=(tt_frame, 6, dim, dim))
     BP_lf = np.zeros(shape=tt_frame)
@@ -82,14 +82,13 @@ def data_process(data_type, device_type, image=str(), dim=36):
             temp_BP_lf = temp_BP_lf[0:current_frames]
             if len(invalid_index_BP) != 0:
                 skip = 0
-                print('Existing Invalid index')
                 for frame in range(current_frames):
                     if frame in invalid_index_BP:
                         skip += 1
                         continue
                     else:
                         temp_video[frame] = videos[i][frame + skip]
-                print(f'Skipped {skip} frames')
+                print(f'Existing Invalid index Skipped {skip} frames')
 
             # Systolic BP finding and linear interp
             temp_BP_lf_systolic_peaks, _ = find_peaks(temp_BP_lf, distance=10)
