@@ -39,7 +39,7 @@ def data_process(data_type, device_type, image=str(), dim=36):
     num_video = len(video_file_path)
     print('Processing ' + str(num_video) + ' Videos')
 
-    videos = [Parallel(n_jobs=12)(
+    videos = [Parallel(n_jobs=8)(
         delayed(preprocess_raw_video)(video_folder_path + video, dim) for video in video_file_path)]
     videos = videos[0]
 
@@ -69,7 +69,7 @@ def data_process(data_type, device_type, image=str(), dim=36):
             temp_BP_lf[j] = mean(temp_BP[j * 40:(j + 1) * 40])
 
         # Find incorrect BP values that is under 40
-        invalid_index_BP = np.where(temp_BP_lf < 40)[0]
+        invalid_index_BP = np.where(temp_BP_lf < 70 or temp_BP_lf > 200)[0]
         video_len = videos[i].shape[0]
         current_frames = (min(BP_lf_len, video_len) - len(invalid_index_BP)) // 120 * 120
 
@@ -225,9 +225,9 @@ def only_BP(data_type, device_type, image=str(), dim=36):
 
 
 if __name__ == '__main__':
-    # data_process('valid', 'remote', 'face_large')
+    data_process('valid', 'remote', 'face_large')
     # data_process('train', 'remote', 'face_large')
-    data_process('test', 'local', 'face_large')
+    # data_process('test', 'local', 'face_large')
     # only_BP('train', 'local', 'face_large')
     # only_BP('valid', 'remote', 'face_large')
     # only_BP('test', 'local', 'face_large')
