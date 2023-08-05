@@ -35,7 +35,7 @@ def data_process(data_type, device_type, image=str(), dim=36):
         if os.path.isfile(os.path.join(video_folder_path, path)):
             video_file_path.append(path)
 
-    # video_file_path = video_file_path[0:2]
+    video_file_path = video_file_path[40:45]
     num_video = len(video_file_path)
     print('Processing ' + str(num_video) + ' Videos')
 
@@ -52,7 +52,7 @@ def data_process(data_type, device_type, image=str(), dim=36):
     for path in sorted(os.listdir(BP_folder_path)):
         if os.path.isfile(os.path.join(BP_folder_path, path)):
             BP_file_path.append(path)
-    # BP_file_path = BP_file_path[81:83]
+    BP_file_path = BP_file_path[40:45]
 
     frames = np.zeros(shape=(tt_frame, 6, dim, dim))
     BP_lf = np.zeros(shape=tt_frame)
@@ -73,40 +73,43 @@ def data_process(data_type, device_type, image=str(), dim=36):
         video_len = videos[i].shape[0]
         current_frames = (min(BP_lf_len, video_len) - len(invalid_index_BP)) // 120 * 120
 
-        # Create new video array with skipped frame size
-        temp_video = np.zeros((current_frames, 6, 36, 36))
-        temp_BP_lf = np.delete(temp_BP_lf, invalid_index_BP)
-        temp_BP_lf = temp_BP_lf[0:current_frames]
-        if len(invalid_index_BP) != 0:
-            skip = 0
-            print('Existing Invalid index')
-            for frame in range(current_frames):
-                if frame in invalid_index_BP:
-                    skip += 1
-                    continue
-                else:
-                    temp_video[frame] = videos[i][frame + skip]
-            print(f'Skipped {skip} frames')
+        if current_frames == 0:
+            continue
+        else:
+            # Create new video array with skipped frame size
+            temp_video = np.zeros((current_frames, 6, 36, 36))
+            temp_BP_lf = np.delete(temp_BP_lf, invalid_index_BP)
+            temp_BP_lf = temp_BP_lf[0:current_frames]
+            if len(invalid_index_BP) != 0:
+                skip = 0
+                print('Existing Invalid index')
+                for frame in range(current_frames):
+                    if frame in invalid_index_BP:
+                        skip += 1
+                        continue
+                    else:
+                        temp_video[frame] = videos[i][frame + skip]
+                print(f'Skipped {skip} frames')
 
-        # Systolic BP finding and linear interp
-        temp_BP_lf_systolic_peaks, _ = find_peaks(temp_BP_lf, distance=10)
-        temp_BP_lf_systolic_inter = np.zeros(current_frames)
-        prev_index = 0
-        for index in temp_BP_lf_systolic_peaks:
-            y_interp = interp1d([prev_index, index], [temp_BP_lf[prev_index], temp_BP_lf[index]])
-            for k in range(prev_index, index + 1):
-                temp_BP_lf_systolic_inter[k] = y_interp(k)
-            prev_index = index
-        y_interp = interp1d([prev_index, current_frames - 1], [temp_BP_lf[prev_index], temp_BP_lf[current_frames - 1]])
-        for l in range(prev_index, current_frames):
-            temp_BP_lf_systolic_inter[l] = y_interp(l)
+            # Systolic BP finding and linear interp
+            temp_BP_lf_systolic_peaks, _ = find_peaks(temp_BP_lf, distance=10)
+            temp_BP_lf_systolic_inter = np.zeros(current_frames)
+            prev_index = 0
+            for index in temp_BP_lf_systolic_peaks:
+                y_interp = interp1d([prev_index, index], [temp_BP_lf[prev_index], temp_BP_lf[index]])
+                for k in range(prev_index, index + 1):
+                    temp_BP_lf_systolic_inter[k] = y_interp(k)
+                prev_index = index
+            y_interp = interp1d([prev_index, current_frames - 1], [temp_BP_lf[prev_index], temp_BP_lf[current_frames - 1]])
+            for l in range(prev_index, current_frames):
+                temp_BP_lf_systolic_inter[l] = y_interp(l)
 
-        # BP smoothing
-        temp_BP_lf_systolic_inter = gaussian_filter(temp_BP_lf_systolic_inter, sigma=25)
-        BP_lf[frame_ind:frame_ind + current_frames] = temp_BP_lf_systolic_inter
-        # Video Batches
-        frames[frame_ind:frame_ind + current_frames, :, :, :] = videos[i][0:current_frames, :, :, :]
-        frame_ind += current_frames
+            # BP smoothing
+            temp_BP_lf_systolic_inter = gaussian_filter(temp_BP_lf_systolic_inter, sigma=25)
+            BP_lf[frame_ind:frame_ind + current_frames] = temp_BP_lf_systolic_inter
+            # Video Batches
+            frames[frame_ind:frame_ind + current_frames, :, :, :] = videos[i][0:current_frames, :, :, :]
+            frame_ind += current_frames
 
     # print(f'Minimum of all BP is {min(BP_lf)}')
     # print(f'Frames size equals BP size is {BP_lf.shape[0] == frames.shape[0]}')
