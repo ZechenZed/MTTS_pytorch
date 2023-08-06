@@ -13,7 +13,7 @@ train_BP = np.load(path + 'train_BP_systolic_a25.npy')
 
 frames = train_frames.reshape((-1, 6, 36, 36))
 BP = train_BP.reshape(-1)
-ind_BP = np.where(BP == 0)
+ind_BP = np.where(BP == 0)[0]
 print(ind_BP)
 frames = frames[0:ind_BP]
 BP = BP[0:ind_BP]
@@ -27,7 +27,7 @@ valid_BP = np.load(path+'valid_BP_systolic_a25.npy')
 
 frames = valid_frames.reshape((-1, 6, 36, 36))
 BP = valid_BP.reshape(-1)
-ind_BP = np.where(BP == 0)
+ind_BP = np.where(BP == 0)[0]
 print(ind_BP)
 frames = frames[0:ind_BP]
 BP = BP[0:ind_BP]
@@ -41,7 +41,7 @@ test_BP = np.load(path+'test_BP_systolic_a25.npy')
 
 frames = test_frames.reshape((-1, 6, 36, 36))
 BP = test_BP.reshape(-1)
-ind_BP = np.where(BP == 0)
+ind_BP = np.where(BP == 0)[0]
 print(ind_BP)
 frames = frames[0:ind_BP]
 BP = BP[0:ind_BP]
