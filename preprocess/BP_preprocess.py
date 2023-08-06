@@ -74,6 +74,7 @@ def data_process(data_type, device_type, image=str(), dim=36):
         current_frames = (min(BP_lf_len, video_len) - len(invalid_index_BP)) // 120 * 120
 
         if current_frames == 0 or current_frames < 0:
+            print(f'Skip video: {BP_file_path[i]}')
             continue
         else:
             # Create new video array with skipped frame size
