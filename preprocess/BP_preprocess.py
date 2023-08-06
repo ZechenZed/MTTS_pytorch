@@ -73,7 +73,7 @@ def data_process(data_type, device_type, image=str(), dim=36):
         video_len = videos[i].shape[0]
         current_frames = (min(BP_lf_len, video_len) - len(invalid_index_BP)) // 120 * 120
 
-        if current_frames == 0:
+        if current_frames == 0 or current_frames < 0:
             continue
         else:
             # Create new video array with skipped frame size
