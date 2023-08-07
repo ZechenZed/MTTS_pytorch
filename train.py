@@ -209,6 +209,8 @@ class TSCAN_trainer:
             print(f'Test Pearson correlation: {pearsonr(predictions, labels)[0]}')
             print(f'Test cMAE: {cMAE}')
 
+        predictions = list()
+        labels = list()
         with torch.no_grad():
             for train_ind, (data_train, train_labels) in enumerate(self.train_loader):
                 # batch_size = train_batch[0].shape[0]
@@ -236,6 +238,8 @@ class TSCAN_trainer:
             print(f'Train Pearson correlation: {pearsonr(predictions, labels)[0]}')
             print(f'Train cMAE: {cMAE}')
 
+        predictions = list()
+        labels = list()
         with torch.no_grad():
             for valid_ind, (data_valid, valid_labels) in enumerate(self.valid_loader):
                 # batch_size = valid_batch[0].shape[0]
