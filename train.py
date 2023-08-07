@@ -76,7 +76,7 @@ class TSCAN_trainer:
             self.scheduler = OneCycleLR(self.optimizer, max_lr=self.lr,
                                         epochs=self.nb_epoch, steps_per_epoch=len(self.train_loader))
         else:
-            v4v_data_test = V4V_Dataset(data_folder_path, 'train', setup.image_type,
+            v4v_data_test = V4V_Dataset(data_folder_path, 'test', setup.image_type,
                                         setup.BP_type, self.gaus_fil_type)
             self.test_loader = DataLoader(dataset=v4v_data_test, batch_size=self.batch_size,
                                           shuffle=False, num_workers=0)
