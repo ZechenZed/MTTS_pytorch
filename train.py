@@ -240,7 +240,7 @@ if __name__ == '__main__':
                         help='learning rate')
     parser.add_argument('-fd', '--frame_depth', type=int, default=10,
                         help='frame depth')
-    parser.add_argument('--drop_rate2', type=float, default=0.4,
+    parser.add_argument('--drop_rate2', type=float, default=0.5,
                         help='Drop rate 2')
     parser.add_argument('--drop_rate1', type=float, default=0.5,
                         help='Drop rate 1')
