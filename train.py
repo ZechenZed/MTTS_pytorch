@@ -206,11 +206,11 @@ class TSCAN_trainer:
             cMAE = sum(abs(predictions - labels)) / predictions.shape[0]
             print(f'Current Pearson correlation: {pearsonr(predictions, labels)[0]}')
             print(f'Current cMAE: {cMAE}')
-            if self.plot_pred:
-                plt.plot(predictions, 'r', label='Prediction')
-                plt.plot(labels, 'g', label='Ground truth')
-                plt.legend()
-                plt.show()
+            # if self.plot_pred:
+            #     plt.plot(predictions, 'r', label='Prediction')
+            #     plt.plot(labels, 'g', label='Ground truth')
+            #     plt.legend()
+            #     plt.show()
 
 
 if __name__ == '__main__':
