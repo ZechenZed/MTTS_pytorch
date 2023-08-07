@@ -35,7 +35,7 @@ class TSCAN_trainer:
         self.nb_dense = setup.nb_dense
         self.criterion = MSELoss()
         self.min_valid_loss = None
-        self.best_epoch = 9
+        self.best_epoch = 11
         self.base_len = setup.nb_device * self.frame_depth
         self.batch_size = setup.nb_batch
         self.USE_LAST_EPOCH = False
@@ -76,7 +76,7 @@ class TSCAN_trainer:
             self.scheduler = OneCycleLR(self.optimizer, max_lr=self.lr,
                                         epochs=self.nb_epoch, steps_per_epoch=len(self.train_loader))
         else:
-            v4v_data_test = V4V_Dataset(data_folder_path, 'test', setup.image_type,
+            v4v_data_test = V4V_Dataset(data_folder_path, 'train', setup.image_type,
                                         setup.BP_type, self.gaus_fil_type)
             self.test_loader = DataLoader(dataset=v4v_data_test, batch_size=self.batch_size,
                                           shuffle=False, num_workers=0)
@@ -195,7 +195,7 @@ class TSCAN_trainer:
                 pred_ppg_test = self.model(data_test)
 
                 pred = pred_ppg_test.detach().cpu().numpy()
-                pred = gaussian_filter(pred, sigma=25)
+                pred = gaussian_filter(pred, sigma=15)
                 predictions.append(pred)
 
                 label = labels_test.detach().cpu().numpy()
@@ -240,7 +240,7 @@ if __name__ == '__main__':
                         help='learning rate')
     parser.add_argument('-fd', '--frame_depth', type=int, default=10,
                         help='frame depth')
-    parser.add_argument('--drop_rate2', type=float, default=0.5,
+    parser.add_argument('--drop_rate2', type=float, default=0.1,
                         help='Drop rate 2')
     parser.add_argument('--drop_rate1', type=float, default=0.5,
                         help='Drop rate 1')
