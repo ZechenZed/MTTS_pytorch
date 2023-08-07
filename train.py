@@ -164,9 +164,6 @@ class TSCAN_trainer:
     def test(self):
         print('')
         print("===Testing===")
-        predictions = list()
-        labels = list()
-
         if self.USE_LAST_EPOCH:
             last_epoch_model_path = os.path.join(
                 self.model_dir, self.model_file_name + '_Epoch' + str(self.nb_epoch - 1) + '.pth')
@@ -179,9 +176,11 @@ class TSCAN_trainer:
             print("Testing uses best epoch selected using model selection as non-pretrained model!")
             print(best_model_path)
             self.model.load_state_dict(torch.load(best_model_path))
-
         self.model = self.model.to(self.device)
         self.model.eval()
+
+        predictions = list()
+        labels = list()
         with torch.no_grad():
             for test_ind, (data_test, test_labels) in enumerate(self.test_loader):
                 # batch_size = test_batch[0].shape[0]
@@ -301,7 +300,7 @@ if __name__ == '__main__':
                         help='learning rate')
     parser.add_argument('-fd', '--frame_depth', type=int, default=10,
                         help='frame depth')
-    parser.add_argument('--drop_rate2', type=float, default=0.25,
+    parser.add_argument('--drop_rate2', type=float, default=0.35,
                         help='Drop rate 2')
     parser.add_argument('--drop_rate1', type=float, default=0.5,
                         help='Drop rate 1')
