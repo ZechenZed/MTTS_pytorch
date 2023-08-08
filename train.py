@@ -207,6 +207,11 @@ class TSCAN_trainer:
             cMAE = sum(abs(predictions - labels)) / predictions.shape[0]
             print(f'Train Pearson correlation: {pearsonr(predictions, labels)[0]}')
             print(f'Train cMAE: {cMAE}')
+            if self.plot_pred:
+                plt.plot(predictions, 'r', label='Prediction')
+                plt.plot(labels, 'g', label='Ground truth')
+                plt.legend()
+                plt.show()
 
         predictions = list()
         labels = list()
@@ -236,6 +241,11 @@ class TSCAN_trainer:
             cMAE = sum(abs(predictions - labels)) / predictions.shape[0]
             print(f'Valid Pearson correlation: {pearsonr(predictions, labels)[0]}')
             print(f'Valid cMAE: {cMAE}')
+            if self.plot_pred:
+                plt.plot(predictions, 'r', label='Prediction')
+                plt.plot(labels, 'g', label='Ground truth')
+                plt.legend()
+                plt.show()
 
         predictions = list()
         labels = list()
@@ -265,12 +275,11 @@ class TSCAN_trainer:
             cMAE = sum(abs(predictions - labels)) / predictions.shape[0]
             print(f'Test Pearson correlation: {pearsonr(predictions, labels)[0]}')
             print(f'Test cMAE: {cMAE}')
-
-            # if self.plot_pred:
-            #     plt.plot(predictions, 'r', label='Prediction')
-            #     plt.plot(labels, 'g', label='Ground truth')
-            #     plt.legend()
-            #     plt.show()
+            if self.plot_pred:
+                plt.plot(predictions, 'r', label='Prediction')
+                plt.plot(labels, 'g', label='Ground truth')
+                plt.legend()
+                plt.show()
 
 
 if __name__ == '__main__':
@@ -308,7 +317,7 @@ if __name__ == '__main__':
                         help='number of filter 1')
     parser.add_argument('--nb_filter2', type=int, default=64,
                         help='number of filter 2')
-    parser.add_argument('--nb_dense', type=int, default=128,
+    parser.add_argument('--nb_dense', type=int, default=192,
                         help='Number of dense layer')
     args = parser.parse_args()
     print('input args:\n', json.dumps(vars(args), indent=4, separators=(',', ':')))  # pretty print args
