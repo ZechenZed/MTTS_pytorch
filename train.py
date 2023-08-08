@@ -182,35 +182,6 @@ class TSCAN_trainer:
         predictions = list()
         labels = list()
         with torch.no_grad():
-            for test_ind, (data_test, test_labels) in enumerate(self.test_loader):
-                # batch_size = test_batch[0].shape[0]
-                data_test = data_test.to(self.device)
-                labels_test = test_labels.to(self.device)
-                N, D, C, H, W = data_test.shape
-                data_test = data_test.view(N * D, C, H, W)
-                labels_test = labels_test.view(-1, 1)
-
-                data_test = data_test[:(N * D) // self.base_len * self.base_len]
-                labels_test = labels_test[:(N * D) // self.base_len * self.base_len]
-
-                pred_ppg_test = self.model(data_test)
-
-                pred = pred_ppg_test.detach().cpu().numpy()
-                pred = gaussian_filter(pred, sigma=15)
-                predictions.append(pred)
-
-                label = labels_test.detach().cpu().numpy()
-                labels.append(label)
-
-            predictions = np.array(predictions).reshape(-1)
-            labels = np.array(labels).reshape(-1)
-            cMAE = sum(abs(predictions - labels)) / predictions.shape[0]
-            print(f'Test Pearson correlation: {pearsonr(predictions, labels)[0]}')
-            print(f'Test cMAE: {cMAE}')
-
-        predictions = list()
-        labels = list()
-        with torch.no_grad():
             for train_ind, (data_train, train_labels) in enumerate(self.train_loader):
                 # batch_size = train_batch[0].shape[0]
                 data_train = data_train.to(self.device)
@@ -266,6 +237,35 @@ class TSCAN_trainer:
             print(f'Valid Pearson correlation: {pearsonr(predictions, labels)[0]}')
             print(f'Valid cMAE: {cMAE}')
 
+        predictions = list()
+        labels = list()
+        with torch.no_grad():
+            for test_ind, (data_test, test_labels) in enumerate(self.test_loader):
+                # batch_size = test_batch[0].shape[0]
+                data_test = data_test.to(self.device)
+                labels_test = test_labels.to(self.device)
+                N, D, C, H, W = data_test.shape
+                data_test = data_test.view(N * D, C, H, W)
+                labels_test = labels_test.view(-1, 1)
+
+                data_test = data_test[:(N * D) // self.base_len * self.base_len]
+                labels_test = labels_test[:(N * D) // self.base_len * self.base_len]
+
+                pred_ppg_test = self.model(data_test)
+
+                pred = pred_ppg_test.detach().cpu().numpy()
+                pred = gaussian_filter(pred, sigma=15)
+                predictions.append(pred)
+
+                label = labels_test.detach().cpu().numpy()
+                labels.append(label)
+
+            predictions = np.array(predictions).reshape(-1)
+            labels = np.array(labels).reshape(-1)
+            cMAE = sum(abs(predictions - labels)) / predictions.shape[0]
+            print(f'Test Pearson correlation: {pearsonr(predictions, labels)[0]}')
+            print(f'Test cMAE: {cMAE}')
+
             # if self.plot_pred:
             #     plt.plot(predictions, 'r', label='Prediction')
             #     plt.plot(labels, 'g', label='Ground truth')
@@ -300,7 +300,7 @@ if __name__ == '__main__':
                         help='learning rate')
     parser.add_argument('-fd', '--frame_depth', type=int, default=10,
                         help='frame depth')
-    parser.add_argument('--drop_rate1', type=float, default=0.25,
+    parser.add_argument('--drop_rate1', type=float, default=0.125,
                         help='Drop rate 1')
     parser.add_argument('--drop_rate2', type=float, default=0.5,
                         help='Drop rate 2')
