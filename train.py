@@ -313,13 +313,13 @@ if __name__ == '__main__':
                         help='Drop rate 1')
     parser.add_argument('--drop_rate2', type=float, default=0.5,
                         help='Drop rate 2')
-    parser.add_argument('--nb_filter1', type=int, default=32,
+    parser.add_argument('--nb_filter1', type=int, default=16,
                         help='number of filter 1')
-    parser.add_argument('--nb_filter2', type=int, default=32,
+    parser.add_argument('--nb_filter2', type=int, default=64,
                         help='number of filter 2')
     parser.add_argument('--nb_dense', type=int, default=384,
                         help='Number of dense layer')
-    parser.add_argument('--best', type=int, default=14,
+    parser.add_argument('--best', type=int, default=8,
                         help='Best Epoch')
     args = parser.parse_args()
     print('input args:\n', json.dumps(vars(args), indent=4, separators=(',', ':')))  # pretty print args
