@@ -57,17 +57,16 @@ class TSCAN_trainer:
                            pool_size=self.pool_size).to(self.device)
         self.model = torch.nn.DataParallel(self.model, device_ids=list(range(setup.nb_device)))
 
-        if setup.data_type == 'train':
-            print('Loading Data')
-            v4v_data_train = V4V_Dataset(data_folder_path, 'train', setup.image_type,
-                                         setup.BP_type, self.gaus_fil_type)
-            self.train_loader = DataLoader(dataset=v4v_data_train, batch_size=self.batch_size,
-                                           shuffle=True, num_workers=1)
-            v4v_data_valid = V4V_Dataset(data_folder_path, 'valid', setup.image_type,
-                                         setup.BP_type, self.gaus_fil_type)
-            self.valid_loader = DataLoader(dataset=v4v_data_valid, batch_size=self.batch_size,
-                                           shuffle=True, num_workers=1)
+        v4v_data_train = V4V_Dataset(data_folder_path, 'train', setup.image_type,
+                                     setup.BP_type, self.gaus_fil_type)
+        self.train_loader = DataLoader(dataset=v4v_data_train, batch_size=self.batch_size,
+                                       shuffle=True, num_workers=1)
+        v4v_data_valid = V4V_Dataset(data_folder_path, 'valid', setup.image_type,
+                                     setup.BP_type, self.gaus_fil_type)
+        self.valid_loader = DataLoader(dataset=v4v_data_valid, batch_size=self.batch_size,
+                                       shuffle=True, num_workers=1)
 
+        if setup.data_type == 'train':
             # test = iter(self.valid_loader)
             # first_test = next(test)
             # x, y = first_test
@@ -179,73 +178,73 @@ class TSCAN_trainer:
         self.model = self.model.to(self.device)
         self.model.eval()
 
-        # predictions = list()
-        # labels = list()
-        # with torch.no_grad():
-        #     for train_ind, (data_train, train_labels) in enumerate(self.train_loader):
-        #         # batch_size = train_batch[0].shape[0]
-        #         data_train = data_train.to(self.device)
-        #         labels_train = train_labels.to(self.device)
-        #         N, D, C, H, W = data_train.shape
-        #         data_train = data_train.view(N * D, C, H, W)
-        #         labels_train = labels_train.view(-1, 1)
-        #
-        #         data_train = data_train[:(N * D) // self.base_len * self.base_len]
-        #         labels_train = labels_train[:(N * D) // self.base_len * self.base_len]
-        #
-        #         pred_ppg_train = self.model(data_train)
-        #
-        #         pred = pred_ppg_train.detach().cpu().numpy()
-        #         pred = gaussian_filter(pred, sigma=15)
-        #         predictions.append(pred)
-        #
-        #         label = labels_train.detach().cpu().numpy()
-        #         labels.append(label)
-        #
-        #     predictions = np.array(predictions).reshape(-1)
-        #     labels = np.array(labels).reshape(-1)
-        #     cMAE = sum(abs(predictions - labels)) / predictions.shape[0]
-        #     print(f'Train Pearson correlation: {pearsonr(predictions, labels)[0]}')
-        #     print(f'Train cMAE: {cMAE}')
-        #     if self.plot_pred:
-        #         plt.plot(predictions, 'r', label='Prediction')
-        #         plt.plot(labels, 'g', label='Ground truth')
-        #         plt.legend()
-        #         plt.show()
-        #
-        # predictions = list()
-        # labels = list()
-        # with torch.no_grad():
-        #     for valid_ind, (data_valid, valid_labels) in enumerate(self.valid_loader):
-        #         # batch_size = valid_batch[0].shape[0]
-        #         data_valid = data_valid.to(self.device)
-        #         labels_valid = valid_labels.to(self.device)
-        #         N, D, C, H, W = data_valid.shape
-        #         data_valid = data_valid.view(N * D, C, H, W)
-        #         labels_valid = labels_valid.view(-1, 1)
-        #
-        #         data_valid = data_valid[:(N * D) // self.base_len * self.base_len]
-        #         labels_valid = labels_valid[:(N * D) // self.base_len * self.base_len]
-        #
-        #         pred_ppg_valid = self.model(data_valid)
-        #
-        #         pred = pred_ppg_valid.detach().cpu().numpy()
-        #         pred = gaussian_filter(pred, sigma=15)
-        #         predictions.append(pred)
-        #
-        #         label = labels_valid.detach().cpu().numpy()
-        #         labels.append(label)
-        #
-        #     predictions = np.array(predictions).reshape(-1)
-        #     labels = np.array(labels).reshape(-1)
-        #     cMAE = sum(abs(predictions - labels)) / predictions.shape[0]
-        #     print(f'Valid Pearson correlation: {pearsonr(predictions, labels)[0]}')
-        #     print(f'Valid cMAE: {cMAE}')
-        #     if self.plot_pred:
-        #         plt.plot(predictions, 'r', label='Prediction')
-        #         plt.plot(labels, 'g', label='Ground truth')
-        #         plt.legend()
-        #         plt.show()
+        predictions = list()
+        labels = list()
+        with torch.no_grad():
+            for train_ind, (data_train, train_labels) in enumerate(self.train_loader):
+                # batch_size = train_batch[0].shape[0]
+                data_train = data_train.to(self.device)
+                labels_train = train_labels.to(self.device)
+                N, D, C, H, W = data_train.shape
+                data_train = data_train.view(N * D, C, H, W)
+                labels_train = labels_train.view(-1, 1)
+
+                data_train = data_train[:(N * D) // self.base_len * self.base_len]
+                labels_train = labels_train[:(N * D) // self.base_len * self.base_len]
+
+                pred_ppg_train = self.model(data_train)
+
+                pred = pred_ppg_train.detach().cpu().numpy()
+                pred = gaussian_filter(pred, sigma=15)
+                predictions.append(pred)
+
+                label = labels_train.detach().cpu().numpy()
+                labels.append(label)
+
+            predictions = np.array(predictions).reshape(-1)
+            labels = np.array(labels).reshape(-1)
+            cMAE = sum(abs(predictions - labels)) / predictions.shape[0]
+            print(f'Train Pearson correlation: {pearsonr(predictions, labels)[0]}')
+            print(f'Train cMAE: {cMAE}')
+            if self.plot_pred:
+                plt.plot(predictions, 'r', label='Prediction')
+                plt.plot(labels, 'g', label='Ground truth')
+                plt.legend()
+                plt.show()
+
+        predictions = list()
+        labels = list()
+        with torch.no_grad():
+            for valid_ind, (data_valid, valid_labels) in enumerate(self.valid_loader):
+                # batch_size = valid_batch[0].shape[0]
+                data_valid = data_valid.to(self.device)
+                labels_valid = valid_labels.to(self.device)
+                N, D, C, H, W = data_valid.shape
+                data_valid = data_valid.view(N * D, C, H, W)
+                labels_valid = labels_valid.view(-1, 1)
+
+                data_valid = data_valid[:(N * D) // self.base_len * self.base_len]
+                labels_valid = labels_valid[:(N * D) // self.base_len * self.base_len]
+
+                pred_ppg_valid = self.model(data_valid)
+
+                pred = pred_ppg_valid.detach().cpu().numpy()
+                pred = gaussian_filter(pred, sigma=15)
+                predictions.append(pred)
+
+                label = labels_valid.detach().cpu().numpy()
+                labels.append(label)
+
+            predictions = np.array(predictions).reshape(-1)
+            labels = np.array(labels).reshape(-1)
+            cMAE = sum(abs(predictions - labels)) / predictions.shape[0]
+            print(f'Valid Pearson correlation: {pearsonr(predictions, labels)[0]}')
+            print(f'Valid cMAE: {cMAE}')
+            if self.plot_pred:
+                plt.plot(predictions, 'r', label='Prediction')
+                plt.plot(labels, 'g', label='Ground truth')
+                plt.legend()
+                plt.show()
 
         predictions = list()
         labels = list()
