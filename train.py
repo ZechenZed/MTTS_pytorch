@@ -318,7 +318,7 @@ if __name__ == '__main__':
                         help='number of filter 2')
     parser.add_argument('--nb_dense', type=int, default=384,
                         help='Number of dense layer')
-    parser.add_argument('--best', type=int, default=19,
+    parser.add_argument('--best', type=int, default=14,
                         help='Best Epoch')
     args = parser.parse_args()
     print('input args:\n', json.dumps(vars(args), indent=4, separators=(',', ':')))  # pretty print args
