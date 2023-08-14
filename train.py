@@ -314,7 +314,7 @@ if __name__ == '__main__':
                         help='Drop rate 2')
     parser.add_argument('--nb_filter1', type=int, default=32,
                         help='number of filter 1')
-    parser.add_argument('--nb_filter2', type=int, default=112,
+    parser.add_argument('--nb_filter2', type=int, default=32,
                         help='number of filter 2')
     parser.add_argument('--nb_dense', type=int, default=384,
                         help='Number of dense layer')
