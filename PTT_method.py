@@ -20,8 +20,8 @@ def PTT():
     finger_frames = preprocess_finger(finger_video_path)
     frames, fps = preprocess_raw_video_unsupervised(face_video_path)
 
-    np.save('C:/Users/Zed/Desktop/Dual_Camera/face/Subject S055 3487906/s55_face.npy', frames)
-    np.save('C:/Users/Zed/Desktop/Dual_Camera/finger/Subject S055 3487906/s55_finger.npy', finger_frames)
+    np.save(env_path+'/face/Subject S055 3487906/s55_face.npy', frames)
+    np.save(env_path+'/finger/Subject S055 3487906/s55_finger.npy', finger_frames)
 
     # face_frames = np.load('C:/Users/Zed/Desktop/Dual_Camera/face/Subject S055 3487906/s55_face.npy')
     # finger_frames = np.load('C:/Users/Zed/Desktop/Dual_Camera/finger/Subject S055 3487906/s55_finger.npy')
