@@ -1,5 +1,8 @@
 import matplotlib.pyplot as plt
 import numpy as np
+import os
+print(os.cpu_count())
+os.environ['CUDA_VISIBLE_DEVICES'] = '1'
 import cv2
 import pandas as pd
 from preprocess.video_preprocess import preprocess_raw_video_unsupervised, preprocess_finger
