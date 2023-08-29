@@ -40,7 +40,7 @@ def PTT():
     plt.plot(chrome_fingerBVP, label='Chrome finger')
     plt.plot(ICA_faceBVP, label='ICA face')
     plt.plot(ICA_fingerBVP, label='ICA finger')
-    plt.savefig(env_path+'PTTplot.png')
+    plt.savefig(env_path+'PTTplot.png',dpi=2400)
     plt.legend()
     plt.show()
     #
