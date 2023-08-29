@@ -230,6 +230,6 @@ if __name__ == '__main__':
     # data_process('valid', 'remote', 'face_large')
     # data_process('train', 'remote', 'face_large')
     # data_process('test', 'local', 'face_large')
-    only_BP('train', 'local', 'face_large')
+    only_BP('train', 'remote', 'face_large')
     # only_BP('valid', 'remote', 'face_large')
     # only_BP('test', 'local', 'face_large')
