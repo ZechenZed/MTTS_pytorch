@@ -308,15 +308,15 @@ if __name__ == '__main__':
                         help='learning rate')
     parser.add_argument('-fd', '--frame_depth', type=int, default=10,
                         help='frame depth')
-    parser.add_argument('--drop_rate1', type=float, default=0.1,
+    parser.add_argument('--drop_rate1', type=float, default=0.25,
                         help='Drop rate 1')
-    parser.add_argument('--drop_rate2', type=float, default=0.2,
+    parser.add_argument('--drop_rate2', type=float, default=0.75,
                         help='Drop rate 2')
-    parser.add_argument('--nb_filter1', type=int, default=16,
+    parser.add_argument('--nb_filter1', type=int, default=48,
                         help='number of filter 1')
-    parser.add_argument('--nb_filter2', type=int, default=32,
+    parser.add_argument('--nb_filter2', type=int, default=64,
                         help='number of filter 2')
-    parser.add_argument('--nb_dense', type=int, default=360,
+    parser.add_argument('--nb_dense', type=int, default=128,
                         help='Number of dense layer')
     parser.add_argument('--best', type=int, default=14,
                         help='Best Epoch')
