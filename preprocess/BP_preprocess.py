@@ -172,9 +172,9 @@ def only_BP(data_type, device_type, image=str(), dim=36):
     for i in range(num_video):
         print(f'Processing Video {BP_file_path[i]}')
         temp_BP = np.loadtxt(BP_folder_path + BP_file_path[i])  # BP loading
-        temp_BP = np.where(temp_BP > 0, temp_BP, 0)
-        invalid_index = np.where(temp_BP == 0)
-        temp_BP = np.delete(temp_BP, invalid_index)
+        # temp_BP = np.where(temp_BP > 0, temp_BP, 0)
+        # invalid_index = np.where(temp_BP == 0)
+        # temp_BP = np.delete(temp_BP, invalid_index)
 
         current_frames = videos[i] // 120 * 120
         temp_BP_lf = np.zeros(current_frames)
