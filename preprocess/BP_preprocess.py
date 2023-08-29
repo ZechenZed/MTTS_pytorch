@@ -35,7 +35,7 @@ def data_process(data_type, device_type, image=str(), dim=36):
         if os.path.isfile(os.path.join(video_folder_path, path)):
             video_file_path.append(path)
 
-    video_file_path = video_file_path[0:10]
+    # video_file_path = video_file_path[0:10]
     num_video = len(video_file_path)
     print('Processing ' + str(num_video) + ' Videos')
 
@@ -72,7 +72,7 @@ def data_process(data_type, device_type, image=str(), dim=36):
         invalid_index_BP = np.where((temp_BP_lf < 40) | (temp_BP_lf > 220))[0]
         # invalid_index_BP = np.where(temp_BP_lf < 60)[0]
         video_len = videos[i].shape[0]
-        if not invalid_index_BP:
+        if len(invalid_index_BP) == 0:
             invalid_len = 0
         else:
             invalid_len = invalid_index_BP[0]
