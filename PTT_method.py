@@ -35,7 +35,7 @@ def PTT():
     ICA_faceBVP = ICA_POH(face_frames,240)
     ICA_fingerBVP = ICA_POH(finger_frames, 240)
 
-    fig = plt.figure(figsize=(20, 18))
+    fig = plt.figure(figsize=(200, 180))
     plt.plot(chrome_faceBVP, label='Chrome face')
     plt.plot(chrome_fingerBVP, label='Chrome finger')
     plt.plot(ICA_faceBVP, label='ICA face')
