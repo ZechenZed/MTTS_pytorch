@@ -206,7 +206,7 @@ def only_BP(data_type, device_type, image=str(), dim=36):
         BP_lf[frame_ind:frame_ind + current_frames] = temp_BP_lf_systolic_inter
         frame_ind += current_frames
 
-    fig = plt.figure(figsize=(200, 180))
+    fig = plt.figure(figsize=(10, 8))
     plt.plot(BP_lf, label='original')
     # plt.plot(BP_lf_25, label='sigma = 25')
     # plt.plot(BP_lf_120, label='sigma = 120')
