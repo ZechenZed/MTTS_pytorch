@@ -144,7 +144,7 @@ def only_BP(data_type, device_type, image=str(), dim=36):
     for path in sorted(os.listdir(video_folder_path)):
         if os.path.isfile(os.path.join(video_folder_path, path)):
             video_file_path.append(path)
-    video_file_path = video_file_path[0:10]
+    # video_file_path = video_file_path[0:10]
     num_video = len(video_file_path)
     print('Processing ' + str(num_video) + ' Videos')
 
@@ -206,7 +206,7 @@ def only_BP(data_type, device_type, image=str(), dim=36):
         BP_lf[frame_ind:frame_ind + current_frames] = temp_BP_lf_systolic_inter
         frame_ind += current_frames
 
-    fig = plt.figure(figsize=(10, 8))
+    fig = plt.figure(figsize=(10, 12))
     plt.plot(BP_lf, label='original')
     # plt.plot(BP_lf_25, label='sigma = 25')
     # plt.plot(BP_lf_120, label='sigma = 120')
