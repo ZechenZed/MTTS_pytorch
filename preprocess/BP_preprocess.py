@@ -69,7 +69,8 @@ def data_process(data_type, device_type, image=str(), dim=36):
             temp_BP_lf[j] = mean(temp_BP[j * 40:(j + 1) * 40])
 
         # Find incorrect BP values that is under 40
-        invalid_index_BP = np.where((temp_BP_lf < 70) | (temp_BP_lf > 200))[0]
+        # invalid_index_BP = np.where((temp_BP_lf < 70) | (temp_BP_lf > 200))[0]
+        invalid_index_BP = np.where(temp_BP_lf < 60)[0]
         video_len = videos[i].shape[0]
         current_frames = (min(BP_lf_len, video_len) - len(invalid_index_BP)) // 120 * 120
 
@@ -82,14 +83,10 @@ def data_process(data_type, device_type, image=str(), dim=36):
             temp_BP_lf = np.delete(temp_BP_lf, invalid_index_BP)
             temp_BP_lf = temp_BP_lf[0:current_frames]
             if len(invalid_index_BP) != 0:
-                skip = 0
                 for frame in range(current_frames):
                     if frame in invalid_index_BP:
-                        skip += 1
-                        continue
-                    else:
-                        temp_video[frame] = videos[i][frame + skip]
-                print(f'Existing Invalid index Skipped {skip} frames')
+                        break
+                    temp_video[frame] = videos[i][frame]
 
             # Systolic BP finding and linear interp
             temp_BP_lf_systolic_peaks, _ = find_peaks(temp_BP_lf, distance=10)
@@ -147,7 +144,7 @@ def only_BP(data_type, device_type, image=str(), dim=36):
     for path in sorted(os.listdir(video_folder_path)):
         if os.path.isfile(os.path.join(video_folder_path, path)):
             video_file_path.append(path)
-    video_file_path = video_file_path[0:1]
+    # video_file_path = video_file_path[0:1]
     num_video = len(video_file_path)
     print('Processing ' + str(num_video) + ' Videos')
 
@@ -213,6 +210,8 @@ def only_BP(data_type, device_type, image=str(), dim=36):
     # plt.plot(BP_lf_25, label='sigma = 25')
     # plt.plot(BP_lf_120, label='sigma = 120')
     # plt.plot(BP_lf_med, label='median 51')
+    plt.savefig('/edrive2/zechenzh/PTTplot.png')
+
     plt.legend()
     plt.show()
 
@@ -221,16 +220,16 @@ def only_BP(data_type, device_type, image=str(), dim=36):
     # BP_lf_120 = BP_lf_120.reshape((-1, 10))
 
     ############## Save the preprocessed model ##############
-    if device_type == "remote":
-        saving_path = '/edrive2/zechenzh/preprocessed_v4v_minibatch/'
-    else:
-        saving_path = 'C:/Users/Zed/Desktop/V4V/preprocessed_v4v/'
+    # if device_type == "remote":
+    #     saving_path = '/edrive2/zechenzh/preprocessed_v4v_minibatch/'
+    # else:
+    #     saving_path = 'C:/Users/Zed/Desktop/V4V/preprocessed_v4v/'
 
 
 if __name__ == '__main__':
     # data_process('valid', 'remote', 'face_large')
     # data_process('train', 'remote', 'face_large')
-    data_process('test', 'local', 'face_large')
-    # only_BP('train', 'local', 'face_large')
+    # data_process('test', 'local', 'face_large')
+    only_BP('train', 'local', 'face_large')
     # only_BP('valid', 'remote', 'face_large')
     # only_BP('test', 'local', 'face_large')
