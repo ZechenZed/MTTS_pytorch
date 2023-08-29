@@ -211,7 +211,7 @@ def only_BP(data_type, device_type, image=str(), dim=36):
     # plt.plot(BP_lf_25, label='sigma = 25')
     # plt.plot(BP_lf_120, label='sigma = 120')
     # plt.plot(BP_lf_med, label='median 51')
-    plt.savefig('/edrive2/zechenzh/PTTplot.png',dpi=1200)
+    plt.savefig('/edrive2/zechenzh/PTTplot.jpg',dpi=1200)
 
     plt.legend()
     plt.show()
