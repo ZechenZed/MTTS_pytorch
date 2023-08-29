@@ -120,16 +120,16 @@ def data_process(data_type, device_type, image=str(), dim=36):
     # print(f'Minimum of all BP is {min(BP_lf)}')
     # print(f'Frames size equals BP size is {BP_lf.shape[0] == frames.shape[0]}')
 
-    # frames = frames.reshape((-1, 10, 6, dim, dim))
-    # BP_lf = BP_lf.reshape((-1, 10))
-    #
-    # ############## Save the preprocessed model ##############
-    # if device_type == "remote":
-    #     saving_path = '/edrive2/zechenzh/preprocessed_v4v_minibatch/'
-    # else:
-    #     saving_path = 'C:/Users/Zed/Desktop/V4V/preprocessed_v4v/'
-    # np.save(saving_path + data_type + '_frames_' + image + '.npy', frames)
-    # np.save(saving_path + data_type + '_BP_systolic_a25.npy', BP_lf)
+    frames = frames.reshape((-1, 10, 6, dim, dim))
+    BP_lf = BP_lf.reshape((-1, 10))
+
+    ############## Save the preprocessed model ##############
+    if device_type == "remote":
+        saving_path = '/edrive2/zechenzh/preprocessed_v4v/'
+    else:
+        saving_path = 'C:/Users/Zed/Desktop/V4V/preprocessed_v4v/'
+    np.save(saving_path + data_type + '_frames_' + image + '.npy', frames)
+    np.save(saving_path + data_type + '_BP_systolic_a25.npy', BP_lf)
 
 
 def only_BP(data_type, device_type, image=str(), dim=36):
