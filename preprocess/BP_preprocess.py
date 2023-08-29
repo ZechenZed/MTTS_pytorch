@@ -72,7 +72,11 @@ def data_process(data_type, device_type, image=str(), dim=36):
         invalid_index_BP = np.where((temp_BP_lf < 40) | (temp_BP_lf > 220))[0]
         # invalid_index_BP = np.where(temp_BP_lf < 60)[0]
         video_len = videos[i].shape[0]
-        current_frames = (min(BP_lf_len, video_len) - invalid_index_BP[0]) // 120 * 120
+        if not invalid_index_BP:
+            invalid_len = 0
+        else:
+            invalid_len = invalid_index_BP[0]
+        current_frames = (min(BP_lf_len, video_len) - invalid_len) // 120 * 120
 
         if current_frames == 0 or current_frames < 0:
             print(f'Skip video: {BP_file_path[i]}')
