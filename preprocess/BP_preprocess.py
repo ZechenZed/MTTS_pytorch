@@ -35,7 +35,7 @@ def data_process(data_type, device_type, image=str(), dim=36):
         if os.path.isfile(os.path.join(video_folder_path, path)):
             video_file_path.append(path)
 
-    # video_file_path = video_file_path[0:10]
+    video_file_path = video_file_path[41:43]
     num_video = len(video_file_path)
     print('Processing ' + str(num_video) + ' Videos')
 
@@ -52,7 +52,7 @@ def data_process(data_type, device_type, image=str(), dim=36):
     for path in sorted(os.listdir(BP_folder_path)):
         if os.path.isfile(os.path.join(BP_folder_path, path)):
             BP_file_path.append(path)
-    # BP_file_path = BP_file_path[40:45]
+    BP_file_path = BP_file_path[41:43]
 
     frames = np.zeros(shape=(tt_frame, 6, dim, dim))
     BP_lf = np.zeros(shape=tt_frame)
@@ -64,19 +64,19 @@ def data_process(data_type, device_type, image=str(), dim=36):
         BP_lf_len = len(temp_BP) // 40
         temp_BP_lf = np.zeros(BP_lf_len)  # Create new lf BP
 
-        # Down-sample BP 1000Hz --> 25Hz using moving mean window
+        ################# Down-sample BP 1000Hz --> 25Hz using moving mean window ################
         for j in range(0, len(temp_BP_lf)):
             temp_BP_lf[j] = mean(temp_BP[j * 40:(j + 1) * 40])
 
-        # Find incorrect BP values that is under 40
+        ################ Find incorrect BP values ################
         invalid_index_BP = np.where((temp_BP_lf < 40) | (temp_BP_lf > 220))[0]
         # invalid_index_BP = np.where(temp_BP_lf < 60)[0]
         video_len = videos[i].shape[0]
         if len(invalid_index_BP) == 0:
-            invalid_len = 0
+            invalid_len = min(BP_lf_len, video_len)
         else:
             invalid_len = invalid_index_BP[0]
-        current_frames = (min(BP_lf_len, video_len) - invalid_len) // 120 * 120
+        current_frames = invalid_len // 120 * 120
 
         if current_frames == 0 or current_frames < 0:
             print(f'Skip video: {BP_file_path[i]}')
