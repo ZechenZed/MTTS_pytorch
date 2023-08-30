@@ -52,7 +52,7 @@ def data_process(data_type, device_type, image=str(), dim=36):
     for path in sorted(os.listdir(BP_folder_path)):
         if os.path.isfile(os.path.join(BP_folder_path, path)):
             BP_file_path.append(path)
-    BP_file_path = BP_file_path[41:43]
+    BP_file_path = BP_file_path[41:45]
 
     frames = np.zeros(shape=(tt_frame, 6, dim, dim))
     BP_lf = np.zeros(shape=tt_frame)
