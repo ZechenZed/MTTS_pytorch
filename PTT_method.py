@@ -25,13 +25,16 @@ def PTT():
     #
     # np.save(env_path+'/face/Subject S055 3487906/s55_face.npy', frames)
     # np.save(env_path+'/finger/Subject S055 3487906/s55_finger.npy', finger_frames)
-
+    print('Loading Face Frames')
     face_frames = np.load(env_path+'/face/Subject S055 3487906/s55_face.npy')[5000:-1]
+    print('Loading Finger Frames')
     finger_frames = np.load(env_path+'/finger/Subject S055 3487906/s55_finger.npy')[5000:-1]
 
+    print('Processing CHROME')
     chrome_faceBVP = CHROME_DEHAAN(face_frames,240)
     chrome_fingerBVP = CHROME_DEHAAN(finger_frames, 240)
 
+    print('Processing ICA')
     ICA_faceBVP = ICA_POH(face_frames,240)
     ICA_fingerBVP = ICA_POH(finger_frames, 240)
 
