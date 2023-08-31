@@ -26,8 +26,8 @@ def PTT():
     # np.save(env_path+'/face/Subject S055 3487906/s55_face.npy', frames)
     # np.save(env_path+'/finger/Subject S055 3487906/s55_finger.npy', finger_frames)
 
-    face_frames = np.load(env_path+'/face/Subject S055 3487906/s55_face.npy')
-    finger_frames = np.load(env_path+'/finger/Subject S055 3487906/s55_finger.npy')
+    face_frames = np.load(env_path+'/face/Subject S055 3487906/s55_face.npy')[5000:-1]
+    finger_frames = np.load(env_path+'/finger/Subject S055 3487906/s55_finger.npy')[5000:-1]
 
     chrome_faceBVP = CHROME_DEHAAN(face_frames,240)
     chrome_fingerBVP = CHROME_DEHAAN(finger_frames, 240)
