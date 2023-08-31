@@ -38,7 +38,7 @@ def PTT():
     print('Processing ICA')
     ICA_faceBVP = ICA_POH(face_frames, 240)
     ICA_fingerBVP = ICA_POH(finger_frames, 240)
-
+    print('Ending ICA')
     fig = plt.figure(figsize=(20, 18))
     print('Plotting figures')
     plt.plot(chrome_faceBVP, label='Chrome face')
