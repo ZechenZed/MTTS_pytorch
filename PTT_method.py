@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import os
-print(os.cpu_count())
+# print(os.cpu_count())
 os.environ['CUDA_VISIBLE_DEVICES'] = '1'
 import cv2
 import pandas as pd
@@ -41,8 +41,8 @@ def PTT():
     plt.plot(ICA_faceBVP, label='ICA face')
     plt.plot(ICA_fingerBVP, label='ICA finger')
     plt.savefig(env_path+'PTTplot.png')
-    plt.legend()
-    plt.show()
+    # plt.legend()
+    # plt.show()
     #
     # peaks, _ = find_peaks(BVP, distance=5)
     # finger_peaks, _ = find_peaks(finger_BVP, distance=5)
