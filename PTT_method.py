@@ -24,8 +24,9 @@ def video_process(device_type):
     for path in sorted(os.listdir(face_video_folder_path)):
         if os.path.isfile(os.path.join(face_video_folder_path, path)):
             video_file_path.append(path)
-
+    video_file_path = video_file_path[0:1]
     print(video_file_path)
+
     for video in video_file_path:
         finger_frames = preprocess_finger(env_path + 'Dual_Camera/finger/' + video)
         frames, fps = preprocess_raw_video_unsupervised(face_video_folder_path + video)
