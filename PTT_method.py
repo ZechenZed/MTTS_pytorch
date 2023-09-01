@@ -15,11 +15,11 @@ from scipy.signal import find_peaks
 
 def video_process(device_type):
     if device_type == "local":
-        env_path = 'C:/Users/Zed/Desktop/Dual_Camera/'
+        env_path = 'C:/Users/Zed/Desktop/'
     else:
-        env_path = '/edrive2/zechenzh/dual_camera/'
+        env_path = '/edrive2/zechenzh/'
 
-    face_video_folder_path = env_path + 'face/'
+    face_video_folder_path = env_path + 'Dual_Camera/face/'
     video_file_path = []
     for path in sorted(os.listdir(face_video_folder_path)):
         if os.path.isfile(os.path.join(face_video_folder_path, path)):
@@ -27,10 +27,10 @@ def video_process(device_type):
 
     print(video_file_path)
     for video in video_file_path:
-        finger_frames = preprocess_finger(env_path + 'finger/' + video)
+        finger_frames = preprocess_finger(env_path + 'Dual_Camera/finger/' + video)
         frames, fps = preprocess_raw_video_unsupervised(face_video_folder_path + video)
-        np.save(f'C:/Users/Zed/Desktop/preprocessed_DC/face/{video}.npy', frames)
-        np.save(f'C:/Users/Zed/Desktop/preprocessed_DC/finger/{video}.npy', finger_frames)
+        np.save(f'{env_path}/preprocessed_DC/face/{video}.npy', frames)
+        np.save(f'{env_path}/preprocessed_DC/finger/{video}.npy', finger_frames)
 
 def PTT(device_type):
     if device_type == "local":
