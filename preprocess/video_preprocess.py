@@ -85,7 +85,7 @@ def preprocess_raw_video(video_file_path, dim=72, plot=False, face_crop=True):
 
 def preprocess_raw_video_unsupervised(video_file_path, dim=108, face_crop=True):
     # set up
-    print("***********Processing " + video_file_path[-12:] + "***********")
+    print("***********Processing " + video_file_path[-8:] + "***********")
     t = []
     i = 0
     vidObj = cv2.VideoCapture(video_file_path)
@@ -146,7 +146,7 @@ def preprocess_raw_video_unsupervised(video_file_path, dim=108, face_crop=True):
 
 def preprocess_finger(video_file_path, dim=108):
     # set up
-    print("***********Processing " + video_file_path[-12:] + "***********")
+    print("***********Processing " + video_file_path[-8:] + "***********")
     t = []
     i = 0
     vidObj = cv2.VideoCapture(video_file_path)
