@@ -86,5 +86,6 @@ def PTT(device_type):
 
 if __name__ == '__main__':
     device_type = 'remote'
+    video_process(device_type)
     PTT(device_type)
-    # video_process(device_type)
+
