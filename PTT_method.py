@@ -55,7 +55,7 @@ def PTT(device_type):
     finger_frames = np.load(env_path + 'finger/S055.npy')
 
     start_frame = 5000
-    end_frame = min(len(face_frames), len(finger_frames))
+    end_frame = min(len(face_frames), len(finger_frames)) / 4
 
     face_frames = face_frames[start_frame:end_frame]
     finger_frames = finger_frames[start_frame:end_frame]
