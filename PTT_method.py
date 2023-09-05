@@ -79,7 +79,7 @@ def PTT(device_type):
     # plt.plot(ICA_faceBVP, label='ICA face')
     plt.plot(POS_faceBVP, label='POS face')
     plt.plot(POS_fingerBVP, label='POS finger')
-    plt.savefig(env_path+'PPG.jpg')
+    plt.savefig(env_path + 'PPG.jpg')
     plt.legend()
     plt.show()
 
@@ -91,8 +91,7 @@ def PTT(device_type):
         print('synchronized')
 
 
-
 if __name__ == '__main__':
-    device_type = 'Remote'
+    device_type = 'remote'
     # video_process(device_type)
     PTT(device_type)
