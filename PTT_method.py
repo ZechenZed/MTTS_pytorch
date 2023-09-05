@@ -70,7 +70,7 @@ def PTT(device_type):
     POS_faceBVP = POS_WANG(face_frames, 240)
     POS_fingerBVP = POS_WANG(finger_frames, 240)
 
-    fig = plt.figure(figsize=(10, 28))
+    fig = plt.figure(figsize=(28, 10))
     print('Plotting figures')
 
     plt.plot(chrome_faceBVP, label='Chrome face')
@@ -79,7 +79,7 @@ def PTT(device_type):
     # plt.plot(ICA_faceBVP, label='ICA face')
     plt.plot(POS_faceBVP, label='POS face')
     plt.plot(POS_fingerBVP, label='POS finger')
-    plt.savefig(env_path + 'PPG.jpg',dpi=1200)
+    plt.savefig(env_path + 'PPG.jpg',dpi=2400)
     plt.legend()
     plt.show()
 
