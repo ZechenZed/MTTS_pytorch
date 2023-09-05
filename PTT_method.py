@@ -11,6 +11,7 @@ from unsupervised_method.CHROME import CHROME_DEHAAN
 from unsupervised_method.GREEN import GREEN
 from unsupervised_method.ICA_POH import ICA_POH
 from scipy.signal import find_peaks
+from unsupervised_method.POS_WANG import POS_WANG
 
 
 def video_process(device_type):
@@ -63,16 +64,22 @@ def PTT(device_type):
     chrome_faceBVP = CHROME_DEHAAN(face_frames, 240)
     chrome_fingerBVP = CHROME_DEHAAN(finger_frames, 240)
 
-    ICA_faceBVP = ICA_POH(face_frames, 240)
-    ICA_fingerBVP = ICA_POH(finger_frames, 240)
+    # ICA_faceBVP = ICA_POH(face_frames, 240)
+    # ICA_fingerBVP = ICA_POH(finger_frames, 240)
+
+    POS_faceBVP = POS_WANG(face_frames, 240)
+    POS_fingerBVP = POS_WANG(finger_frames, 240)
 
     fig = plt.figure(figsize=(20, 18))
     print('Plotting figures')
 
     plt.plot(chrome_faceBVP, label='Chrome face')
     plt.plot(chrome_fingerBVP, label='Chrome finger')
-    plt.plot(ICA_fingerBVP, label='ICA finger')
-    plt.plot(ICA_faceBVP, label='ICA face')
+    # plt.plot(ICA_fingerBVP, label='ICA finger')
+    # plt.plot(ICA_faceBVP, label='ICA face')
+    plt.plot(POS_faceBVP, label='POS face')
+    plt.plot(POS_fingerBVP, label='POS finger')
+    plt.savefig(env_path+'PPG.jpg')
     plt.legend()
     plt.show()
 
@@ -84,8 +91,8 @@ def PTT(device_type):
         print('synchronized')
 
 
-if __name__ == '__main__':
-    device_type = 'remote'
-    video_process(device_type)
-    PTT(device_type)
 
+if __name__ == '__main__':
+    device_type = 'Remote'
+    # video_process(device_type)
+    PTT(device_type)
