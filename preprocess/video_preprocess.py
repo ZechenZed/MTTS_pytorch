@@ -125,11 +125,12 @@ def preprocess_raw_video_unsupervised(video_file_path, dim=108, face_crop=True):
             # Cropping out ROI from the original image based on the "1:1:1"ish face ratio
             roi = 0
             for (x, y, w, h) in faces:
-                roi = img_as_float(img[int(y - 0.25 * h):int(y + 1.05 * h), int(x - 0.15 * w):int(x + 1.15 * w), :])
+                roi = img_as_float(img[int(y+0.125*h):int(y+0.875*h), int(x+0.125*w):int(x+0.875*w), :])
 
             # Original resizing from MTTS_CAN
             vidLxL = cv2.resize(roi, (dim, dim), interpolation=cv2.INTER_AREA)
-
+            # plt.matshow(vidLxL)
+            # plt.show()
         vidLxL = cv2.cvtColor(vidLxL.astype('float32'), cv2.COLOR_BGR2RGB)
         vidLxL[vidLxL > 1] = 1
         vidLxL[vidLxL < (1 / 255)] = 1 / 255
