@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import os
+import global_align as ga
 
 # print(os.cpu_count())
 os.environ['CUDA_VISIBLE_DEVICES'] = '1'
@@ -35,6 +36,23 @@ def video_process(device_type):
         # np.save(f'{env_path}/preprocessed_DC/finger/{video[0:4]}.npy', finger_frames)
 
 
+def plotting(method_name, faceBVP, fingerBVP):
+    face_peaks, _ = find_peaks(faceBVP, distance=80)
+    finger_peaks, _ = find_peaks(fingerBVP, distance=80)
+    print(f'Number of face peaks:{len(face_peaks)} and Number of finger peaks{len(finger_peaks)}')
+    plt.plot(face_peaks, faceBVP[face_peaks], 'o', label=f'{method_name} face peaks')
+    plt.plot(finger_peaks, fingerBVP[finger_peaks], 'x', label=f'{method_name}finger peaks')
+    plt.plot(faceBVP, label=f'{method_name}face')
+    plt.plot(fingerBVP, label=f'{method_name}finger')
+    plt.legend()
+    plt.show()
+
+
+def normalization(bvp):
+    bvp = bvp / max(abs(bvp))
+    return bvp
+
+
 def PTT(device_type):
     if device_type == "local":
         env_path = 'C:/Users/Zed/Desktop/preprocessed_DC/'
@@ -63,49 +81,24 @@ def PTT(device_type):
     print('Processing CHROME')
     chrome_faceBVP = CHROME_DEHAAN(face_frames, 240)
     chrome_fingerBVP = CHROME_DEHAAN(finger_frames, 240)
-    plt.plot(chrome_faceBVP, label='Chrome face')
-    plt.plot(chrome_fingerBVP, label='Chrome finger')
-    plt.legend()
-    plt.show()
+    chrome_faceBVP = normalization(chrome_faceBVP)
+    chrome_fingerBVP = normalization(chrome_fingerBVP)
+    plotting('Chrome', chrome_faceBVP, chrome_fingerBVP)
 
     ICA_faceBVP = ICA_POH(face_frames, 240)
     ICA_fingerBVP = ICA_POH(finger_frames, 240)
-    plt.plot(ICA_faceBVP, label='ICA face')
-    plt.plot(ICA_fingerBVP, label='ICA finger')
-    plt.legend()
-    plt.show()
+    ICA_faceBVP = normalization(ICA_faceBVP)
+    ICA_fingerBVP = normalization(ICA_fingerBVP)
+    plotting('ICA', ICA_faceBVP, ICA_fingerBVP)
 
     POS_faceBVP = POS_WANG(face_frames, 240)
     POS_fingerBVP = POS_WANG(finger_frames, 240)
-
-    fig = plt.figure(figsize=(10, 5))
-    print('Plotting figures')
-
-    # plt.plot(chrome_faceBVP, label='Chrome face')
-    # plt.plot(chrome_fingerBVP, label='Chrome finger')
-    # plt.plot(ICA_faceBVP, label='ICA face')
-    # plt.plot(ICA_fingerBVP, label='ICA finger')
-    plt.plot(POS_faceBVP, label='POS face')
-    plt.plot(POS_fingerBVP, label='POS finger')
-    plt.savefig(env_path + 'PPG.jpg', dpi=2400)
-    plt.legend()
-    plt.show()
-
-    chrome_peaks, _ = find_peaks(chrome_faceBVP, distance=5)
-    chorme_finger_peaks, _ = find_peaks(chrome_fingerBVP, distance=5)
-    if len(chorme_finger_peaks) > len(chrome_peaks):
-        chorme_finger_peaks = chorme_finger_peaks[0:len(chrome_peaks)]
-    PTT = chorme_finger_peaks - chrome_peaks
-    plt.plot(PTT)
-    plt.show()
-    ICA_peaks, _ = find_peaks(chrome_faceBVP, distance=5)
-    ICA_finger_peaks, _ = find_peaks(chrome_fingerBVP, distance=5)
-
-    if len(ICA_peaks) == len(ICA_finger_peaks):
-        print('synchronized')
+    POS_faceBVP = normalization(POS_faceBVP)
+    POS_fingerBVP = normalization(POS_fingerBVP)
+    plotting('POS', POS_faceBVP, POS_fingerBVP)
 
 
 if __name__ == '__main__':
-    device_type = 'remote'
-    video_process(device_type)
-    # PTT(device_type)
+    device_type = 'local'
+    # video_process(device_type)
+    PTT(device_type)
