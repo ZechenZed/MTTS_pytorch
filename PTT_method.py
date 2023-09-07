@@ -32,8 +32,8 @@ def video_process(device_type):
     print(video_file_path)
 
     for video in video_file_path:
-        finger_frames = preprocess_finger(env_path + 'Dual_Camera/finger/' + video)
         frames, fps = preprocess_raw_video_unsupervised(face_video_folder_path + video)
+        finger_frames = preprocess_finger(env_path + 'Dual_Camera/finger/' + video)
         np.save(f'{env_path}/preprocessed_DC/face/{video[0:4]}.npy', frames)
         np.save(f'{env_path}/preprocessed_DC/finger/{video[0:4]}.npy', finger_frames)
 
@@ -111,6 +111,6 @@ def PTT(device_type):
 
 
 if __name__ == '__main__':
-    device_type = 'remote'
+    device_type = 'disk'
     video_process(device_type)
     # PTT(device_type)
