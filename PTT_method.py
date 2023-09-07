@@ -28,14 +28,14 @@ def video_process(device_type):
     for path in sorted(os.listdir(face_video_folder_path)):
         if os.path.isfile(os.path.join(face_video_folder_path, path)):
             video_file_path.append(path)
-    video_file_path = video_file_path[0:1]
+    video_file_path = video_file_path[3:4]
     print(video_file_path)
 
     for video in video_file_path:
-        # finger_frames = preprocess_finger(env_path + 'Dual_Camera/finger/' + video)
+        finger_frames = preprocess_finger(env_path + 'Dual_Camera/finger/' + video)
         frames, fps = preprocess_raw_video_unsupervised(face_video_folder_path + video)
         np.save(f'{env_path}/preprocessed_DC/face/{video[0:4]}.npy', frames)
-        # np.save(f'{env_path}/preprocessed_DC/finger/{video[0:4]}.npy', finger_frames)
+        np.save(f'{env_path}/preprocessed_DC/finger/{video[0:4]}.npy', finger_frames)
 
 
 def plotting(method_name, faceBVP, fingerBVP):
@@ -86,7 +86,7 @@ def PTT(device_type):
     print('Processing CHROME')
     chrome_faceBVP = CHROME_DEHAAN(face_frames, fs)
     chrome_fingerBVP = CHROME_DEHAAN(finger_frames, fs)
-    [b_resp, a_resp] = butter(2, [(40/60) / fs * 2, (140/60) / fs * 2], btype='bandpass')
+    [b_resp, a_resp] = butter(6, [(40/60) / fs * 2, (140/60) / fs * 2], btype='bandpass')
     chrome_faceBVP = filtfilt(b_resp, a_resp, np.double(chrome_faceBVP))
     chrome_fingerBVP = filtfilt(b_resp, a_resp, np.double(chrome_fingerBVP))
     chrome_faceBVP = normalization(chrome_faceBVP)
@@ -111,6 +111,6 @@ def PTT(device_type):
 
 
 if __name__ == '__main__':
-    device_type = 'disk'
-    # video_process(device_type)
-    PTT(device_type)
+    device_type = 'remote'
+    video_process(device_type)
+    # PTT(device_type)
