@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import os
-import global_align as ga
+# import global_align as ga
 
 # print(os.cpu_count())
 os.environ['CUDA_VISIBLE_DEVICES'] = '1'
