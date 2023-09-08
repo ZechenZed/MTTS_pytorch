@@ -21,8 +21,9 @@ def _process_video(frames):
 
 
 def POS_WANG(frames, fs):
-    WinSec = 1.6
+    # WinSec = 1.6
     RGB = _process_video(frames)
+    WinSec = RGB.shape[0] / fs * 0.0625 * 2
     N = RGB.shape[0]
     H = np.zeros((1, N))
     l = math.ceil(WinSec * fs)

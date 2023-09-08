@@ -11,7 +11,9 @@ import unsupervised_method.utils as utils
 def CHROME_DEHAAN(frames, FS):
     LPF = 0.7
     HPF = 2.5
-    WinSec = 1.6
+    # WinSec = 10
+    WinSec = frames.shape[0] / 240 * 0.0625 * 4
+    print(f'Winsec :{WinSec}')
 
     RGB = process_video(frames)
     FN = RGB.shape[0]
