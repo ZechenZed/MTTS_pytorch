@@ -79,7 +79,7 @@ def PTT(device_type):
     finger_frames = np.load(env_path + 'finger/S058.npy')
 
     start_time = 5
-    end_time = 20
+    end_time = 45
     fs = 240
     start_frame = start_time * fs
     end_frame = start_frame + end_time * 240
@@ -98,11 +98,13 @@ def PTT(device_type):
     chrome_faceBVP = normalization(chrome_faceBVP)
     chrome_fingerBVP = normalization(chrome_fingerBVP)
     chrome_face_peaks, chrome_finger_peaks = plotting('Chrome', chrome_faceBVP, chrome_fingerBVP)
-    PTT = chrome_face_peaks - chrome_finger_peaks
+    if len(chrome_finger_peaks) == len(chrome_face_peaks):
+        PTT = chrome_face_peaks - chrome_finger_peaks
 
-    plt.plot(PTT)
-    plt.plot(biodata)
-    plt.show()
+        plt.plot(PTT)
+        plt.plot(biodata)
+        plt.show()
+
     # ICA_faceBVP = ICA_POH(face_frames, fs)
     # ICA_fingerBVP = ICA_POH(finger_frames, fs)
     # # ICA_faceBVP = filtfilt(b_resp, a_resp, np.double(ICA_faceBVP))
@@ -121,6 +123,6 @@ def PTT(device_type):
 
 
 if __name__ == '__main__':
-    device_type = 'disk'
+    device_type = 'local'
     # video_process(device_type)
     PTT(device_type)
