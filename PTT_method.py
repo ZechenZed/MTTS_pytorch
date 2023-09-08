@@ -74,12 +74,12 @@ def PTT(device_type):
 
     biodata = pd.read_csv(env_path+'bp/S58.csv')['SystolicBP']
     print('Loading Face Frames')
-    face_frames = np.load(env_path + 'face/S058.npy')
+    face_frames = np.load(env_path + 'face/S058_mini.npy')
     print('Loading Finger Frames')
-    finger_frames = np.load(env_path + 'finger/S058.npy')
+    finger_frames = np.load(env_path + 'finger/S058_mini.npy')
 
     start_time = 5
-    end_time = 45
+    end_time = 15
     fs = 240
     start_frame = start_time * fs
     end_frame = start_frame + end_time * 240
@@ -88,6 +88,8 @@ def PTT(device_type):
 
     face_frames = face_frames[start_frame:end_frame]
     finger_frames = finger_frames[start_frame:end_frame]
+    # np.save(env_path + 'face/S058_mini.npy',face_frames)
+    # np.save(env_path + 'finger/S058_mini.npy',finger_frames)
 
     print('Processing CHROME')
     chrome_faceBVP = CHROME_DEHAAN(face_frames, fs)
@@ -112,17 +114,15 @@ def PTT(device_type):
     # ICA_faceBVP = normalization(ICA_faceBVP)
     # ICA_fingerBVP = normalization(ICA_fingerBVP)
     # plotting('ICA', ICA_faceBVP, ICA_fingerBVP)
-    #
-    # POS_faceBVP = POS_WANG(face_frames, fs)
-    # POS_fingerBVP = POS_WANG(finger_frames, fs)
-    # # POS_faceBVP = filtfilt(b_resp, a_resp, np.double(POS_faceBVP))
-    # # POS_fingerBVP = filtfilt(b_resp, a_resp, np.double(POS_fingerBVP))
-    # POS_faceBVP = normalization(POS_faceBVP)
-    # POS_fingerBVP = normalization(POS_fingerBVP)
-    # plotting('POS', POS_faceBVP, POS_fingerBVP)
+
+    POS_faceBVP = POS_WANG(face_frames, fs)
+    POS_fingerBVP = POS_WANG(finger_frames, fs)
+    POS_faceBVP = normalization(POS_faceBVP)
+    POS_fingerBVP = normalization(POS_fingerBVP)
+    plotting('POS', POS_faceBVP, POS_fingerBVP)
 
 
 if __name__ == '__main__':
-    device_type = 'local'
+    device_type = 'disk'
     # video_process(device_type)
     PTT(device_type)

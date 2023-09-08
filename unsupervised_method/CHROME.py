@@ -18,7 +18,7 @@ def CHROME_DEHAAN(frames, FS):
     RGB = process_video(frames)
     FN = RGB.shape[0]
     NyquistF = 1 / 2 * FS
-    B, A = signal.butter(2, [LPF / NyquistF, HPF / NyquistF], 'bandpass')
+    B, A = signal.butter(4, [LPF / NyquistF, HPF / NyquistF], 'bandpass')
 
     WinL = math.ceil(WinSec * FS)
     if WinL % 2:
