@@ -34,7 +34,7 @@ def data_process(data_type, device_type, image=str(), dim=36):
         if os.path.isfile(os.path.join(video_folder_path, path)):
             video_file_path.append(path)
 
-    # video_file_path = video_file_path[43:50]
+    video_file_path = video_file_path[15:25]
     num_video = len(video_file_path)
     print('Processing ' + str(num_video) + ' Videos')
 
@@ -52,7 +52,7 @@ def data_process(data_type, device_type, image=str(), dim=36):
     for path in sorted(os.listdir(BP_folder_path)):
         if os.path.isfile(os.path.join(BP_folder_path, path)):
             BP_file_path.append(path)
-    # BP_file_path = BP_file_path[43:50]
+    BP_file_path = BP_file_path[15:25]
 
     frames = np.zeros(shape=(tt_frame, 6, dim, dim))
     BP_lf = np.zeros(shape=tt_frame)
@@ -71,7 +71,7 @@ def data_process(data_type, device_type, image=str(), dim=36):
         current_frames = min(BP_lf_len, video_len)
         temp_BP_lf = temp_BP_lf[0:current_frames]
         ############# Systolic BP finding and linear interp #############
-        temp_BP_lf_systolic_peaks, _ = find_peaks(temp_BP_lf, distance=10,prominence=20)
+        temp_BP_lf_systolic_peaks, _ = find_peaks(temp_BP_lf, distance=8)
 
         temp_BP_lf_systolic_inter = np.zeros(current_frames)
         first_index = temp_BP_lf_systolic_peaks[0]
@@ -234,7 +234,7 @@ def only_BP(data_type, device_type, image=str(), dim=36):
 
 
 if __name__ == '__main__':
-    data_process('valid', 'remote', 'face_large')
+    data_process('valid', 'local', 'face_large')
     # data_process('train', 'remote', 'face_large')
     # data_process('test', 'remote', 'face_large')
     # only_BP('train', 'remote', 'face_large')
