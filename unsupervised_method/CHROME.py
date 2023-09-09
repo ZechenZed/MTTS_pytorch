@@ -1,4 +1,4 @@
-# The Chrominance Method from: De Haan, G., & Jeanne, V. (2013).
+  # The Chrominance Method from: De Haan, G., & Jeanne, V. (2013).
 # Robust pulse rate from chrominance-based rPPG. IEEE Transactions on Biomedical Engineering, 60(10), 2878-2886.
 # DOI: 10.1109/TBME.2013.2266196
 import numpy as np
@@ -18,7 +18,7 @@ def CHROME_DEHAAN(frames, FS):
     RGB = process_video(frames)
     FN = RGB.shape[0]
     NyquistF = 1 / 2 * FS
-    B, A = signal.butter(4, [LPF / NyquistF, HPF / NyquistF], 'bandpass')
+    B, A = signal.butter(2, [LPF / NyquistF, HPF / NyquistF], 'bandpass')
 
     WinL = math.ceil(WinSec * FS)
     if WinL % 2:

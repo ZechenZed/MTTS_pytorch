@@ -1,7 +1,4 @@
 import os
-
-print(os.cpu_count())
-os.environ['CUDA_VISIBLE_DEVICES'] = '1'
 import numpy as np
 from statistics import mean
 import matplotlib.pyplot as plt
@@ -10,6 +7,8 @@ from joblib import Parallel, delayed
 from scipy.interpolate import interp1d
 from scipy.ndimage import gaussian_filter
 from video_preprocess import preprocess_raw_video, count_frames
+
+os.environ['CUDA_VISIBLE_DEVICES'] = '1'
 
 
 def data_process(data_type, device_type, image=str(), dim=36):
@@ -35,13 +34,14 @@ def data_process(data_type, device_type, image=str(), dim=36):
         if os.path.isfile(os.path.join(video_folder_path, path)):
             video_file_path.append(path)
 
-    # video_file_path = video_file_path[41:45]
+    video_file_path = video_file_path[43:50]
     num_video = len(video_file_path)
     print('Processing ' + str(num_video) + ' Videos')
 
     videos = [Parallel(n_jobs=8)(
         delayed(preprocess_raw_video)(video_folder_path + video, dim) for video in video_file_path)]
     videos = videos[0]
+
 
     tt_frame = 0
     for i in range(num_video):
@@ -52,12 +52,11 @@ def data_process(data_type, device_type, image=str(), dim=36):
     for path in sorted(os.listdir(BP_folder_path)):
         if os.path.isfile(os.path.join(BP_folder_path, path)):
             BP_file_path.append(path)
-    # BP_file_path = BP_file_path[41:45]
+    BP_file_path = BP_file_path[43:50]
 
     frames = np.zeros(shape=(tt_frame, 6, dim, dim))
     BP_lf = np.zeros(shape=tt_frame)
     frame_ind = 0
-
     for i in range(num_video):
         print(f'BP process on {BP_file_path[i]}')
         temp_BP = np.loadtxt(BP_folder_path + BP_file_path[i])  # BP loading
@@ -66,59 +65,56 @@ def data_process(data_type, device_type, image=str(), dim=36):
 
         ################# Down-sample BP 1000Hz --> 25Hz using moving mean window ################
         for j in range(0, len(temp_BP_lf)):
-            temp_BP_lf[j] = mean(temp_BP[j * 40:(j + 1) * 40])
+            temp_BP_lf[j] = np.average(temp_BP[j * 40:(j + 1) * 40])
+
+        video_len = videos[i].shape[0]
+        current_frames = min(BP_lf_len, video_len)
+        temp_BP_lf = temp_BP_lf[0:current_frames]
+        ############# Systolic BP finding and linear interp #############
+        temp_BP_lf_systolic_peaks, _ = find_peaks(temp_BP_lf, distance=10,prominence=20)
+
+        temp_BP_lf_systolic_inter = np.zeros(current_frames)
+        first_index = temp_BP_lf_systolic_peaks[0]
+        prev_index = 0
+        for index in temp_BP_lf_systolic_peaks:
+            y_interp = interp1d([prev_index, index], [temp_BP_lf[prev_index], temp_BP_lf[index]])
+            for k in range(prev_index, index + 1):
+                temp_BP_lf_systolic_inter[k] = y_interp(k)
+            prev_index = index
+        y_interp = interp1d([prev_index, current_frames - 1],
+                            [temp_BP_lf[prev_index], temp_BP_lf[current_frames - 1]])
+        for l in range(prev_index, current_frames):
+            temp_BP_lf_systolic_inter[l] = y_interp(l)
+        temp_BP_lf_systolic_inter = temp_BP_lf_systolic_inter[first_index:-1]
 
         ################ Find incorrect BP values ################
-        invalid_index_BP = np.where((temp_BP_lf < 40) | (temp_BP_lf > 220))[0]
-        # invalid_index_BP = np.where(temp_BP_lf < 60)[0]
-        video_len = videos[i].shape[0]
-        if len(invalid_index_BP) == 0:
-            invalid_len = min(BP_lf_len, video_len)
+        invalid_index_BP = np.where((temp_BP_lf_systolic_inter < 70) | (temp_BP_lf_systolic_inter > 220))[0]
+
+        if len(invalid_index_BP) != 0:
+            current_frames = invalid_index_BP[0] // 120 * 120
         else:
-            invalid_len = invalid_index_BP[0]
-        current_frames = invalid_len // 120 * 120
+            current_frames = len(temp_BP_lf_systolic_inter) // 120 * 120
 
         if current_frames == 0 or current_frames < 0:
             print(f'Skip video: {BP_file_path[i]}')
             continue
         else:
-            # Create new video array with skipped frame size
-            temp_video = np.zeros((current_frames, 6, 36, 36))
-            temp_BP_lf = np.delete(temp_BP_lf, invalid_index_BP)
-            temp_BP_lf = temp_BP_lf[0:current_frames]
-            if len(invalid_index_BP) != 0:
-                for frame in range(current_frames):
-                    if frame in invalid_index_BP:
-                        break
-                    temp_video[frame] = videos[i][frame]
+            temp_BP_lf_systolic_inter = temp_BP_lf_systolic_inter[0:current_frames]
 
-            ############# Systolic BP finding and linear interp #############
-            temp_BP_lf_systolic_peaks, _ = find_peaks(temp_BP_lf, distance=10)
-            temp_BP_lf_systolic_inter = np.zeros(current_frames)
-            prev_index = 0
-            for index in temp_BP_lf_systolic_peaks:
-                y_interp = interp1d([prev_index, index], [temp_BP_lf[prev_index], temp_BP_lf[index]])
-                for k in range(prev_index, index + 1):
-                    temp_BP_lf_systolic_inter[k] = y_interp(k)
-                prev_index = index
-            y_interp = interp1d([prev_index, current_frames - 1],
-                                [temp_BP_lf[prev_index], temp_BP_lf[current_frames - 1]])
-            for l in range(prev_index, current_frames):
-                temp_BP_lf_systolic_inter[l] = y_interp(l)
+        ############# BP smoothing #############
+        plt.plot(temp_BP_lf_systolic_inter)
+        temp_BP_lf_systolic_inter = gaussian_filter(temp_BP_lf_systolic_inter, sigma=5)
+        plt.plot(temp_BP_lf_systolic_inter)
+        plt.show()
+        BP_lf[frame_ind:frame_ind + current_frames] = temp_BP_lf_systolic_inter
 
-            ############# BP smoothing #############
-            temp_BP_lf_systolic_inter = gaussian_filter(temp_BP_lf_systolic_inter, sigma=15)
-            BP_lf[frame_ind:frame_ind + current_frames] = temp_BP_lf_systolic_inter
+        ############# Video Batches #############
+        frames[frame_ind:frame_ind + current_frames] = videos[i][first_index:first_index+current_frames]
+        frame_ind += current_frames
 
-            ############# Video Batches #############
-            frames[frame_ind:frame_ind + current_frames, :, :, :] = videos[i][0:current_frames, :, :, :]
-            frame_ind += current_frames
-
-    plt.plot(BP_lf)
-    plt.savefig('/edrive2/zechenzh/BP.jpg', dpi=1200)
-
-    # print(f'Minimum of all BP is {min(BP_lf)}')
-    # print(f'Frames size equals BP size is {BP_lf.shape[0] == frames.shape[0]}')
+    ind_BP_rest = np.where(BP_lf == 0)[0][0]
+    BP_lf = BP_lf[0:ind_BP_rest]
+    frames = frames[0:ind_BP_rest]
 
     frames = frames.reshape((-1, 10, 6, dim, dim))
     BP_lf = BP_lf.reshape((-1, 10))
@@ -129,7 +125,7 @@ def data_process(data_type, device_type, image=str(), dim=36):
     else:
         saving_path = 'C:/Users/Zed/Desktop/V4V/preprocessed_v4v/'
     np.save(saving_path + data_type + '_frames_' + image + '.npy', frames)
-    np.save(saving_path + data_type + '_BP_systolic_a25.npy', BP_lf)
+    np.save(saving_path + data_type + '_BP_systolic.npy', BP_lf)
 
 
 def only_BP(data_type, device_type, image=str(), dim=36):
@@ -238,9 +234,9 @@ def only_BP(data_type, device_type, image=str(), dim=36):
 
 
 if __name__ == '__main__':
-    # data_process('valid', 'remote', 'face_large')
-    data_process('train', 'remote', 'face_large')
-    data_process('test', 'remote', 'face_large')
+    data_process('valid', 'remote', 'face_large')
+    # data_process('train', 'remote', 'face_large')
+    # data_process('test', 'remote', 'face_large')
     # only_BP('train', 'remote', 'face_large')
     # only_BP('valid', 'remote', 'face_large')
     # only_BP('test', 'local', 'face_large')

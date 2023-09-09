@@ -74,12 +74,12 @@ def PTT(device_type):
 
     biodata = pd.read_csv(env_path+'bp/S58.csv')['SystolicBP']
     print('Loading Face Frames')
-    face_frames = np.load(env_path + 'face/S058_mini.npy')
+    face_frames = np.load(env_path + 'face/S058.npy')
     print('Loading Finger Frames')
-    finger_frames = np.load(env_path + 'finger/S058_mini.npy')
+    finger_frames = np.load(env_path + 'finger/S058.npy')
 
     start_time = 5
-    end_time = 15
+    end_time = 45
     fs = 240
     start_frame = start_time * fs
     end_frame = start_frame + end_time * 240
@@ -115,14 +115,14 @@ def PTT(device_type):
     # ICA_fingerBVP = normalization(ICA_fingerBVP)
     # plotting('ICA', ICA_faceBVP, ICA_fingerBVP)
 
-    POS_faceBVP = POS_WANG(face_frames, fs)
-    POS_fingerBVP = POS_WANG(finger_frames, fs)
-    POS_faceBVP = normalization(POS_faceBVP)
-    POS_fingerBVP = normalization(POS_fingerBVP)
-    plotting('POS', POS_faceBVP, POS_fingerBVP)
+    # POS_faceBVP = POS_WANG(face_frames, fs)
+    # POS_fingerBVP = POS_WANG(finger_frames, fs)
+    # POS_faceBVP = normalization(POS_faceBVP)
+    # POS_fingerBVP = normalization(POS_fingerBVP)
+    # plotting('POS', POS_faceBVP, POS_fingerBVP)
 
 
 if __name__ == '__main__':
-    device_type = 'disk'
+    device_type = 'local'
     # video_process(device_type)
     PTT(device_type)
