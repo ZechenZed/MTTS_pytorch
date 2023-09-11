@@ -54,7 +54,7 @@ class TSCAN_trainer:
         self.model = TSCAN(frame_depth=self.frame_depth, img_size=36, dropout_rate1=self.drop_rate1,
                            dropout_rate2=self.drop_rate2, kernel_size=self.kernel, nb_dense=self.nb_dense,
                            pool_size=self.pool_size).to(self.device)
-        self.model = torch.nn.DataParallel(self.model, device_ids=list(range(setup.nb_device)))
+        # self.model = torch.nn.DataParallel(self.model, device_ids=list(range(setup.nb_device)))
 
         v4v_data_train = V4V_Dataset(data_folder_path, 'train', setup.image_type, setup.BP_type)
         self.train_loader = DataLoader(dataset=v4v_data_train, batch_size=self.batch_size,
@@ -304,7 +304,7 @@ if __name__ == '__main__':
                         help='learning rate')
     parser.add_argument('-fd', '--frame_depth', type=int, default=10,
                         help='frame depth')
-    parser.add_argument('--drop_rate1', type=float, default=0.1,
+    parser.add_argument('--drop_rate1', type=float, default=0.25,
                         help='Drop rate 1')
     parser.add_argument('--drop_rate2', type=float, default=0.25,
                         help='Drop rate 2')
