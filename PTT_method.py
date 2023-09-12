@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import os
+
 # import global_align as ga
 
 # print(os.cpu_count())
@@ -39,7 +40,7 @@ def video_process(device_type):
 
 
 def plotting(method_name, faceBVP, fingerBVP):
-    dist_min = 240/2.5
+    dist_min = 240 / 2.5
     face_peaks, _ = find_peaks(faceBVP, distance=dist_min)
     finger_peaks, _ = find_peaks(fingerBVP, distance=dist_min)
     print(f'Number of face peaks:{len(face_peaks)} and Number of finger peaks{len(finger_peaks)}')
@@ -50,6 +51,7 @@ def plotting(method_name, faceBVP, fingerBVP):
     plt.legend()
     plt.show()
     return face_peaks, finger_peaks
+
 
 def normalization(bvp):
     bvp = bvp / max(abs(bvp))
@@ -72,7 +74,7 @@ def PTT(device_type):
 
     print(video_file_path)
 
-    biodata = pd.read_csv(env_path+'bp/S58.csv')['SystolicBP']
+    biodata = np.array(pd.read_csv(env_path + 'bp/S58.csv')['SystolicBP'])
     print('Loading Face Frames')
     face_frames = np.load(env_path + 'face/S058.npy')
     print('Loading Finger Frames')
@@ -83,43 +85,52 @@ def PTT(device_type):
     fs = 240
     start_frame = start_time * fs
     end_frame = start_frame + end_time * 240
-    # end_frame = int(min(len(face_frames), len(finger_frames)) / 10)
-    biodata = biodata[start_frame*1000:end_time*1000]
+    biodata = biodata[start_frame * 1000:end_time * 1000]
 
     face_frames = face_frames[start_frame:end_frame]
     finger_frames = finger_frames[start_frame:end_frame]
-    # np.save(env_path + 'face/S058_mini.npy',face_frames)
-    # np.save(env_path + 'finger/S058_mini.npy',finger_frames)
 
     print('Processing CHROME')
     chrome_faceBVP = CHROME_DEHAAN(face_frames, fs)
     chrome_fingerBVP = CHROME_DEHAAN(finger_frames, fs)
-    # [b_resp, a_resp] = butter(6, [(40/60) / fs * 2, (140/60) / fs * 2], btype='bandpass')
-    # chrome_faceBVP = filtfilt(b_resp, a_resp, np.double(chrome_faceBVP))
-    # chrome_fingerBVP = filtfilt(b_resp, a_resp, np.double(chrome_fingerBVP))
     chrome_faceBVP = normalization(chrome_faceBVP)
     chrome_fingerBVP = normalization(chrome_fingerBVP)
     chrome_face_peaks, chrome_finger_peaks = plotting('Chrome', chrome_faceBVP, chrome_fingerBVP)
-    if len(chrome_finger_peaks) == len(chrome_face_peaks):
-        PTT = chrome_face_peaks - chrome_finger_peaks
+    ran = min(len(chrome_face_peaks), len(chrome_finger_peaks)) // 5
+    PTT = []
+    for i in range(ran):
+        PTT.append(np.average(chrome_face_peaks[5 * i:5 * (i + 1)]) - \
+                   np.average(chrome_finger_peaks[5 * i:5 * (i + 1)]))
+    plt.plot(PTT)
+    plt.plot(biodata)
+    plt.show()
 
-        plt.plot(PTT)
-        plt.plot(biodata)
-        plt.show()
+    ICA_faceBVP = ICA_POH(face_frames, fs)
+    ICA_fingerBVP = ICA_POH(finger_frames, fs)
+    ICA_faceBVP = normalization(ICA_faceBVP)
+    ICA_fingerBVP = normalization(ICA_fingerBVP)
+    ICA_face_peaks, ICA_finger_peaks = plotting('ICA', ICA_faceBVP, ICA_fingerBVP)
+    PTT = []
+    for i in range(ran):
+        PTT.append(np.average(ICA_face_peaks[5 * i:5 * (i + 1)]) - \
+                   np.average(ICA_finger_peaks[5 * i:5 * (i + 1)]))
+    plt.plot(PTT)
+    plt.plot(biodata)
+    plt.show()
 
-    # ICA_faceBVP = ICA_POH(face_frames, fs)
-    # ICA_fingerBVP = ICA_POH(finger_frames, fs)
-    # # ICA_faceBVP = filtfilt(b_resp, a_resp, np.double(ICA_faceBVP))
-    # # ICA_fingerBVP = filtfilt(b_resp, a_resp, np.double(ICA_fingerBVP))
-    # ICA_faceBVP = normalization(ICA_faceBVP)
-    # ICA_fingerBVP = normalization(ICA_fingerBVP)
-    # plotting('ICA', ICA_faceBVP, ICA_fingerBVP)
+    POS_faceBVP = POS_WANG(face_frames, fs)
+    POS_fingerBVP = POS_WANG(finger_frames, fs)
+    POS_faceBVP = normalization(POS_faceBVP)
+    POS_fingerBVP = normalization(POS_fingerBVP)
+    POS_face_peaks, POS_finger_peaks = plotting('POS', POS_faceBVP, POS_fingerBVP)
+    PTT = []
+    for i in range(ran):
+        PTT.append(np.average(POS_face_peaks[5 * i:5 * (i + 1)]) - \
+                   np.average(POS_finger_peaks[5 * i:5 * (i + 1)]))
+    plt.plot(PTT)
+    plt.plot(biodata)
+    plt.show()
 
-    # POS_faceBVP = POS_WANG(face_frames, fs)
-    # POS_fingerBVP = POS_WANG(finger_frames, fs)
-    # POS_faceBVP = normalization(POS_faceBVP)
-    # POS_fingerBVP = normalization(POS_fingerBVP)
-    # plotting('POS', POS_faceBVP, POS_fingerBVP)
 
 
 if __name__ == '__main__':
