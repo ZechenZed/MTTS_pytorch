@@ -64,10 +64,10 @@ def preprocess_raw_video(video_file_path, dim=72, plot=True, face_crop=True):
                 y = int(bounding_box.ymin * img.shape[0])
                 h = int(bounding_box.height * img.shape[0])
 
-                cv2.rectangle(img, (x, int(y - 0.2 * h)), (x + w, y + h), (0, 255, 0), 2)
+                # cv2.rectangle(img, (x, int(y - 0.2 * h)), (x + w, y + h), (0, 255, 0), 2)
                 roi = img_as_float(img[int(y - 0.2 * h):y + h, x:x + w, :])
 
-            ###### Video #######
+            # ##### Video #######
             # cv2.imshow('Frame', img)
             # # Press 'q' to quit
             # if cv2.waitKey(1) & 0xFF == ord('q'):
@@ -75,6 +75,7 @@ def preprocess_raw_video(video_file_path, dim=72, plot=True, face_crop=True):
         try:
             vidLxL = cv2.resize(roi, (dim, dim), interpolation=cv2.INTER_AREA)
         except AssertionError:
+            print(f'Exception triggered in {video_file_path[-12:]} ')
             vidLxL = cv2.resize(prev_roi, (dim, dim), interpolation=cv2.INTER_AREA)
         # vidLxL = cv2.rotate(vidLxL, cv2.ROTATE_90_CLOCKWISE)
         vidLxL = cv2.cvtColor(vidLxL.astype('float32'), cv2.COLOR_BGR2RGB)
@@ -85,7 +86,7 @@ def preprocess_raw_video(video_file_path, dim=72, plot=True, face_crop=True):
         success, img = vidObj.read()
         i = i + 1
         prev_roi = roi
-    ###### Video #######
+    ##### Video #######
     # Release the video capture
     # vidObj.release()
     # cv2.destroyAllWindows()
