@@ -75,7 +75,7 @@ def preprocess_raw_video(video_file_path, dim=72, plot=True, face_crop=True):
         try:
             vidLxL = cv2.resize(roi, (dim, dim), interpolation=cv2.INTER_AREA)
         except:
-            print(f'Exception triggered in {video_file_path[-12:]} ')
+            print(f'Exception triggered in {video_file_path[-12:]} at frame {i}')
             vidLxL = cv2.resize(prev_roi, (dim, dim), interpolation=cv2.INTER_AREA)
         # vidLxL = cv2.rotate(vidLxL, cv2.ROTATE_90_CLOCKWISE)
         vidLxL = cv2.cvtColor(vidLxL.astype('float32'), cv2.COLOR_BGR2RGB)
