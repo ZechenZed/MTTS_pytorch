@@ -19,7 +19,7 @@ def preprocess_raw_video(video_file_path, dim=72, plot=True, face_crop=True):
     height, width, _ = img.shape
     # face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
     face_detection = mp.solutions.face_detection.FaceDetection(min_detection_confidence=0.6)
-
+    prev_roi = 0
     ############## Reading frame by frame ##############
     while success:
         t.append(vidObj.get(cv2.CAP_PROP_POS_MSEC))
@@ -72,8 +72,10 @@ def preprocess_raw_video(video_file_path, dim=72, plot=True, face_crop=True):
             # # Press 'q' to quit
             # if cv2.waitKey(1) & 0xFF == ord('q'):
             #     break
-
-        vidLxL = cv2.resize(roi, (dim, dim), interpolation=cv2.INTER_AREA)
+        try:
+            vidLxL = cv2.resize(roi, (dim, dim), interpolation=cv2.INTER_AREA)
+        except:
+            vidLxL = cv2.resize(prev_roi, (dim, dim), interpolation=cv2.INTER_AREA)
         # vidLxL = cv2.rotate(vidLxL, cv2.ROTATE_90_CLOCKWISE)
         vidLxL = cv2.cvtColor(vidLxL.astype('float32'), cv2.COLOR_BGR2RGB)
         vidLxL[vidLxL > 1] = 1
@@ -82,7 +84,7 @@ def preprocess_raw_video(video_file_path, dim=72, plot=True, face_crop=True):
 
         success, img = vidObj.read()
         i = i + 1
-
+        prev_roi = roi
     ###### Video #######
     # Release the video capture
     # vidObj.release()
