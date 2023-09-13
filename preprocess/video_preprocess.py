@@ -37,7 +37,7 @@ def preprocess_raw_video(video_file_path, dim=72, plot=True, face_crop=True):
 
             # Face detection in gray scale image
             gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-            faces = face_cascade.detectMultiScale(gray, 1.01, 6)
+            faces = face_cascade.detectMultiScale(gray, 1.01, 5)
 
             # Cropping out ROI from the original image based on the "1:1:1"ish face ratio
             roi = 0
