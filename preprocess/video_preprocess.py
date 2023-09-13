@@ -65,7 +65,7 @@ def preprocess_raw_video(video_file_path, dim=72, plot=True, face_crop=True):
                 h = int(bounding_box.height * img.shape[0])
 
                 # cv2.rectangle(img, (x, int(y - 0.2 * h)), (x + w, y + h), (0, 255, 0), 2)
-                roi = img_as_float(img[int(y - 0.2 * h):y + h, x:x + w, :])
+                roi = img_as_float(img[y:y + h, x:x + w, :])
 
             # ##### Video #######
             # cv2.imshow('Frame', img)
