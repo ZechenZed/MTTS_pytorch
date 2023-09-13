@@ -8,7 +8,7 @@ from scipy.interpolate import interp1d
 from scipy.ndimage import gaussian_filter
 from video_preprocess import preprocess_raw_video, count_frames
 
-os.environ['CUDA_VISIBLE_DEVICES'] = '1'
+os.environ['CUDA_VISIBLE_DEVICES'] = '0'
 
 
 def data_process(data_type, device_type, image=str(), dim=36):
@@ -34,7 +34,7 @@ def data_process(data_type, device_type, image=str(), dim=36):
         if os.path.isfile(os.path.join(video_folder_path, path)):
             video_file_path.append(path)
 
-    # video_file_path = video_file_path[0:1]
+    video_file_path = video_file_path[9:10]
     num_video = len(video_file_path)
     print('Processing ' + str(num_video) + ' Videos')
 
@@ -235,7 +235,7 @@ def only_BP(data_type, device_type, image=str(), dim=36):
 
 
 if __name__ == '__main__':
-    data_process('valid', 'remote', 'face_large')
+    data_process('valid', 'local', 'face_large')
     # data_process('train', 'remote', 'face_large')
     # data_process('test', 'remote', 'face_large')
     # only_BP('train', 'remote', 'face_large')

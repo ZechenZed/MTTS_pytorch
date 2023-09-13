@@ -25,10 +25,10 @@ def preprocess_raw_video(video_file_path, dim=72, plot=True, face_crop=True):
         t.append(vidObj.get(cv2.CAP_PROP_POS_MSEC))
 
         # Without considering the ratio
-        vidLxL = cv2.resize(img_as_float(img[:, :, :]), (dim, dim), interpolation=cv2.INTER_AREA)
+        # vidLxL = cv2.resize(img_as_float(img[:, :, :]), (dim, dim), interpolation=cv2.INTER_AREA)
 
         if face_crop:
-            # # Add edge to the Img
+            # Add edge to the Img
             # width_edge = 100
             # height_edge = height * (width_edge / width)
             # original_cf = np.float32([[0, 0], [width - 1, 0], [(width - 1) / 2, height - 1]])
@@ -64,18 +64,16 @@ def preprocess_raw_video(video_file_path, dim=72, plot=True, face_crop=True):
                 y = int(bounding_box.ymin * img.shape[0])
                 h = int(bounding_box.height * img.shape[0])
 
-                # cv2.rectangle(img, (x, int(y - 0.2 * h)), (x + w, y + h), (0, 255, 0), 2)
+                cv2.rectangle(img, (x, int(y - 0.2 * h)), (x + w, y + h), (0, 255, 0), 2)
                 roi = img_as_float(img[int(y - 0.2 * h):y + h, x:x + w, :])
 
-            # ###### Video #######
+            ###### Video #######
             # cv2.imshow('Frame', img)
             # # Press 'q' to quit
             # if cv2.waitKey(1) & 0xFF == ord('q'):
             #     break
 
-            # Original resizing from MTTS_CAN
-            vidLxL = cv2.resize(roi, (dim, dim), interpolation=cv2.INTER_AREA)
-
+        vidLxL = cv2.resize(roi, (dim, dim), interpolation=cv2.INTER_AREA)
         # vidLxL = cv2.rotate(vidLxL, cv2.ROTATE_90_CLOCKWISE)
         vidLxL = cv2.cvtColor(vidLxL.astype('float32'), cv2.COLOR_BGR2RGB)
         vidLxL[vidLxL > 1] = 1
@@ -85,11 +83,11 @@ def preprocess_raw_video(video_file_path, dim=72, plot=True, face_crop=True):
         success, img = vidObj.read()
         i = i + 1
 
-    # ###### Video #######
-    # # Release the video capture
+    ###### Video #######
+    # Release the video capture
     # vidObj.release()
     # cv2.destroyAllWindows()
-    #
+
     # if plot:
     #     # Plot an example of data after preprocess
     #     plt.imshow(Xsub[100])
