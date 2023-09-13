@@ -74,11 +74,13 @@ def PTT(device_type):
 
     print(video_file_path)
 
-    biodata = np.array(pd.read_csv(env_path + 'bp/S58.csv')['SystolicBP'])
+    biodata = np.array(pd.read_csv(env_path + 'bp/S55.csv')['SystolicBP'])
     print('Loading Face Frames')
-    face_frames = np.load(env_path + 'face/S058.npy')
+    face_frames = np.load(env_path + 'face/S055.npy')
     print('Loading Finger Frames')
-    finger_frames = np.load(env_path + 'finger/S058.npy')
+    finger_frames = np.load(env_path + 'finger/S055.npy')
+    plt.plot(biodata)
+    plt.show()
 
     start_time = 5
     end_time = 45
