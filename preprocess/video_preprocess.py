@@ -1,6 +1,7 @@
 import random
 import numpy as np
 import cv2
+import mediapipe as mp
 from skimage.util import img_as_float
 from scipy.sparse import spdiags
 import matplotlib.pyplot as plt
@@ -16,7 +17,8 @@ def preprocess_raw_video(video_file_path, dim=72, plot=True, face_crop=True):
     Xsub = np.zeros((totalFrames, dim, dim, 3), dtype=np.float32)
     success, img = vidObj.read()
     height, width, _ = img.shape
-    face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
+    # face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
+    face_detection = mp.solutions.face_detection.FaceDetection(min_detection_confidence=0.6)
 
     ############## Reading frame by frame ##############
     while success:
@@ -35,22 +37,37 @@ def preprocess_raw_video(video_file_path, dim=72, plot=True, face_crop=True):
             # matrix = cv2.getAffineTransform(original_cf, transed_cf)
             # img = cv2.warpAffine(img, matrix, (height, width))
 
-            # Face detection in gray scale image
-            gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-            faces = face_cascade.detectMultiScale(gray, 1.01, 5)
+            ####### Face detection with OPENCV ###########
+            # gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+            # faces = face_cascade.detectMultiScale(gray, 1.01, 5)
+            # for (x, y, w, h) in faces:
+            #     if w < width/2:
+            #         print(f'Warning No Face Detected in {i}th frame')
+            #
+            #     ####### Video #######
+            #     # cv2.rectangle(img, (x, y), (x + w, y + h), (0, 255, 0), 2)
+            #
+            #     roi = img_as_float(img[y:y + h, x:x + w, :])
 
-            # Cropping out ROI from the original image based on the "1:1:1"ish face ratio
+            ########## Face detection with OPENCV #############
+            # img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+
+            ########## Face detection with MediaPipe ############
+            results = face_detection.process(img)
             roi = 0
-            for (x, y, w, h) in faces:
-                if w < width/2:
-                    print(f'Warning No Face Detected in {i}th frame')
+            for face in results.detections:
+                if not face:
+                    print('No face detected')
+                bounding_box = face.location_data.relative_bounding_box
+                x = int(bounding_box.xmin * img.shape[1])
+                w = int(bounding_box.width * img.shape[1])
+                y = int(bounding_box.ymin * img.shape[0])
+                h = int(bounding_box.height * img.shape[0])
 
-                ####### Video #######
-                # cv2.rectangle(img, (x, y), (x + w, y + h), (0, 255, 0), 2)
+                # cv2.rectangle(img, (x, int(y - 0.2 * h)), (x + w, y + h), (0, 255, 0), 2)
+                roi = img_as_float(img[int(y - 0.2 * h):y + h, x:x + w, :])
 
-                roi = img_as_float(img[y:y + h, x:x + w, :])
-
-            ####### Video #######
+            # ###### Video #######
             # cv2.imshow('Frame', img)
             # # Press 'q' to quit
             # if cv2.waitKey(1) & 0xFF == ord('q'):
@@ -68,16 +85,16 @@ def preprocess_raw_video(video_file_path, dim=72, plot=True, face_crop=True):
         success, img = vidObj.read()
         i = i + 1
 
-    ####### Video #######
+    # ###### Video #######
     # # Release the video capture
     # vidObj.release()
     # cv2.destroyAllWindows()
-
-    if plot:
-        # Plot an example of data after preprocess
-        plt.imshow(Xsub[100])
-        plt.title('Sample Preprocessed Frame')
-        plt.show()
+    #
+    # if plot:
+    #     # Plot an example of data after preprocess
+    #     plt.imshow(Xsub[100])
+    #     plt.title('Sample Preprocessed Frame')
+    #     plt.show()
 
     ########################## Normalize raw frames in the appearance branch ##########################
     normalized_len = len(t) - 1
@@ -93,7 +110,7 @@ def preprocess_raw_video(video_file_path, dim=72, plot=True, face_crop=True):
     ##########################  Video array transpose ##########################
     transposed_arr = np.transpose(dXsub, (0, 3, 1, 2))
     dXsub = transposed_arr.reshape((normalized_len, 6, dim, dim))
-    # plt.matshow(dXsub[1000,3,:,:])
+    # plt.matshow(dXsub[1000, 3, :, :])
     # plt.show()
     return dXsub
 
