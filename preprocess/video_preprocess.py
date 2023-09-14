@@ -24,54 +24,52 @@ def preprocess_raw_video(video_file_path, dim=72, plot=True, face_crop=True):
     while success:
         t.append(vidObj.get(cv2.CAP_PROP_POS_MSEC))
 
-        # Without considering the ratio
-        # vidLxL = cv2.resize(img_as_float(img[:, :, :]), (dim, dim), interpolation=cv2.INTER_AREA)
+        # Add edge to the Img
+        # width_edge = 100
+        # height_edge = height * (width_edge / width)
+        # original_cf = np.float32([[0, 0], [width - 1, 0], [(width - 1) / 2, height - 1]])
+        # transed_cf = np.float32([[width_edge - 1, height_edge - 1], [width - width_edge - 1, height_edge - 1],
+        #                          [(width - 1) / 2, height - height_edge - 1]])
+        # matrix = cv2.getAffineTransform(original_cf, transed_cf)
+        # img = cv2.warpAffine(img, matrix, (height, width))
 
-        if face_crop:
-            # Add edge to the Img
-            # width_edge = 100
-            # height_edge = height * (width_edge / width)
-            # original_cf = np.float32([[0, 0], [width - 1, 0], [(width - 1) / 2, height - 1]])
-            # transed_cf = np.float32([[width_edge - 1, height_edge - 1], [width - width_edge - 1, height_edge - 1],
-            #                          [(width - 1) / 2, height - height_edge - 1]])
-            # matrix = cv2.getAffineTransform(original_cf, transed_cf)
-            # img = cv2.warpAffine(img, matrix, (height, width))
+        ####### Face detection with OPENCV ###########
+        # gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+        # faces = face_cascade.detectMultiScale(gray, 1.01, 5)
+        # for (x, y, w, h) in faces:
+        #     if w < width/2:
+        #         print(f'Warning No Face Detected in {i}th frame')
+        #
+        #     ####### Video #######
+        #     # cv2.rectangle(img, (x, y), (x + w, y + h), (0, 255, 0), 2)
+        #
+        #     roi = img_as_float(img[y:y + h, x:x + w, :])
 
-            ####### Face detection with OPENCV ###########
-            # gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-            # faces = face_cascade.detectMultiScale(gray, 1.01, 5)
-            # for (x, y, w, h) in faces:
-            #     if w < width/2:
-            #         print(f'Warning No Face Detected in {i}th frame')
-            #
-            #     ####### Video #######
-            #     # cv2.rectangle(img, (x, y), (x + w, y + h), (0, 255, 0), 2)
-            #
-            #     roi = img_as_float(img[y:y + h, x:x + w, :])
+        ########## Face detection with OPENCV #############
+        # img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
 
-            ########## Face detection with OPENCV #############
-            # img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+        ########## Face detection with MediaPipe ############
+        results = face_detection.process(img)
+        roi = 0
+        if results.detections:
+            for face in results.detections:
+                bounding_box = face.location_data.relative_bounding_box
+                x = int(bounding_box.xmin * img.shape[1])
+                w = int(bounding_box.width * img.shape[1])
+                y = int(bounding_box.ymin * img.shape[0])
+                h = int(bounding_box.height * img.shape[0])
 
-            ########## Face detection with MediaPipe ############
-            results = face_detection.process(img)
-            roi = 0
-            if results.detections:
-                for face in results.detections:
-                    bounding_box = face.location_data.relative_bounding_box
-                    x = int(bounding_box.xmin * img.shape[1])
-                    w = int(bounding_box.width * img.shape[1])
-                    y = int(bounding_box.ymin * img.shape[0])
-                    h = int(bounding_box.height * img.shape[0])
+                # cv2.rectangle(img, (x, int(y - 0.2 * h)), (x + w, y + h), (0, 255, 0), 2)
+                roi = img_as_float(img[y:y + h, x:x + w, :])
+        else:
+            print(f'No Face Detected in {video_file_path[-12:]}at {i}th Frame')
 
-                    # cv2.rectangle(img, (x, int(y - 0.2 * h)), (x + w, y + h), (0, 255, 0), 2)
-                    roi = img_as_float(img[y:y + h, x:x + w, :])
-            else:
-                print('No Face Detected')
-            # ##### Video #######
-            # cv2.imshow('Frame', img)
-            # # Press 'q' to quit
-            # if cv2.waitKey(1) & 0xFF == ord('q'):
-            #     break
+        # ##### Video #######
+        # cv2.imshow('Frame', img)
+        # # Press 'q' to quit
+        # if cv2.waitKey(1) & 0xFF == ord('q'):
+        #     break
+
         try:
             vidLxL = cv2.resize(roi, (dim, dim), interpolation=cv2.INTER_AREA)
             prev_roi = roi
