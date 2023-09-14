@@ -119,22 +119,23 @@ def preprocess_raw_video(video_file_path, dim=72, plot=True, face_crop=True):
         print(f'Too Many invalid frames in video {video_file_path[-12:]}')
     ########################## Normalize raw frames in the appearance branch ##########################
     normalized_len = len(t) - 1
-    dXsub = np.zeros((normalized_len, dim, dim, 3), dtype=np.float32)
-    for j in range(normalized_len - 1):
-        dXsub[j, :, :, :] = (Xsub[j + 1, :, :, :] - Xsub[j, :, :, :]) / (Xsub[j + 1, :, :, :] + Xsub[j, :, :, :])
-    dXsub = dXsub / np.std(dXsub)
-    Xsub = Xsub - np.mean(Xsub)
-    Xsub = Xsub / np.std(Xsub)
-    Xsub = Xsub[:totalFrames - 1, :, :, :]
-    dXsub = np.concatenate((dXsub, Xsub), axis=3)
+    if normalized_len > 0:
+        dXsub = np.zeros((normalized_len, dim, dim, 3), dtype=np.float32)
+        for j in range(normalized_len - 1):
+            dXsub[j, :, :, :] = (Xsub[j + 1, :, :, :] - Xsub[j, :, :, :]) / (Xsub[j + 1, :, :, :] + Xsub[j, :, :, :])
+        dXsub = dXsub / np.std(dXsub)
+        Xsub = Xsub - np.mean(Xsub)
+        Xsub = Xsub / np.std(Xsub)
+        Xsub = Xsub[:totalFrames - 1, :, :, :]
+        dXsub = np.concatenate((dXsub, Xsub), axis=3)
 
-    ##########################  Video array transpose ##########################
-    transposed_arr = np.transpose(dXsub, (0, 3, 1, 2))
-    dXsub = transposed_arr.reshape((normalized_len, 6, dim, dim))
-    # plt.matshow(dXsub[1000, 3, :, :])
-    # plt.show()
-    return dXsub
-
+        ##########################  Video array transpose ##########################
+        transposed_arr = np.transpose(dXsub, (0, 3, 1, 2))
+        dXsub = transposed_arr.reshape((normalized_len, 6, dim, dim))
+        # plt.matshow(dXsub[1000, 3, :, :])
+        # plt.show()
+        return dXsub
+    return np.zeros((1,dim,dim,3),dtype=np.float32)
 
 def preprocess_raw_video_unsupervised(video_file_path, dim=108, face_crop=True):
     # set up
