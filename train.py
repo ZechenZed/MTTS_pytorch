@@ -205,7 +205,7 @@ class TSCAN_trainer:
                 pred_ppg_train = self.model(data_train)
 
                 pred = pred_ppg_train.detach().cpu().numpy()
-                pred = gaussian_filter(pred, sigma=15)
+                pred = gaussian_filter(pred, sigma=3)
                 predictions.append(pred)
 
                 label = labels_train.detach().cpu().numpy()
@@ -240,7 +240,7 @@ class TSCAN_trainer:
                 pred_ppg_valid = self.model(data_valid)
 
                 pred = pred_ppg_valid.detach().cpu().numpy()
-                pred = gaussian_filter(pred, sigma=15)
+                pred = gaussian_filter(pred, sigma=3)
                 predictions.append(pred)
 
                 label = labels_valid.detach().cpu().numpy()
@@ -275,7 +275,7 @@ class TSCAN_trainer:
                 pred_ppg_test = self.model(data_test)
 
                 pred = pred_ppg_test.detach().cpu().numpy()
-                pred = gaussian_filter(pred, sigma=15)
+                pred = gaussian_filter(pred, sigma=3)
                 predictions.append(pred)
 
                 label = labels_test.detach().cpu().numpy()
