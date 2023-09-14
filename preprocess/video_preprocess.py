@@ -46,13 +46,13 @@ def preprocess_raw_video(video_file_path, dim=72, plot=True, face_crop=True):
         t.append(vidObj.get(cv2.CAP_PROP_POS_MSEC))
 
         # Add edge to the Img
-        # width_edge = 100
-        # height_edge = height * (width_edge / width)
-        # original_cf = np.float32([[0, 0], [width - 1, 0], [(width - 1) / 2, height - 1]])
-        # transed_cf = np.float32([[width_edge - 1, height_edge - 1], [width - width_edge - 1, height_edge - 1],
-        #                          [(width - 1) / 2, height - height_edge - 1]])
-        # matrix = cv2.getAffineTransform(original_cf, transed_cf)
-        # img = cv2.warpAffine(img, matrix, (height, width))
+        width_edge = 100
+        height_edge = height * (width_edge / width)
+        original_cf = np.float32([[0, 0], [width - 1, 0], [(width - 1) / 2, height - 1]])
+        transed_cf = np.float32([[width_edge - 1, height_edge - 1], [width - width_edge - 1, height_edge - 1],
+                                 [(width - 1) / 2, height - height_edge - 1]])
+        matrix = cv2.getAffineTransform(original_cf, transed_cf)
+        img = cv2.warpAffine(img, matrix, (height, width))
 
         ####### Face detection with OPENCV ###########
         # gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
@@ -80,17 +80,17 @@ def preprocess_raw_video(video_file_path, dim=72, plot=True, face_crop=True):
                 y = int(bounding_box.ymin * img.shape[0])
                 h = int(bounding_box.height * img.shape[0])
 
-                # cv2.rectangle(img, (x, int(y - 0.2 * h)), (x + w, y + h), (0, 255, 0), 2)
+                cv2.rectangle(img, (x, int(y - 0.2 * h)), (x + w, y + h), (0, 255, 0), 2)
                 roi = img_as_float(img[int(y - 0.2 * h):y + h, x:x + w, :])
         else:
             invalid_frames.append(i)
             print(f'No Face Detected in {video_file_path[-12:]} at {i}th Frame')
 
-        # ##### Video #######
-        # cv2.imshow('Frame', img)
-        # # Press 'q' to quit
-        # if cv2.waitKey(1) & 0xFF == ord('q'):
-        #     break
+        ##### Video #######
+        cv2.imshow('Frame', img)
+        # Press 'q' to quit
+        if cv2.waitKey(1) & 0xFF == ord('q'):
+            break
 
         try:
             vidLxL = cv2.resize(roi, (dim, dim), interpolation=cv2.INTER_LINEAR)
@@ -107,10 +107,10 @@ def preprocess_raw_video(video_file_path, dim=72, plot=True, face_crop=True):
 
         success, img = vidObj.read()
         i = i + 1
-    ##### Video #######
+    ###### Video #######
     # Release the video capture
-    # vidObj.release()
-    # cv2.destroyAllWindows()
+    vidObj.release()
+    cv2.destroyAllWindows()
 
     # if plot:
     #     # Plot an example of data after preprocess
@@ -135,8 +135,8 @@ def preprocess_raw_video(video_file_path, dim=72, plot=True, face_crop=True):
         ##########################  Video array transpose ##########################
         transposed_arr = np.transpose(dXsub, (0, 3, 1, 2))
         dXsub = transposed_arr.reshape((normalized_len, 6, dim, dim))
-        # plt.matshow(dXsub[1000, 3, :, :])
-        # plt.show()
+        plt.matshow(dXsub[1000, 3, :, :])
+        plt.show()
         return dXsub
     return np.zeros((1, dim, dim, 3), dtype=np.float32)
 
