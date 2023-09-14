@@ -54,7 +54,7 @@ class TSCAN_trainer:
             data_folder_path = '/edrive2/zechenzh/preprocessed_v4v/'
         wandb.init(project='TSCAN',
                    config={
-                       'img_size': 72,
+                       'img_size': 36,
                        'dropout_rate1': self.drop_rate1,
                        'dropout_rate2': self.drop_rate2,
                        'kernel_size': self.kernel,
@@ -62,7 +62,7 @@ class TSCAN_trainer:
                        'pool_size':self.pool_size
                    })
 
-        self.model = TSCAN(frame_depth=self.frame_depth, img_size=72, dropout_rate1=self.drop_rate1,
+        self.model = TSCAN(frame_depth=self.frame_depth, img_size=36, dropout_rate1=self.drop_rate1,
                            dropout_rate2=self.drop_rate2, kernel_size=self.kernel, nb_dense=self.nb_dense,
                            pool_size=self.pool_size).to(self.device)
         # self.model = torch.nn.DataParallel(self.model, device_ids=list(range(setup.nb_device)))
