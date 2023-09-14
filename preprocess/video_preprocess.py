@@ -21,8 +21,8 @@ def is_not_consecutive(l, n):
 
     for i in range(len(l) - n):
         if l[i] + 1 != l[i + n]:
-            return True
-    return False
+            return False
+    return True
 
 
 def preprocess_raw_video(video_file_path, dim=72, plot=True, face_crop=True):
