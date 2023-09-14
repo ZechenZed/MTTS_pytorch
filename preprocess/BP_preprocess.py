@@ -123,6 +123,7 @@ def data_process(data_type, device_type, image=str(), dim=36):
     BP_lf = BP_lf.reshape((-1, 10))
 
     ############## Save the preprocessed model ##############
+    saving_path = ''
     if device_type == 'remote':
         saving_path = '/edrive2/zechenzh/preprocessed_v4v/'
     elif device_type == 'local':
