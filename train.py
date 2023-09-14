@@ -245,14 +245,13 @@ class TSCAN_trainer:
 
                 label = labels_valid.detach().cpu().numpy()
                 labels.append(label)
+                wandb.log({'Valid Predictions': pred,'Valid Labels': label})
 
             predictions = np.array(predictions).reshape(-1)
             labels = np.array(labels).reshape(-1)
             cMAE = sum(abs(predictions - labels)) / predictions.shape[0]
             print(f'Valid Pearson correlation: {pearsonr(predictions, labels)[0]}')
             print(f'Valid cMAE: {cMAE}')
-            wandb.log({'Valid Predictions': predictions, 'Valid Labels': labels})
-
             if self.plot_pred:
                 plt.plot(predictions, 'r', label='Prediction')
                 plt.plot(labels, 'g', label='Ground truth')
@@ -281,14 +280,13 @@ class TSCAN_trainer:
 
                 label = labels_test.detach().cpu().numpy()
                 labels.append(label)
+                wandb.log({'Test Predictions': pred,'Test Labels': label})
 
             predictions = np.array(predictions).reshape(-1)
             labels = np.array(labels).reshape(-1)
             cMAE = sum(abs(predictions - labels)) / predictions.shape[0]
             print(f'Test Pearson correlation: {pearsonr(predictions, labels)[0]}')
             print(f'Test cMAE: {cMAE}')
-            wandb.log({'Test Predictions': predictions,'Test Labels': labels})
-
             if self.plot_pred:
                 plt.plot(predictions, 'r', label='Prediction')
                 plt.plot(labels, 'g', label='Ground truth')
