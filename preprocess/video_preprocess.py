@@ -7,12 +7,30 @@ from scipy.sparse import spdiags
 import matplotlib.pyplot as plt
 
 
+def is_not_consecutive(l, n):
+    """
+  Checks if there is a continuous number in a list for n indexes.
+
+  Args:
+    list: The list to check.
+    n: The number of indexes to check.
+
+  Returns:
+    True if there is a continuous number in the list for n indexes, False otherwise.
+  """
+
+    for i in range(len(l) - n):
+        if l[i] + 1 != l[i + n]:
+            return True
+    return False
+
+
 def preprocess_raw_video(video_file_path, dim=72, plot=True, face_crop=True):
     # set up
     print("***********Processing " + video_file_path[-12:] + "***********")
     t = []
     i = 0
-    invalid_frames = 0
+    invalid_frames = []
     vidObj = cv2.VideoCapture(video_file_path)
     totalFrames = int(vidObj.get(cv2.CAP_PROP_FRAME_COUNT))
     Xsub = np.zeros((totalFrames, dim, dim, 3), dtype=np.float32)
@@ -22,7 +40,7 @@ def preprocess_raw_video(video_file_path, dim=72, plot=True, face_crop=True):
     face_detection = mp.solutions.face_detection.FaceDetection(min_detection_confidence=0.2)
     prev_roi = img_as_float(img)
     ############## Reading frame by frame ##############
-    while success and invalid_frames/totalFrames < 0.25:
+    while success and len(invalid_frames) / totalFrames < 0.25 and is_not_consecutive(invalid_frames, 25):
         t.append(vidObj.get(cv2.CAP_PROP_POS_MSEC))
 
         # Add edge to the Img
@@ -61,9 +79,9 @@ def preprocess_raw_video(video_file_path, dim=72, plot=True, face_crop=True):
                 h = int(bounding_box.height * img.shape[0])
 
                 # cv2.rectangle(img, (x, int(y - 0.2 * h)), (x + w, y + h), (0, 255, 0), 2)
-                roi = img_as_float(img[int(y-0.2*h):y + h, x:x + w, :])
+                roi = img_as_float(img[int(y - 0.2 * h):y + h, x:x + w, :])
         else:
-            invalid_frames += 0
+            invalid_frames.append(i)
             print(f'No Face Detected in {video_file_path[-12:]} at {i}th Frame')
 
         # ##### Video #######
@@ -76,6 +94,7 @@ def preprocess_raw_video(video_file_path, dim=72, plot=True, face_crop=True):
             vidLxL = cv2.resize(roi, (dim, dim), interpolation=cv2.INTER_LINEAR)
             prev_roi = roi
         except:
+            invalid_frames.append(i)
             print(f'Exception triggered in {video_file_path[-12:]} at frame {i}')
             vidLxL = cv2.resize(prev_roi, (dim, dim), interpolation=cv2.INTER_LINEAR)
         # vidLxL = cv2.rotate(vidLxL, cv2.ROTATE_90_CLOCKWISE)
@@ -96,7 +115,7 @@ def preprocess_raw_video(video_file_path, dim=72, plot=True, face_crop=True):
     #     plt.imshow(Xsub[100])
     #     plt.title('Sample Preprocessed Frame')
     #     plt.show()
-    if invalid_frames/totalFrames > 0.25:
+    if invalid_frames / totalFrames > 0.25:
         print(f'Too Many invalid frames in video {video_file_path[-12:]}')
     ########################## Normalize raw frames in the appearance branch ##########################
     normalized_len = len(t) - 1
