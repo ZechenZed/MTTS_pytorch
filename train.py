@@ -15,6 +15,7 @@ import matplotlib.pyplot as plt
 from sklearn.metrics import mean_squared_error, mean_absolute_error
 from scipy.ndimage import gaussian_filter
 from scipy.stats import pearsonr
+import wandb
 
 
 class TSCAN_trainer:
@@ -51,7 +52,10 @@ class TSCAN_trainer:
             data_folder_path = 'C:/Users/Zed/Desktop/V4V/preprocessed_v4v/'
         else:
             data_folder_path = '/edrive2/zechenzh/preprocessed_v4v/'
-        self.model = TSCAN(frame_depth=self.frame_depth, img_size=36, dropout_rate1=self.drop_rate1,
+        wandb.init(project='TSCAN',
+                   config={})
+
+        self.model = TSCAN(frame_depth=self.frame_depth, img_size=72, dropout_rate1=self.drop_rate1,
                            dropout_rate2=self.drop_rate2, kernel_size=self.kernel, nb_dense=self.nb_dense,
                            pool_size=self.pool_size).to(self.device)
         # self.model = torch.nn.DataParallel(self.model, device_ids=list(range(setup.nb_device)))
