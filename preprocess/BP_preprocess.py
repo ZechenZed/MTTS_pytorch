@@ -13,7 +13,7 @@ os.environ['CUDA_VISIBLE_DEVICES'] = '0'
 
 def data_process(data_type, device_type, image=str(), dim=36):
     ############## Data folder path setting ##############
-    if device_type == "local":
+    if device_type == 'local':
         data_folder_path = "C:/Users/Zed/Desktop/V4V/"
     elif device_type == 'disk':
         data_folder_path = 'D:/V4V/'
@@ -123,9 +123,9 @@ def data_process(data_type, device_type, image=str(), dim=36):
     BP_lf = BP_lf.reshape((-1, 10))
 
     ############## Save the preprocessed model ##############
-    if device_type == "remote":
+    if device_type == 'remote':
         saving_path = '/edrive2/zechenzh/preprocessed_v4v/'
-    else:
+    elif device_type == 'local':
         saving_path = 'C:/Users/Zed/Desktop/V4V/preprocessed_v4v/'
     np.save(saving_path + data_type + '_frames_' + image + '.npy', frames)
     np.save(saving_path + data_type + '_BP_systolic.npy', BP_lf)
