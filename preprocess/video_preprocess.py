@@ -19,10 +19,10 @@ def is_not_consecutive(l, n):
     True if there is a continuous number in the list for n indexes, False otherwise.
   """
 
-    for i in range(len(l) - n):
-        if l[i] + 1 == l[i + n]:
-            return False
-    return True
+    for j in range(len(l) - n):
+        if l[j] + 1 != l[j + n]:
+            return True
+    return False
 
 
 def preprocess_raw_video(video_file_path, dim=72, plot=True, face_crop=True):
