@@ -24,7 +24,7 @@ def is_not_consecutive(l, n, totalFrames):
         for j in range(len(l) - n):
             if l[j] + 1 != l[j + n]:
                 return True
-        return False
+    return False
 
 
 def preprocess_raw_video(video_file_path, dim=72, plot=True, face_crop=True):
