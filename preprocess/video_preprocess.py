@@ -22,7 +22,8 @@ def is_not_consecutive(l, n):
     for j in range(len(l) - n):
         if l[j] + 1 != l[j + n]:
             return True
-    return False
+        else:
+            return False
 
 
 def preprocess_raw_video(video_file_path, dim=72, plot=True, face_crop=True):
@@ -119,7 +120,7 @@ def preprocess_raw_video(video_file_path, dim=72, plot=True, face_crop=True):
         print(f'Too Many invalid frames in video {video_file_path[-12:]}')
     ########################## Normalize raw frames in the appearance branch ##########################
     # normalized_len = len(t) - 1
-    normalized_len = i -1
+    normalized_len = i - 1
     if normalized_len > 0:
         dXsub = np.zeros((normalized_len, dim, dim, 3), dtype=np.float32)
         for j in range(normalized_len - 1):
@@ -136,7 +137,8 @@ def preprocess_raw_video(video_file_path, dim=72, plot=True, face_crop=True):
         # plt.matshow(dXsub[1000, 3, :, :])
         # plt.show()
         return dXsub
-    return np.zeros((1,dim,dim,3),dtype=np.float32)
+    return np.zeros((1, dim, dim, 3), dtype=np.float32)
+
 
 def preprocess_raw_video_unsupervised(video_file_path, dim=108, face_crop=True):
     # set up
