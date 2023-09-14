@@ -55,18 +55,18 @@ def preprocess_raw_video(video_file_path, dim=72, plot=True, face_crop=True):
             ########## Face detection with MediaPipe ############
             results = face_detection.process(img)
             roi = 0
-            for face in results.detections:
-                if not face:
-                    print('No face detected')
-                bounding_box = face.location_data.relative_bounding_box
-                x = int(bounding_box.xmin * img.shape[1])
-                w = int(bounding_box.width * img.shape[1])
-                y = int(bounding_box.ymin * img.shape[0])
-                h = int(bounding_box.height * img.shape[0])
+            if results.detections:
+                for face in results.detections:
+                    bounding_box = face.location_data.relative_bounding_box
+                    x = int(bounding_box.xmin * img.shape[1])
+                    w = int(bounding_box.width * img.shape[1])
+                    y = int(bounding_box.ymin * img.shape[0])
+                    h = int(bounding_box.height * img.shape[0])
 
-                # cv2.rectangle(img, (x, int(y - 0.2 * h)), (x + w, y + h), (0, 255, 0), 2)
-                roi = img_as_float(img[y:y + h, x:x + w, :])
-
+                    # cv2.rectangle(img, (x, int(y - 0.2 * h)), (x + w, y + h), (0, 255, 0), 2)
+                    roi = img_as_float(img[y:y + h, x:x + w, :])
+            else:
+                print('No Face Detected')
             # ##### Video #######
             # cv2.imshow('Frame', img)
             # # Press 'q' to quit
