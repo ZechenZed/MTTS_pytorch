@@ -210,13 +210,13 @@ class TSCAN_trainer:
 
                 label = labels_train.detach().cpu().numpy()
                 labels.append(label)
+                wandb.log({'Train Predictions': pred,'Train Labels': label})
 
             predictions = np.array(predictions).reshape(-1)
             labels = np.array(labels).reshape(-1)
             cMAE = sum(abs(predictions - labels)) / predictions.shape[0]
             print(f'Train Pearson correlation: {pearsonr(predictions, labels)[0]}')
             print(f'Train cMAE: {cMAE}')
-            wandb.log({'Train Predictions': predictions,'Train Labels': labels})
             if self.plot_pred:
                 plt.plot(predictions, 'r', label='Prediction')
                 plt.plot(labels, 'g', label='Ground truth')
