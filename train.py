@@ -53,7 +53,14 @@ class TSCAN_trainer:
         else:
             data_folder_path = '/edrive2/zechenzh/preprocessed_v4v/'
         wandb.init(project='TSCAN',
-                   config={})
+                   config={
+                       'img_size': 72,
+                       'dropout_rate1': self.drop_rate1,
+                       'dropout_rate2': self.drop_rate2,
+                       'kernel_size': self.kernel,
+                       'nb_dense': self.nb_dense,
+                       'pool_size':self.pool_size
+                   })
 
         self.model = TSCAN(frame_depth=self.frame_depth, img_size=72, dropout_rate1=self.drop_rate1,
                            dropout_rate2=self.drop_rate2, kernel_size=self.kernel, nb_dense=self.nb_dense,
@@ -126,6 +133,9 @@ class TSCAN_trainer:
                 self.min_valid_loss = valid_loss
                 self.best_epoch = epoch
                 print("Update best model! Best epoch: {}".format(self.best_epoch))
+
+            wandb.log({'train_loss': train_loss, 'validation_loss': valid_loss})
+
         print("")
         print("Best trained epoch: {}, min_val_loss: {}".format(self.best_epoch, self.min_valid_loss))
 
@@ -206,6 +216,7 @@ class TSCAN_trainer:
             cMAE = sum(abs(predictions - labels)) / predictions.shape[0]
             print(f'Train Pearson correlation: {pearsonr(predictions, labels)[0]}')
             print(f'Train cMAE: {cMAE}')
+            wandb.log({'Train Predictions': predictions,'Train Labels': labels})
             if self.plot_pred:
                 plt.plot(predictions, 'r', label='Prediction')
                 plt.plot(labels, 'g', label='Ground truth')
@@ -240,6 +251,8 @@ class TSCAN_trainer:
             cMAE = sum(abs(predictions - labels)) / predictions.shape[0]
             print(f'Valid Pearson correlation: {pearsonr(predictions, labels)[0]}')
             print(f'Valid cMAE: {cMAE}')
+            wandb.log({'Valid Predictions': predictions, 'Valid Labels': labels})
+
             if self.plot_pred:
                 plt.plot(predictions, 'r', label='Prediction')
                 plt.plot(labels, 'g', label='Ground truth')
@@ -274,6 +287,8 @@ class TSCAN_trainer:
             cMAE = sum(abs(predictions - labels)) / predictions.shape[0]
             print(f'Test Pearson correlation: {pearsonr(predictions, labels)[0]}')
             print(f'Test cMAE: {cMAE}')
+            wandb.log({'Test Predictions': predictions,'Test Labels': labels})
+
             if self.plot_pred:
                 plt.plot(predictions, 'r', label='Prediction')
                 plt.plot(labels, 'g', label='Ground truth')
