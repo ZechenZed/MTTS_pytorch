@@ -115,7 +115,7 @@ def preprocess_raw_video(video_file_path, dim=72, plot=True, face_crop=True):
     #     plt.imshow(Xsub[100])
     #     plt.title('Sample Preprocessed Frame')
     #     plt.show()
-    if invalid_frames / totalFrames > 0.25:
+    if len(invalid_frames) / totalFrames > 0.25:
         print(f'Too Many invalid frames in video {video_file_path[-12:]}')
     ########################## Normalize raw frames in the appearance branch ##########################
     normalized_len = len(t) - 1
