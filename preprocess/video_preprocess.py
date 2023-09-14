@@ -74,6 +74,7 @@ def preprocess_raw_video(video_file_path, dim=72, plot=True, face_crop=True):
             #     break
         try:
             vidLxL = cv2.resize(roi, (dim, dim), interpolation=cv2.INTER_AREA)
+            prev_roi = roi
         except:
             print(f'Exception triggered in {video_file_path[-12:]} at frame {i}')
             vidLxL = cv2.resize(prev_roi, (dim, dim), interpolation=cv2.INTER_AREA)
@@ -85,7 +86,6 @@ def preprocess_raw_video(video_file_path, dim=72, plot=True, face_crop=True):
 
         success, img = vidObj.read()
         i = i + 1
-        prev_roi = roi
     ##### Video #######
     # Release the video capture
     # vidObj.release()
