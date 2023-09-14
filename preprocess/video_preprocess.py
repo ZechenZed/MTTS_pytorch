@@ -7,7 +7,7 @@ from scipy.sparse import spdiags
 import matplotlib.pyplot as plt
 
 
-def is_not_consecutive(l, n):
+def is_not_consecutive(l, n, totalFrames):
     """
   Checks if there is a continuous number in a list for n indexes.
 
@@ -18,12 +18,13 @@ def is_not_consecutive(l, n):
   Returns:
     True if there is a continuous number in the list for n indexes, False otherwise.
   """
-
-    for j in range(len(l) - n):
-        if l[j] + 1 != l[j + n]:
+    if len(l) / totalFrames < 0.25:
+        if len(l) == 0:
             return True
-        else:
-            return False
+        for j in range(len(l) - n):
+            if l[j] + 1 != l[j + n]:
+                return True
+        return False
 
 
 def preprocess_raw_video(video_file_path, dim=72, plot=True, face_crop=True):
@@ -41,7 +42,7 @@ def preprocess_raw_video(video_file_path, dim=72, plot=True, face_crop=True):
     face_detection = mp.solutions.face_detection.FaceDetection(min_detection_confidence=0.2)
     prev_roi = img_as_float(img)
     ############## Reading frame by frame ##############
-    while success and len(invalid_frames) / totalFrames < 0.25 and is_not_consecutive(invalid_frames, 25):
+    while success and is_not_consecutive(invalid_frames, 25, totalFrames):
         t.append(vidObj.get(cv2.CAP_PROP_POS_MSEC))
 
         # Add edge to the Img
