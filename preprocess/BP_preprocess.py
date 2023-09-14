@@ -235,7 +235,7 @@ def only_BP(data_type, device_type, image=str(), dim=36):
 
 
 if __name__ == '__main__':
-    data_process('valid', 'local', 'face_large')
+    data_process('valid', 'remote', 'face_large')
     # data_process('train', 'remote', 'face_large')
     # data_process('test', 'remote', 'face_large')
     # only_BP('train', 'remote', 'face_large')
