@@ -6,7 +6,7 @@ metric:
   goal: minimize
 parameters:
   lr:
-    values: [0.001, 0.0001, 0.00001, 0.000001]
+    values: [0.001, 0.0001, 0.00001]
   nb_batch:
     values: [2,3,4,6,12]
   dropout_rate1:
