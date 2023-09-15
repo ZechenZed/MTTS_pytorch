@@ -18,6 +18,10 @@ from scipy.stats import pearsonr
 import wandb
 
 
+default_config = {
+
+}
+
 class TSCAN_trainer:
     def __init__(self, setup):
         ################### Env setup ###################
@@ -42,7 +46,7 @@ class TSCAN_trainer:
         self.USE_LAST_EPOCH = False
         self.plot_pred = True
         self.nb_filters1 = setup.nb_filter1
-        self.nb_filters1 = setup.nb_filter2
+        self.nb_filters2 = setup.nb_filter2
         self.drop_rate1 = setup.drop_rate1
         self.drop_rate2 = setup.drop_rate2
         self.kernel = setup.kernel
@@ -57,14 +61,15 @@ class TSCAN_trainer:
                        'img_size': 36,
                        'dropout_rate1': self.drop_rate1,
                        'dropout_rate2': self.drop_rate2,
-                       'kernel_size': self.kernel,
+                       'nb_filters1': self.nb_filters1,
+                       'nb_filters2':self.nb_filters2,
                        'nb_dense': self.nb_dense,
-                       'pool_size':self.pool_size
                    })
 
         self.model = TSCAN(frame_depth=self.frame_depth, img_size=36, dropout_rate1=self.drop_rate1,
                            dropout_rate2=self.drop_rate2, kernel_size=self.kernel, nb_dense=self.nb_dense,
-                           pool_size=self.pool_size).to(self.device)
+                           pool_size=self.pool_size, nb_filters1=self.nb_filters1,
+                           nb_filters2=self.nb_filters2).to(self.device)
         # self.model = torch.nn.DataParallel(self.model, device_ids=list(range(setup.nb_device)))
 
         v4v_data_train = V4V_Dataset(data_folder_path, 'train', setup.image_type, setup.BP_type)
