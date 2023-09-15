@@ -18,10 +18,6 @@ from scipy.stats import pearsonr
 import wandb
 
 
-default_config = {
-
-}
-
 class TSCAN_trainer:
     def __init__(self, setup):
         ################### Env setup ###################
@@ -47,8 +43,8 @@ class TSCAN_trainer:
         self.plot_pred = True
         self.nb_filters1 = setup.nb_filter1
         self.nb_filters2 = setup.nb_filter2
-        self.drop_rate1 = setup.drop_rate1
-        self.drop_rate2 = setup.drop_rate2
+        self.drop_rate1 = setup.dropout_rate1
+        self.drop_rate2 = setup.dropout_rate2
         self.kernel = setup.kernel
         self.pool_size = (2, 2)
         ################### Load data ###################
@@ -56,15 +52,6 @@ class TSCAN_trainer:
             data_folder_path = 'C:/Users/Zed/Desktop/V4V/preprocessed_v4v/'
         else:
             data_folder_path = '/edrive2/zechenzh/preprocessed_v4v/'
-        wandb.init(project='TSCAN',
-                   config={
-                       'img_size': 36,
-                       'dropout_rate1': self.drop_rate1,
-                       'dropout_rate2': self.drop_rate2,
-                       'nb_filters1': self.nb_filters1,
-                       'nb_filters2':self.nb_filters2,
-                       'nb_dense': self.nb_dense,
-                   })
 
         self.model = TSCAN(frame_depth=self.frame_depth, img_size=36, dropout_rate1=self.drop_rate1,
                            dropout_rate2=self.drop_rate2, kernel_size=self.kernel, nb_dense=self.nb_dense,
@@ -300,8 +287,10 @@ class TSCAN_trainer:
 
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser()
+    wandb.init(project='TSCAN', config=wandb.config)
+    config = wandb.config
 
+    parser = argparse.ArgumentParser()
     parser.add_argument('-device', '--device_type', type=str, default='local',
                         help='Local / Remote device')
     parser.add_argument('--gpu', type=str, default='0',
@@ -316,19 +305,19 @@ if __name__ == '__main__':
     parser.add_argument('-BP', '--BP_type', type=str, default='systolic',
                         help='Choose type of BP from mean, systolic and diastolic')
 
-    parser.add_argument('-g', '--nb_epoch', type=int, default=15,
+    parser.add_argument('--nb_epoch', type=int, default=15,
                         help='nb_epoch')
     parser.add_argument('--nb_batch', type=int, default=12,
                         help='nb_batch')
     parser.add_argument('--kernel', type=int, default=3,
                         help='Kernel size')
-    parser.add_argument('-lr', '--lr', type=float, default=0.001,
+    parser.add_argument('--lr', type=float, default=0.001,
                         help='learning rate')
-    parser.add_argument('-fd', '--frame_depth', type=int, default=10,
+    parser.add_argument('--frame_depth', type=int, default=10,
                         help='frame depth')
-    parser.add_argument('--drop_rate1', type=float, default=0.25,
+    parser.add_argument('--dropout_rate1', type=float, default=0.25,
                         help='Drop rate 1')
-    parser.add_argument('--drop_rate2', type=float, default=0.5,
+    parser.add_argument('--dropout_rate2', type=float, default=0.5,
                         help='Drop rate 2')
     parser.add_argument('--nb_filter1', type=int, default=32,
                         help='number of filter 1')
