@@ -290,11 +290,13 @@ if __name__ == '__main__':
     config = wandb.config
     # parser.add_argument('--gpu', type=str, default='0',
     #                     help='List of GPUs used')
-    # parser.add_argument('--nb_device', type=int, default=1,
-    #                     help='Total number of device')
+
     # os.environ['CUDA_VISIBLE_DEVICES'] = setup.gpu
 
     parser = argparse.ArgumentParser()
+    parser.add_argument('--nb_device', type=int, default=1,
+                        help='Total number of device')
+
     parser.add_argument('-device', '--device_type', type=str, default='remote',
                         help='Local / Remote device')
 
