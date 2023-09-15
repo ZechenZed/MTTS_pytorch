@@ -201,7 +201,7 @@ class TSCAN_trainer:
 
                 label = labels_train.detach().cpu().numpy()
                 labels.append(label)
-                wandb.log({'Train Predictions': pred, 'Train Labels': label})
+                wandb.log({'Train Predictions': pred,'Train Labels': label})
 
             predictions = np.array(predictions).reshape(-1)
             labels = np.array(labels).reshape(-1)
@@ -236,7 +236,7 @@ class TSCAN_trainer:
 
                 label = labels_valid.detach().cpu().numpy()
                 labels.append(label)
-                wandb.log({'Valid Predictions': pred, 'Valid Labels': label})
+                wandb.log({'Valid Predictions': pred,'Valid Labels': label})
 
             predictions = np.array(predictions).reshape(-1)
             labels = np.array(labels).reshape(-1)
@@ -271,7 +271,7 @@ class TSCAN_trainer:
 
                 label = labels_test.detach().cpu().numpy()
                 labels.append(label)
-                wandb.log({'Test Predictions': pred, 'Test Labels': label})
+                wandb.log({'Test Predictions': pred,'Test Labels': label})
 
             predictions = np.array(predictions).reshape(-1)
             labels = np.array(labels).reshape(-1)
@@ -290,20 +290,21 @@ if __name__ == '__main__':
     config = wandb.config
     # parser.add_argument('--gpu', type=str, default='0',
     #                     help='List of GPUs used')
-
     # os.environ['CUDA_VISIBLE_DEVICES'] = setup.gpu
 
     parser = argparse.ArgumentParser()
-    parser.add_argument('--nb_device', type=int, default=1,
-                        help='Total number of device')
-
     parser.add_argument('-device', '--device_type', type=str, default='remote',
                         help='Local / Remote device')
+
+    parser.add_argument('--nb_device', type=int, default=1,
+                        help='Total number of device')
 
     parser.add_argument('-image', '--image_type', type=str, default='face_large',
                         help='choose from 1) ratio, 2) face_large, 3) face')
     parser.add_argument('-data', '--data_type', type=str, default='train',
                         help='data type')
+    parser.add_argument('-BP', '--BP_type', type=str, default='systolic',
+                        help='Choose type of BP from mean, systolic and diastolic')
 
     parser.add_argument('--nb_epoch', type=int, default=15,
                         help='nb_epoch')
