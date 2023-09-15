@@ -126,7 +126,7 @@ class TSCAN_trainer:
                 self.best_epoch = epoch
                 print("Update best model! Best epoch: {}".format(self.best_epoch))
 
-            wandb.log({'train_loss': np.average(train_loss), 'validation_loss': valid_loss})
+            wandb.log({'train_loss': np.average(train_loss), 'valid_loss': valid_loss})
 
         print("")
         print("Best trained epoch: {}, min_val_loss: {}".format(self.best_epoch, self.min_valid_loss))
