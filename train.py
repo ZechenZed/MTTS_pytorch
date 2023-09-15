@@ -300,7 +300,7 @@ if __name__ == '__main__':
 
     parser.add_argument('-image', '--image_type', type=str, default='face_large',
                         help='choose from 1) ratio, 2) face_large, 3) face')
-    parser.add_argument('-data', '--data_type', type=str, default='test',
+    parser.add_argument('-data', '--data_type', type=str, default='train',
                         help='data type')
     parser.add_argument('-BP', '--BP_type', type=str, default='systolic',
                         help='Choose type of BP from mean, systolic and diastolic')
