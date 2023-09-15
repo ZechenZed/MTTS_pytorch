@@ -1,12 +1,14 @@
 program: train.py
-method: random
+method: bayes
 project: TS_CAN
 metric:
   name: valid_loss
   goal: minimize
 parameters:
   lr:
-    values: [0.001, 0.0001, 0.00001]
+    values: [0.001, 0.0001, 0.00001, 0.000001]
+  kernel:
+    values: [1,2,4,5,6,7,8,9,10,11,12]
   dropout_rate1:
     min: 0.05
     max: 0.95
@@ -15,7 +17,5 @@ parameters:
     max: 0.95
   nb_filter1:
     values: [16,32,64]
-  nb_filter2:
-    values: [32,64,128]
   nb_dense:
     values: [128,256,384,512]
