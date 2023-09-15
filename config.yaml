@@ -5,6 +5,8 @@ metric:
   name: valid_loss
   goal: minimize
 parameters:
+  lr:
+    values: [0.001, 0.0001, 0.00001]
   dropout_rate1:
     min: 0.05
     max: 0.95
