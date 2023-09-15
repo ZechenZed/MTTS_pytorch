@@ -12,8 +12,8 @@ parameters:
     min: 0.05
     max: 0.95
   nb_filter1:
-    values: [16,24,32,40,48]
+    values: [16,32,48]
   nb_filter2:
-    values: [32,40,64,80,96]
+    values: [32,64,96]
   nb_dense:
     values: [128,256,384,512]
