@@ -8,9 +8,7 @@ parameters:
   lr:
     values: [0.001, 0.0001, 0.00001]
   frame_depth:
-    values: [1]
-  nb_batch:
-    values: [2,3,4,6,12]
+    values: [1,2,10,20,40,80,120]
   dropout_rate1:
     min: 0.05
     max: 0.95
@@ -19,5 +17,4 @@ parameters:
     max: 0.95
   nb_filter1:
     values: [16,32,64]
-  nb_dense:
-    values: [128,256,384,512]
+
