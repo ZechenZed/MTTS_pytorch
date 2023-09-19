@@ -6,9 +6,9 @@ metric:
   goal: minimize
 parameters:
   lr:
-    values: [0.001, 0.0001, 0.00001, 0.000005]
-  frame_depth:
-    values: [1,2,10,20,40,80,120]
+    values: [1e-5, 1e-7, 1e-8]
+#  frame_depth:
+#    values: [1,2,10,20,40,80,120]
   dropout_rate1:
     min: 0.05
     max: 0.95
