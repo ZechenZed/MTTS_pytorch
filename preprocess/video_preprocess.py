@@ -45,13 +45,13 @@ def preprocess_raw_video(video_file_path, dim=72, plot=True, face_crop=True):
 
     ############## Reading frame by frame ##############
     while success:
+        t.append(vidObj.get(cv2.CAP_PROP_POS_MSEC))
         if len(invalid_frames) / totalFrames > 0.25:
             print('Too many invalid frames')
             break
         if is_consecutive(invalid_frames, 25):
             print('Invalid frames more than 1s')
             break
-        t.append(vidObj.get(cv2.CAP_PROP_POS_MSEC))
 
         # vidLxL = cv2.resize(img_as_float(img[175:1216, :, :]), (dim, dim), interpolation = cv2.INTER_AREA)
 
@@ -141,7 +141,7 @@ def preprocess_raw_video(video_file_path, dim=72, plot=True, face_crop=True):
     #     print(f'Too Many invalid frames in video {video_file_path[-12:]}')
 
     ########################## Normalize raw frames in the appearance branch ##########################
-    normalized_len = i - 1
+    normalized_len = len(t) - 1
     dXsub = np.zeros((normalized_len, dim, dim, 3), dtype=np.float32)
     for j in range(normalized_len - 1):
         dXsub[j, :, :, :] = (Xsub[j + 1, :, :, :] - Xsub[j, :, :, :]) / (Xsub[j + 1, :, :, :] + Xsub[j, :, :, :])
