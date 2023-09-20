@@ -7,7 +7,7 @@ from scipy.sparse import spdiags
 import matplotlib.pyplot as plt
 
 
-def is_not_consecutive(l, n):
+def is_consecutive(l, n):
     """
   Checks if there is a continuous number in a list for n indexes.
 
@@ -19,11 +19,11 @@ def is_not_consecutive(l, n):
     True if there is a continuous number in the list for n indexes, False otherwise.
   """
     if len(l) == 0:
-        return True
-    if range(l[0], l[0] + n) == l[:n]:
         return False
-    else:
+    if range(l[0], l[0] + n) == l[:n]:
         return True
+    else:
+        return False
 
 
 def preprocess_raw_video(video_file_path, dim=72, plot=True, face_crop=True):
