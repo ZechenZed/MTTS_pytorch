@@ -40,7 +40,7 @@ def preprocess_raw_video(video_file_path, dim=72, plot=True, face_crop=True):
     # print(f'Height:{height}, width{width}')
     
     face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
-    face_detection = mp.solutions.face_detection.FaceDetection(min_detection_confidence=0.2)
+    face_detection = mp.solutions.face_detection.FaceDetection(min_detection_confidence=0.75)
     prev_roi = img_as_float(img)
 
     ############## Reading frame by frame ##############
