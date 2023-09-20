@@ -126,7 +126,7 @@ def preprocess_raw_video(video_file_path, dim=72, plot=True, face_crop=True):
 
         success, img = vidObj.read()
         i = i + 1
-    Xsub = Xsub[0:i]
+    Xsub = Xsub[0:len(t)-1]
     # ###### Video #######
     # # Release the video capture
     # vidObj.release()
