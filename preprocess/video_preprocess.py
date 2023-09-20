@@ -80,6 +80,7 @@ def preprocess_raw_video(video_file_path, dim=72, plot=True, face_crop=True):
         ################### Face detection with MediaPipe ###################
         results = face_detection.process(img)
         roi = 0
+        print(results.detections)
         if results.detections:
             for face in results.detections:
                 bounding_box = face.location_data.relative_bounding_box
@@ -89,7 +90,7 @@ def preprocess_raw_video(video_file_path, dim=72, plot=True, face_crop=True):
                 h = int(bounding_box.height * img.shape[0])
 
                 # cv2.rectangle(img, (x, int(y - 0.2 * h)), (x + w, y + h), (0, 255, 0), 2)
-                roi = img_as_float(img[int(y - 0.2 * h):int(y + 1.1 * h), x:x + w, :])
+                roi = img_as_float(img[y:y + h, x:x + w, :])
             vidLxL = cv2.resize(roi, (dim, dim), interpolation=cv2.INTER_AREA)
             prev_roi = roi
         else:
