@@ -93,7 +93,8 @@ def preprocess_raw_video(video_file_path, dim=72, plot=True, face_crop=True):
             try:
                 vidLxL = cv2.resize(roi, (dim, dim), interpolation=cv2.INTER_AREA)
             except:
-                print(results.detection)
+                print(f'in {video_file_path[-12:]} at {i}th Frame')
+                print(results.detections)
                 print(f'xmax{xmax},xmin{xmin},ymax{ymax},ymin{ymin}')
             prev_roi = roi
         else:
