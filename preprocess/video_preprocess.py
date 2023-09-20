@@ -18,12 +18,12 @@ def is_consecutive(l, n):
   Returns:
     True if there is a continuous number in the list for n indexes, False otherwise.
   """
-    if len(l) == 0:
+    if len(l) < 25:
         return False
-    if range(l[0], l[0] + n) == l[:n]:
-        return True
-    else:
-        return False
+    for z in range(len(l)-n):
+        if l[z] + n - 1 == l[z+n-1]:
+            return True
+    return False
 
 
 def preprocess_raw_video(video_file_path, dim=72, plot=True, face_crop=True):
