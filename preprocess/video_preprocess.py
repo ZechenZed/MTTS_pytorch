@@ -7,7 +7,7 @@ from scipy.sparse import spdiags
 import matplotlib.pyplot as plt
 
 
-def is_not_consecutive(l, n, totalFrames):
+def is_not_consecutive(l, n):
     """
   Checks if there is a continuous number in a list for n indexes.
 
@@ -18,13 +18,12 @@ def is_not_consecutive(l, n, totalFrames):
   Returns:
     True if there is a continuous number in the list for n indexes, False otherwise.
   """
-    if len(l) / totalFrames < 0.25:
-        if len(l) == 0:
-            return True
-        for j in range(len(l) - n):
-            if l[j] + 1 != l[j + n]:
-                return True
-    return False
+    if len(l) == 0:
+        return True
+    if range(l[0], l[0] + n) == l[:n]:
+        return False
+    else:
+        return True
 
 
 def preprocess_raw_video(video_file_path, dim=72, plot=True, face_crop=True):
@@ -45,12 +44,18 @@ def preprocess_raw_video(video_file_path, dim=72, plot=True, face_crop=True):
     prev_roi = img_as_float(img)
 
     ############## Reading frame by frame ##############
-    while success and is_not_consecutive(invalid_frames, 25, totalFrames):
+    while success:
+        if len(invalid_frames) / totalFrames > 0.25:
+            print('Too many invalid frames')
+            break
+        if is_not_consecutive(invalid_frames, 25):
+            print('Invalid frames more than 1s')
+            break
         t.append(vidObj.get(cv2.CAP_PROP_POS_MSEC))
 
-        vidLxL = cv2.resize(img_as_float(img[175:1216, :, :]), (dim, dim), interpolation = cv2.INTER_AREA)
+        # vidLxL = cv2.resize(img_as_float(img[175:1216, :, :]), (dim, dim), interpolation = cv2.INTER_AREA)
 
-        # # Add edge to the Img
+        ################### Add edge to the Img ###################
         # width_edge = 100
         # height_edge = height * (width_edge / width)
         # original_cf = np.float32([[0, 0], [width - 1, 0], [(width - 1) / 2, height - 1]])
@@ -59,7 +64,7 @@ def preprocess_raw_video(video_file_path, dim=72, plot=True, face_crop=True):
         # matrix = cv2.getAffineTransform(original_cf, transed_cf)
         # img = cv2.warpAffine(img, matrix, (height, width))
 
-        ####### Face detection with OPENCV ###########
+        ################### Face detection with OPENCV ###################
         # gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
         # faces = face_cascade.detectMultiScale(gray, 1.01, 5)
         # for (x, y, w, h) in faces:
@@ -72,7 +77,7 @@ def preprocess_raw_video(video_file_path, dim=72, plot=True, face_crop=True):
         #     roi = img_as_float(img[y:y + h, x:x + w, :])
         # img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
 
-        ########## Face detection with MediaPipe ############
+        ################### Face detection with MediaPipe ###################
         results = face_detection.process(img)
         roi = 0
         if results.detections:
@@ -83,25 +88,29 @@ def preprocess_raw_video(video_file_path, dim=72, plot=True, face_crop=True):
                 y = int(bounding_box.ymin * img.shape[0])
                 h = int(bounding_box.height * img.shape[0])
 
-                cv2.rectangle(img, (x, int(y - 0.2 * h)), (x + w, y + h), (0, 255, 0), 2)
-                roi = img_as_float(img[int(y - 0.2 * h):y + h, x:x + w, :])
-        else:
-            invalid_frames.append(i)
-            print(f'No Face Detected in {video_file_path[-12:]} at {i}th Frame')
-
-        ##### Video #######
-        cv2.imshow('Frame', img)
-        # Press 'q' to quit
-        if cv2.waitKey(1) & 0xFF == ord('q'):
-            break
-
-        try:
-            vidLxL = cv2.resize(roi, (dim, dim), interpolation=cv2.INTER_LINEAR)
+                # cv2.rectangle(img, (x, int(y - 0.2 * h)), (x + w, y + h), (0, 255, 0), 2)
+                roi = img_as_float(img[int(y - 0.2 * h):y + 1.1 * h, x:x + w, :])
+            vidLxL = cv2.resize(roi, (dim, dim), interpolation=cv2.INTER_AREA)
             prev_roi = roi
-        except:
+        else:
+            print(f'No Face Detected in {video_file_path[-12:]} at {i}th Frame')
             invalid_frames.append(i)
-            print(f'Exception triggered in {video_file_path[-12:]} at frame {i}')
-            vidLxL = cv2.resize(prev_roi, (dim, dim), interpolation=cv2.INTER_LINEAR)
+            vidLxL = cv2.resize(prev_roi, (dim, dim), interpolation=cv2.INTER_AREA)
+
+
+        ################### Video ###################
+        # cv2.imshow('Frame', img)
+        # # Press 'q' to quit
+        # if cv2.waitKey(1) & 0xFF == ord('q'):
+        #     break
+
+        # try:
+        #     vidLxL = cv2.resize(roi, (dim, dim), interpolation=cv2.INTER_AREA)
+        #     prev_roi = roi
+        # except:
+        #     invalid_frames.append(i)
+        #     print(f'Exception triggered in {video_file_path[-12:]} at frame {i}')
+        #     vidLxL = cv2.resize(prev_roi, (dim, dim), interpolation=cv2.INTER_AREA)
         # vidLxL = cv2.rotate(vidLxL, cv2.ROTATE_90_CLOCKWISE)
         vidLxL = cv2.cvtColor(vidLxL.astype('float32'), cv2.COLOR_BGR2RGB)
         vidLxL[vidLxL > 1] = 1
@@ -110,6 +119,7 @@ def preprocess_raw_video(video_file_path, dim=72, plot=True, face_crop=True):
 
         success, img = vidObj.read()
         i = i + 1
+    Xsub = Xsub[0:i]
     # ###### Video #######
     # # Release the video capture
     # vidObj.release()
