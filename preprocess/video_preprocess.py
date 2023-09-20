@@ -48,7 +48,7 @@ def preprocess_raw_video(video_file_path, dim=72, plot=True, face_crop=True):
         if len(invalid_frames) / totalFrames > 0.25:
             print('Too many invalid frames')
             break
-        if is_not_consecutive(invalid_frames, 25):
+        if is_consecutive(invalid_frames, 25):
             print('Invalid frames more than 1s')
             break
         t.append(vidObj.get(cv2.CAP_PROP_POS_MSEC))
