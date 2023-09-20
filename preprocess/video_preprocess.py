@@ -36,11 +36,11 @@ def preprocess_raw_video(video_file_path, dim=72, plot=True, face_crop=True):
     totalFrames = int(vidObj.get(cv2.CAP_PROP_FRAME_COUNT))
     Xsub = np.zeros((totalFrames, dim, dim, 3), dtype=np.float32)
     success, img = vidObj.read()
-    height, width, _ = img.shape
-    # print(f'Height:{height}, width{width}')
+    height, width, _ = img.shape  # Height 1392, width 1040
+    print(f'Height:{height}, width{width}')
     
     face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
-    face_detection = mp.solutions.face_detection.FaceDetection(min_detection_confidence=0.75)
+    face_detection = mp.solutions.face_detection.FaceDetection(min_detection_confidence=0.25)
     prev_roi = img_as_float(img)
 
     ############## Reading frame by frame ##############
@@ -86,7 +86,9 @@ def preprocess_raw_video(video_file_path, dim=72, plot=True, face_crop=True):
                 xmin = int(bbox.xmin * img.shape[1])
                 ymin = int(bbox.ymin * img.shape[0])
                 xmax = int(bbox.xmin * img.shape[1] + bbox.width * img.shape[1])
-                ymax = int(bbox.ymin * img.shape[0] + bbox.height * img.shape[0])
+                ymax = int(bbox.ymin * img.shape[0] + 1.2 * bbox.height * img.shape[0])
+
+                xmin = max(xmin, 0)
 
                 # cv2.rectangle(img, (x, int(y - 0.2 * h)), (x + w, y + h), (0, 255, 0), 2)
                 roi = img_as_float(img[ymin:ymax, xmin:xmax, :])
