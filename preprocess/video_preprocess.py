@@ -82,14 +82,15 @@ def preprocess_raw_video(video_file_path, dim=72, plot=True, face_crop=True):
         roi = 0
         if results.detections:
             for face in results.detections:
-                bounding_box = face.location_data.relative_bounding_box
-                x = int(bounding_box.xmin * img.shape[1])
-                w = int(bounding_box.width * img.shape[1])
-                y = int(bounding_box.ymin * img.shape[0])
-                h = int(bounding_box.height * img.shape[0])
+                bbox = face.location_data.relative_bounding_box
+                xmin = int(bbox.xmin * img.shape[1])
+                ymin = int(bbox.ymin * img.shape[0])
+                xmax = int(bbox.xmin * img.shape[1] + bbox.width * img.shape[1])
+                ymax = int(bbox.ymin * img.shape[0] + bbox.height * img.shape[0])
 
                 # cv2.rectangle(img, (x, int(y - 0.2 * h)), (x + w, y + h), (0, 255, 0), 2)
-                roi = img_as_float(img[y:y + h, x:x + w, :])
+                roi = img_as_float(img[ymin:ymax, xmin:xmax, :])
+
             vidLxL = cv2.resize(roi, (dim, dim), interpolation=cv2.INTER_AREA)
             prev_roi = roi
         else:
