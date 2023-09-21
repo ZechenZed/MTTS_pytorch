@@ -1,12 +1,12 @@
 program: train.py
 method: random
 project: TS_CAN
-#metric:
-#  name: valid_loss
-#  goal: minimize
+metric:
+  name: Train_pearson
+  goal: maximize
 parameters:
   lr:
-    values: [1e-2, 1e-3,1e-4, 1e-5, 1e-6]
+    values: [1e-2, 1e-3,1e-4, 1e-5]
   dropout_rate1:
     min: 0.05
     max: 0.95
