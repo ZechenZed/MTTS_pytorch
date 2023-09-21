@@ -44,7 +44,7 @@ class TSCAN_trainer:
         self.drop_rate2 = setup.dropout_rate2
         self.kernel = setup.kernel
         self.pool_size = (2, 2)
-
+        self.USE_LAST_EPOCH = True
         self.plot_pred = False
 
         ################### Load data ###################
