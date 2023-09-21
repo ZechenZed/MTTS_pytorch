@@ -200,7 +200,7 @@ class TSCAN_trainer:
             labels = np.array(labels).reshape(-1)
             cMAE = sum(abs(predictions - labels)) / predictions.shape[0]
             ro = pearsonr(predictions, labels)[0]
-            wandb.log({'Train cMAE': cMAE, ' pearson:': ro})
+            wandb.log({'Train_cMAE': cMAE, 'Train_pearson': ro})
             print(f'Train Pearson correlation: {ro}')
             print(f'Train cMAE: {cMAE}')
             if self.plot_pred:
@@ -236,7 +236,7 @@ class TSCAN_trainer:
             labels = np.array(labels).reshape(-1)
             cMAE = sum(abs(predictions - labels)) / predictions.shape[0]
             ro = pearsonr(predictions, labels)[0]
-            wandb.log({'Valid cMAE': cMAE, ' pearson:': ro})
+            wandb.log({'Valid_cMAE': cMAE, 'Valid_pearson': ro})
             print(f'Valid Pearson correlation: {ro}')
             print(f'Valid cMAE: {cMAE}')
             if self.plot_pred:
@@ -272,7 +272,7 @@ class TSCAN_trainer:
             labels = np.array(labels).reshape(-1)
             cMAE = sum(abs(predictions - labels)) / predictions.shape[0]
             ro = pearsonr(predictions, labels)[0]
-            wandb.log({'Test cMAE': cMAE, ' pearson:': ro})
+            wandb.log({'Test_cMAE': cMAE, 'Test_pearson': ro})
             print(f'Test Pearson correlation: {ro}')
             print(f'Test cMAE: {cMAE}')
             if self.plot_pred:
