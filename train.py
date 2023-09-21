@@ -38,14 +38,15 @@ class TSCAN_trainer:
         self.best_epoch = setup.best
         self.base_len = setup.nb_device * self.frame_depth
         self.batch_size = setup.nb_batch
-        self.USE_LAST_EPOCH = False
-        self.plot_pred = True
         self.nb_filters1 = setup.nb_filter1
         self.nb_filters2 = setup.nb_filter2
         self.drop_rate1 = setup.dropout_rate1
         self.drop_rate2 = setup.dropout_rate2
         self.kernel = setup.kernel
         self.pool_size = (2, 2)
+
+        self.plot_pred = False
+
         ################### Load data ###################
         if setup.device_type == 'local':
             data_folder_path = 'C:/Users/Zed/Desktop/V4V/preprocessed_v4v/'
@@ -64,22 +65,15 @@ class TSCAN_trainer:
         v4v_data_valid = V4V_Dataset(data_folder_path, 'valid', setup.image_type, setup.BP_type)
         self.valid_loader = DataLoader(dataset=v4v_data_valid, batch_size=self.batch_size,
                                        shuffle=True, num_workers=1)
+        v4v_data_test = V4V_Dataset(data_folder_path, 'test', setup.image_type, setup.BP_type)
+        self.test_loader = DataLoader(dataset=v4v_data_test, batch_size=self.batch_size,
+                                      shuffle=False, num_workers=0)
 
-        if setup.data_type == 'train':
-            # test = iter(self.valid_loader)
-            # first_test = next(test)
-            # x, y = first_test
-            # print(type(x), type(y))
-            if self.train_loader and self.valid_loader:
-                print('Successfully loaded')
-            self.optimizer = optim.AdamW(self.model.parameters(), lr=self.lr, weight_decay=0)
-            self.scheduler = OneCycleLR(self.optimizer, max_lr=self.lr,
-                                        epochs=self.nb_epoch, steps_per_epoch=len(self.train_loader))
-        else:
-            v4v_data_test = V4V_Dataset(data_folder_path, 'test', setup.image_type, setup.BP_type)
-            self.test_loader = DataLoader(dataset=v4v_data_test, batch_size=self.batch_size,
-                                          shuffle=False, num_workers=0)
-            self.chunk_len = len(self.test_loader)
+        if self.train_loader and self.valid_loader and self.test_loader:
+            print('Successfully loaded')
+        self.optimizer = optim.AdamW(self.model.parameters(), lr=self.lr, weight_decay=0)
+        self.scheduler = OneCycleLR(self.optimizer, max_lr=self.lr,
+                                    epochs=self.nb_epoch, steps_per_epoch=len(self.train_loader))
 
     def train(self):
         for epoch in range(self.nb_epoch):
@@ -201,12 +195,13 @@ class TSCAN_trainer:
 
                 label = labels_train.detach().cpu().numpy()
                 labels.append(label)
-                wandb.log({'Train Predictions': pred,'Train Labels': label})
 
             predictions = np.array(predictions).reshape(-1)
             labels = np.array(labels).reshape(-1)
             cMAE = sum(abs(predictions - labels)) / predictions.shape[0]
-            print(f'Train Pearson correlation: {pearsonr(predictions, labels)[0]}')
+            ro = pearsonr(predictions, labels)[0]
+            wandb.log({'Train cMAE': cMAE, ' pearson:': ro})
+            print(f'Train Pearson correlation: {ro}')
             print(f'Train cMAE: {cMAE}')
             if self.plot_pred:
                 plt.plot(predictions, 'r', label='Prediction')
@@ -236,12 +231,13 @@ class TSCAN_trainer:
 
                 label = labels_valid.detach().cpu().numpy()
                 labels.append(label)
-                wandb.log({'Valid Predictions': pred,'Valid Labels': label})
 
             predictions = np.array(predictions).reshape(-1)
             labels = np.array(labels).reshape(-1)
             cMAE = sum(abs(predictions - labels)) / predictions.shape[0]
-            print(f'Valid Pearson correlation: {pearsonr(predictions, labels)[0]}')
+            ro = pearsonr(predictions, labels)[0]
+            wandb.log({'Valid cMAE': cMAE, ' pearson:': ro})
+            print(f'Valid Pearson correlation: {ro}')
             print(f'Valid cMAE: {cMAE}')
             if self.plot_pred:
                 plt.plot(predictions, 'r', label='Prediction')
@@ -271,12 +267,13 @@ class TSCAN_trainer:
 
                 label = labels_test.detach().cpu().numpy()
                 labels.append(label)
-                wandb.log({'Test Predictions': pred,'Test Labels': label})
 
             predictions = np.array(predictions).reshape(-1)
             labels = np.array(labels).reshape(-1)
             cMAE = sum(abs(predictions - labels)) / predictions.shape[0]
-            print(f'Test Pearson correlation: {pearsonr(predictions, labels)[0]}')
+            ro = pearsonr(predictions, labels)[0]
+            wandb.log({'Test cMAE': cMAE, ' pearson:': ro})
+            print(f'Test Pearson correlation: {ro}')
             print(f'Test cMAE: {cMAE}')
             if self.plot_pred:
                 plt.plot(predictions, 'r', label='Prediction')
@@ -331,7 +328,5 @@ if __name__ == '__main__':
     args = parser.parse_args()
     print('input args:\n', json.dumps(vars(args), indent=4, separators=(',', ':')))  # pretty print args
     trainer = TSCAN_trainer(args)
-    if args.data_type == 'train':
-        trainer.train()
-    else:
-        trainer.test()
+    trainer.train()
+    trainer.test()

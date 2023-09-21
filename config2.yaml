@@ -1,9 +1,9 @@
 program: train.py
-method: bayes
+method: random
 project: TS_CAN
-metric:
-  name: valid_loss
-  goal: minimize
+#metric:
+#  name: valid_loss
+#  goal: minimize
 parameters:
   lr:
     values: [1e-3,1e-4, 1e-5, 1e-6]
