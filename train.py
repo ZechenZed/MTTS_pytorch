@@ -328,5 +328,5 @@ if __name__ == '__main__':
     args = parser.parse_args()
     print('input args:\n', json.dumps(vars(args), indent=4, separators=(',', ':')))  # pretty print args
     trainer = TSCAN_trainer(args)
-    # trainer.train()
+    trainer.train()
     trainer.test()
