@@ -53,7 +53,7 @@ class TSCAN_trainer:
         else:
             data_folder_path = '/edrive2/zechenzh/preprocessed_v4v/'
 
-        self.model = TSCAN(frame_depth=self.frame_depth, img_size=36, dropout_rate1=self.drop_rate1,
+        self.model = TSCAN(frame_depth=self.frame_depth, img_size=72, dropout_rate1=self.drop_rate1,
                            dropout_rate2=self.drop_rate2, kernel_size=self.kernel, nb_dense=self.nb_dense,
                            pool_size=self.pool_size, nb_filters1=self.nb_filters1,
                            nb_filters2=self.nb_filters2).to(self.device)
