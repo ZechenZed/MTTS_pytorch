@@ -45,7 +45,7 @@ class TSCAN_trainer:
         self.kernel = setup.kernel
         self.pool_size = (2, 2)
         self.USE_LAST_EPOCH = True
-        self.plot_pred = False
+        self.plot_pred = True
 
         ################### Load data ###################
         if setup.device_type == 'local':
@@ -53,7 +53,7 @@ class TSCAN_trainer:
         else:
             data_folder_path = '/edrive2/zechenzh/preprocessed_v4v/'
 
-        self.model = TSCAN(frame_depth=self.frame_depth, img_size=36, dropout_rate1=self.drop_rate1,
+        self.model = TSCAN(frame_depth=self.frame_depth, img_size=72, dropout_rate1=self.drop_rate1,
                            dropout_rate2=self.drop_rate2, kernel_size=self.kernel, nb_dense=self.nb_dense,
                            pool_size=self.pool_size, nb_filters1=self.nb_filters1,
                            nb_filters2=self.nb_filters2).to(self.device)
@@ -290,7 +290,7 @@ if __name__ == '__main__':
     # os.environ['CUDA_VISIBLE_DEVICES'] = setup.gpu
 
     parser = argparse.ArgumentParser()
-    parser.add_argument('-device', '--device_type', type=str, default='remote',
+    parser.add_argument('-device', '--device_type', type=str, default='local',
                         help='Local / Remote device')
 
     parser.add_argument('--nb_device', type=int, default=1,
@@ -328,5 +328,5 @@ if __name__ == '__main__':
     args = parser.parse_args()
     print('input args:\n', json.dumps(vars(args), indent=4, separators=(',', ':')))  # pretty print args
     trainer = TSCAN_trainer(args)
-    trainer.train()
+    # trainer.train()
     trainer.test()
