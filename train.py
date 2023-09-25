@@ -321,7 +321,7 @@ if __name__ == '__main__':
                         help='number of filter 1')
     parser.add_argument('--nb_filter2', type=int, default=64,
                         help='number of filter 2')
-    parser.add_argument('--nb_dense', type=int, default=768,
+    parser.add_argument('--nb_dense', type=int, default=128,
                         help='Number of dense layer')
     parser.add_argument('--best', type=int, default=19,
                         help='Best Epoch')
