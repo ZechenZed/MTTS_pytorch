@@ -51,9 +51,9 @@ class TSCAN_trainer:
         if setup.device_type == 'local':
             data_folder_path = 'C:/Users/Zed/Desktop/V4V/preprocessed_v4v/'
         else:
-            data_folder_path = '/edrive2/zechenzh/preprocessed_v4v/'
+            data_folder_path = '/edrive1/zechenzh/preprocessed_v4v/'
 
-        self.model = TSCAN(frame_depth=self.frame_depth, img_size=72, dropout_rate1=self.drop_rate1,
+        self.model = TSCAN(frame_depth=self.frame_depth, img_size=36, dropout_rate1=self.drop_rate1,
                            dropout_rate2=self.drop_rate2, kernel_size=self.kernel, nb_dense=self.nb_dense,
                            pool_size=self.pool_size, nb_filters1=self.nb_filters1,
                            nb_filters2=self.nb_filters2).to(self.device)
@@ -62,14 +62,14 @@ class TSCAN_trainer:
         v4v_data_train = V4V_Dataset(data_folder_path, 'train', setup.image_type, setup.BP_type)
         self.train_loader = DataLoader(dataset=v4v_data_train, batch_size=self.batch_size,
                                        shuffle=True, num_workers=1)
-        v4v_data_valid = V4V_Dataset(data_folder_path, 'valid', setup.image_type, setup.BP_type)
-        self.valid_loader = DataLoader(dataset=v4v_data_valid, batch_size=self.batch_size,
-                                       shuffle=True, num_workers=1)
+        # v4v_data_valid = V4V_Dataset(data_folder_path, 'valid', setup.image_type, setup.BP_type)
+        # self.valid_loader = DataLoader(dataset=v4v_data_valid, batch_size=self.batch_size,
+        #                                shuffle=True, num_workers=1)
         v4v_data_test = V4V_Dataset(data_folder_path, 'test', setup.image_type, setup.BP_type)
         self.test_loader = DataLoader(dataset=v4v_data_test, batch_size=self.batch_size,
                                       shuffle=False, num_workers=0)
 
-        if self.train_loader and self.valid_loader and self.test_loader:
+        if self.train_loader and self.test_loader:
             print('Successfully loaded')
         self.optimizer = optim.AdamW(self.model.parameters(), lr=self.lr, weight_decay=0)
         self.scheduler = OneCycleLR(self.optimizer, max_lr=self.lr,
@@ -108,21 +108,22 @@ class TSCAN_trainer:
                 train_loss.append(loss.item())
                 tbar.set_postfix(loss=loss.item())
             self.save_model(epoch)
-            valid_loss = self.valid()
-            print('validation loss: ', valid_loss)
-            if self.min_valid_loss is None:
-                self.min_valid_loss = valid_loss
-                self.best_epoch = 0
-                print("Update best model! Best epoch: {}".format(self.best_epoch))
-            elif valid_loss < self.min_valid_loss:
-                self.min_valid_loss = valid_loss
-                self.best_epoch = epoch
-                print("Update best model! Best epoch: {}".format(self.best_epoch))
+            # valid_loss = self.valid()
+            # print('validation loss: ', valid_loss)
+            # if self.min_valid_loss is None:
+            #     self.min_valid_loss = valid_loss
+            #     self.best_epoch = 0
+            #     print("Update best model! Best epoch: {}".format(self.best_epoch))
+            # elif valid_loss < self.min_valid_loss:
+            #     self.min_valid_loss = valid_loss
+            #     self.best_epoch = epoch
+            #     print("Update best model! Best epoch: {}".format(self.best_epoch))
+            # wandb.log({'train_loss': np.average(train_loss), 'valid_loss': valid_loss})
 
-            wandb.log({'train_loss': np.average(train_loss), 'valid_loss': valid_loss})
+            wandb.log({'train_loss': np.average(train_loss)})
 
-        print("")
-        print("Best trained epoch: {}, min_val_loss: {}".format(self.best_epoch, self.min_valid_loss))
+        # print("")
+        # print("Best trained epoch: {}, min_val_loss: {}".format(self.best_epoch, self.min_valid_loss))
 
     def valid(self):
         print('')

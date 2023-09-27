@@ -20,15 +20,22 @@ def data_process(data_type, device_type, image=str(), dim=72):
     else:
         data_folder_path = "/edrive2/zechenzh/V4V/"
 
+    # if data_type == "train":
+    #     video_folder_path = f'{data_folder_path}Phase1_data/Videos/train/'
+    #     BP_folder_path = f'{data_folder_path}Phase1_data/Ground_truth/BP_raw_1KHz/'
+    # elif data_type == "test":
+    #     video_folder_path = f'{data_folder_path}Phase2_data/Videos/test/'
+    #     BP_folder_path = f'{data_folder_path}Phase2_data/blood_pressure/test_set_bp/'
+    # else:
+    #     video_folder_path = f'{data_folder_path}Phase1_data/Videos/valid/'
+    #     BP_folder_path = f'{data_folder_path}Phase2_data/blood_pressure/val_set_bp/'
+
     if data_type == "train":
-        video_folder_path = f'{data_folder_path}Phase1_data/Videos/train/'
-        BP_folder_path = f'{data_folder_path}Phase1_data/Ground_truth/BP_raw_1KHz/'
-    elif data_type == "test":
-        video_folder_path = f'{data_folder_path}Phase2_data/Videos/test/'
-        BP_folder_path = f'{data_folder_path}Phase2_data/blood_pressure/test_set_bp/'
+        video_folder_path = f'{data_folder_path}Phase1_data/Videos/new_train/'
+        BP_folder_path = f'{data_folder_path}Phase1_data/Ground_truth/new_train_BP/'
     else:
-        video_folder_path = f'{data_folder_path}Phase1_data/Videos/valid/'
-        BP_folder_path = f'{data_folder_path}Phase2_data/blood_pressure/val_set_bp/'
+        video_folder_path = f'{data_folder_path}Phase1_data/Videos/new_test/'
+        BP_folder_path = f'{data_folder_path}Phase1_data/Ground_truth/new_test_BP/'
 
     ############## Video processing ##############
     video_file_path = []
@@ -112,7 +119,7 @@ def data_process(data_type, device_type, image=str(), dim=72):
         BP_lf[frame_ind:frame_ind + current_frames] = temp_BP_lf_systolic_inter
 
         ############# Video Batches #############
-        frames[frame_ind:frame_ind + current_frames] = videos[i][first_index:first_index+current_frames]
+        frames[frame_ind:frame_ind + current_frames] = videos[i][first_index:first_index + current_frames]
         frame_ind += current_frames
 
     ind_BP_rest = np.where(BP_lf == 0)[0][0]
@@ -125,7 +132,7 @@ def data_process(data_type, device_type, image=str(), dim=72):
     ############## Save the preprocessed model ##############
     saving_path = ''
     if device_type == 'remote':
-        saving_path = '/edrive2/zechenzh/preprocessed_v4v/'
+        saving_path = '/edrive1/zechenzh/preprocessed_v4v/'
     elif device_type == 'local':
         saving_path = 'C:/Users/Zed/Desktop/V4V/preprocessed_v4v/'
     np.save(saving_path + data_type + '_frames_' + image + '.npy', frames)
@@ -240,7 +247,7 @@ def only_BP(data_type, device_type, image=str(), dim=36):
 if __name__ == '__main__':
     # data_process('valid', 'remote', 'face_large')
     data_process('train', 'remote', 'face_large')
-    # data_process('test', 'remote', 'face_large')
+    data_process('test', 'remote', 'face_large')
     # only_BP('train', 'remote', 'face_large')
     # only_BP('valid', 'remote', 'face_large')
     # only_BP('test', 'local', 'face_large')
