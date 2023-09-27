@@ -10,7 +10,7 @@ from data_loader import V4V_Dataset
 from tqdm import tqdm
 from evaluation.metrics import calculate_metrics
 from torch.optim.lr_scheduler import OneCycleLR
-from torch.nn import MSELoss
+from torch.nn import MSELoss, L1Loss
 import matplotlib.pyplot as plt
 from sklearn.metrics import mean_squared_error, mean_absolute_error
 from scipy.ndimage import gaussian_filter
@@ -24,7 +24,7 @@ class TSCAN_trainer:
         if setup.device_type == 'local':
             self.model_dir = 'C:/Users/Zed/Desktop/MTTS_pytorch/model_ckpts/'
         else:
-            self.model_dir = '/edrive2/zechenzh/model_ckpts/'
+            self.model_dir = '/edrive1/zechenzh/model_ckpts/'
         self.model_file_name = f'TSCAN_{setup.image_type}'
         self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
@@ -33,7 +33,7 @@ class TSCAN_trainer:
         self.nb_epoch = setup.nb_epoch
         self.lr = setup.lr
         self.nb_dense = setup.nb_dense
-        self.criterion = MSELoss()
+        self.criterion = L1Loss()
         self.min_valid_loss = None
         self.best_epoch = setup.best
         self.base_len = setup.nb_device * self.frame_depth
@@ -127,7 +127,7 @@ class TSCAN_trainer:
 
     def valid(self):
         print('')
-        print("===Validating===")
+        print("==========Validating==========")
         valid_loss = []
         self.model.eval()
         valid_step = 0
@@ -210,41 +210,41 @@ class TSCAN_trainer:
                 plt.legend()
                 plt.show()
 
-        predictions = list()
-        labels = list()
-        with torch.no_grad():
-            for valid_ind, (data_valid, valid_labels) in enumerate(self.valid_loader):
-                # batch_size = valid_batch[0].shape[0]
-                data_valid = data_valid.to(self.device)
-                labels_valid = valid_labels.to(self.device)
-                N, D, C, H, W = data_valid.shape
-                data_valid = data_valid.view(N * D, C, H, W)
-                labels_valid = labels_valid.view(-1, 1)
-
-                data_valid = data_valid[:(N * D) // self.base_len * self.base_len]
-                labels_valid = labels_valid[:(N * D) // self.base_len * self.base_len]
-
-                pred_ppg_valid = self.model(data_valid)
-
-                pred = pred_ppg_valid.detach().cpu().numpy()
-                pred = gaussian_filter(pred, sigma=3)
-                predictions.append(pred)
-
-                label = labels_valid.detach().cpu().numpy()
-                labels.append(label)
-
-            predictions = np.array(predictions).reshape(-1)
-            labels = np.array(labels).reshape(-1)
-            cMAE = sum(abs(predictions - labels)) / predictions.shape[0]
-            ro = pearsonr(predictions, labels)[0]
-            wandb.log({'Valid_cMAE': cMAE, 'Valid_pearson': ro})
-            print(f'Valid Pearson correlation: {ro}')
-            print(f'Valid cMAE: {cMAE}')
-            if self.plot_pred:
-                plt.plot(predictions, 'r', label='Prediction')
-                plt.plot(labels, 'g', label='Ground truth')
-                plt.legend()
-                plt.show()
+        # predictions = list()
+        # labels = list()
+        # with torch.no_grad():
+        #     for valid_ind, (data_valid, valid_labels) in enumerate(self.valid_loader):
+        #         # batch_size = valid_batch[0].shape[0]
+        #         data_valid = data_valid.to(self.device)
+        #         labels_valid = valid_labels.to(self.device)
+        #         N, D, C, H, W = data_valid.shape
+        #         data_valid = data_valid.view(N * D, C, H, W)
+        #         labels_valid = labels_valid.view(-1, 1)
+        #
+        #         data_valid = data_valid[:(N * D) // self.base_len * self.base_len]
+        #         labels_valid = labels_valid[:(N * D) // self.base_len * self.base_len]
+        #
+        #         pred_ppg_valid = self.model(data_valid)
+        #
+        #         pred = pred_ppg_valid.detach().cpu().numpy()
+        #         pred = gaussian_filter(pred, sigma=3)
+        #         predictions.append(pred)
+        #
+        #         label = labels_valid.detach().cpu().numpy()
+        #         labels.append(label)
+        #
+        #     predictions = np.array(predictions).reshape(-1)
+        #     labels = np.array(labels).reshape(-1)
+        #     cMAE = sum(abs(predictions - labels)) / predictions.shape[0]
+        #     ro = pearsonr(predictions, labels)[0]
+        #     wandb.log({'Valid_cMAE': cMAE, 'Valid_pearson': ro})
+        #     print(f'Valid Pearson correlation: {ro}')
+        #     print(f'Valid cMAE: {cMAE}')
+        #     if self.plot_pred:
+        #         plt.plot(predictions, 'r', label='Prediction')
+        #         plt.plot(labels, 'g', label='Ground truth')
+        #         plt.legend()
+        #         plt.show()
 
         predictions = list()
         labels = list()
