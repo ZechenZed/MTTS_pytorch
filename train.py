@@ -201,6 +201,8 @@ class TSCAN_trainer:
             labels = np.array(labels).reshape(-1)
             cMAE = sum(abs(predictions - labels)) / predictions.shape[0]
             ro = pearsonr(predictions, labels)[0]
+            if ro == float('nan'):
+                ro = -1
             wandb.log({'Train_cMAE': cMAE, 'Train_pearson': ro})
             print(f'Train Pearson correlation: {ro}')
             print(f'Train cMAE: {cMAE}')
@@ -273,6 +275,8 @@ class TSCAN_trainer:
             labels = np.array(labels).reshape(-1)
             cMAE = sum(abs(predictions - labels)) / predictions.shape[0]
             ro = pearsonr(predictions, labels)[0]
+            if ro == float('nan'):
+                ro = -1
             wandb.log({'Test_cMAE': cMAE, 'Test_pearson': ro})
             print(f'Test Pearson correlation: {ro}')
             print(f'Test cMAE: {cMAE}')
