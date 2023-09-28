@@ -201,7 +201,7 @@ class TSCAN_trainer:
             labels = np.array(labels).reshape(-1)
             cMAE = sum(abs(predictions - labels)) / predictions.shape[0]
             ro = pearsonr(predictions, labels)[0]
-            if ro == float('nan'):
+            if np.isnan(ro):
                 ro = -1
             wandb.log({'Train_cMAE': cMAE, 'Train_pearson': ro})
             print(f'Train Pearson correlation: {ro}')
@@ -275,7 +275,7 @@ class TSCAN_trainer:
             labels = np.array(labels).reshape(-1)
             cMAE = sum(abs(predictions - labels)) / predictions.shape[0]
             ro = pearsonr(predictions, labels)[0]
-            if ro == float('nan'):
+            if np.isnan(ro):
                 ro = -1
             wandb.log({'Test_cMAE': cMAE, 'Test_pearson': ro})
             print(f'Test Pearson correlation: {ro}')
@@ -303,7 +303,7 @@ if __name__ == '__main__':
     parser.add_argument('-BP', '--BP_type', type=str, default='systolic',
                         help='Choose type of BP from mean, systolic and diastolic')
 
-    parser.add_argument('--nb_epoch', type=int, default=15,
+    parser.add_argument('--nb_epoch', type=int, default=20,
                         help='nb_epoch')
     parser.add_argument('--nb_batch', type=int, default=12,
                         help='nb_batch')
@@ -313,11 +313,11 @@ if __name__ == '__main__':
                         help='learning rate')
     parser.add_argument('--frame_depth', type=int, default=10,
                         help='frame depth')
-    parser.add_argument('--dropout_rate1', type=float, default=0.726254919160984,
+    parser.add_argument('--dropout_rate1', type=float, default=0.25,
                         help='Drop rate 1')
-    parser.add_argument('--dropout_rate2', type=float, default=0.5294595844877134,
+    parser.add_argument('--dropout_rate2', type=float, default=0.5,
                         help='Drop rate 2')
-    parser.add_argument('--nb_filter1', type=int, default=64,
+    parser.add_argument('--nb_filter1', type=int, default=32,
                         help='number of filter 1')
     parser.add_argument('--nb_filter2', type=int, default=64,
                         help='number of filter 2')
