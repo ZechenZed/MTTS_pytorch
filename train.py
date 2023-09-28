@@ -299,7 +299,7 @@ if __name__ == '__main__':
     parser.add_argument('-BP', '--BP_type', type=str, default='systolic',
                         help='Choose type of BP from mean, systolic and diastolic')
 
-    parser.add_argument('--nb_epoch', type=int, default=20,
+    parser.add_argument('--nb_epoch', type=int, default=15,
                         help='nb_epoch')
     parser.add_argument('--nb_batch', type=int, default=12,
                         help='nb_batch')

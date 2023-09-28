@@ -1,12 +1,12 @@
 program: train.py
-method: random
+method: bayes
 project: TS_CAN
-#metric:
-#  name: Train_pearson
-#  goal: maximize
+metric:
+  name: Test_pearson
+  goal: maximize
 parameters:
   lr:
-    values: [1e-2, 1e-3,1e-4, 1e-5]
+    values: [1e-2, 1e-3,1e-4]
   dropout_rate1:
     min: 0.05
     max: 0.95
