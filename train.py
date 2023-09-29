@@ -71,6 +71,7 @@ class TSCAN_trainer:
 
         if self.train_loader and self.test_loader:
             print('Successfully loaded')
+        print(f'The Length of train data loder:{len(self.train_loader)}')
         self.optimizer = optim.AdamW(self.model.parameters(), lr=self.lr, weight_decay=0)
         self.scheduler = OneCycleLR(self.optimizer, max_lr=self.lr,
                                     epochs=self.nb_epoch, steps_per_epoch=len(self.train_loader))
@@ -303,7 +304,7 @@ if __name__ == '__main__':
     parser.add_argument('-BP', '--BP_type', type=str, default='systolic',
                         help='Choose type of BP from mean, systolic and diastolic')
 
-    parser.add_argument('--nb_epoch', type=int, default=20,
+    parser.add_argument('--nb_epoch', type=int, default=30,
                         help='nb_epoch')
     parser.add_argument('--nb_batch', type=int, default=12,
                         help='nb_batch')
@@ -327,6 +328,7 @@ if __name__ == '__main__':
                         help='Best Epoch')
     args = parser.parse_args()
     print('input args:\n', json.dumps(vars(args), indent=4, separators=(',', ':')))  # pretty print args
+
     trainer = TSCAN_trainer(args)
     trainer.train()
     trainer.test()
