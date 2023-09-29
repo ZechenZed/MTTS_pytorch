@@ -304,7 +304,7 @@ if __name__ == '__main__':
     parser.add_argument('-BP', '--BP_type', type=str, default='systolic',
                         help='Choose type of BP from mean, systolic and diastolic')
 
-    parser.add_argument('--nb_epoch', type=int, default=40,
+    parser.add_argument('--nb_epoch', type=int, default=24,
                         help='nb_epoch')
     parser.add_argument('--nb_batch', type=int, default=12,
                         help='nb_batch')
@@ -324,7 +324,7 @@ if __name__ == '__main__':
                         help='number of filter 2')
     parser.add_argument('--nb_dense', type=int, default=128,
                         help='Number of dense layer')
-    parser.add_argument('--best', type=int, default=39,
+    parser.add_argument('--best', type=int, default=23,
                         help='Best Epoch')
     args = parser.parse_args()
     print('input args:\n', json.dumps(vars(args), indent=4, separators=(',', ':')))  # pretty print args
