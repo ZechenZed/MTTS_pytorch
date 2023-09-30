@@ -6,7 +6,7 @@ metric:
   goal: maximize
 parameters:
   lr:
-    values: [1e-2,1e-3,1e-4]
+    values: [1e-2,1e-3,5e-4]
   dropout_rate1:
     min: 0.05
     max: 0.95
@@ -16,5 +16,5 @@ parameters:
   nb_filter1:
     values: [8,16,32,64,128,256]
   nb_dense:
-    values: [128,256,384,512,640,768,896,1024]
+    values: [128,256,512,1024,2048]
 
