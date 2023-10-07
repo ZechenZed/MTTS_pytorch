@@ -20,8 +20,8 @@ def is_consecutive(l, n):
   """
     if len(l) < 25:
         return False
-    for z in range(len(l)-n):
-        if l[z] + n - 1 == l[z+n-1]:
+    for z in range(len(l) - n):
+        if l[z] + n - 1 == l[z + n - 1]:
             return True
     return False
 
@@ -36,11 +36,17 @@ def preprocess_raw_video(video_file_path, dim=72, plot=True, face_crop=True):
     totalFrames = int(vidObj.get(cv2.CAP_PROP_FRAME_COUNT))
     Xsub = np.zeros((totalFrames, dim, dim, 3), dtype=np.float32)
     success, img = vidObj.read()
-    height, width, _ = img.shape  # Height 1392, width 1040
-    # print(f'Height:{height}, width{width}')
-    
+    height, width = img.shape[:2]
+
+    # OpenCV
     face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
-    face_detection = mp.solutions.face_detection.FaceDetection(min_detection_confidence=0.25)
+    # OpenCV Cuda
+    faceModel = cv2.dnn.readNetFromCaffe('res10_300x300_ssd_iter_140000.prototxt',
+                                         caffeModel='res10_300x300_ssd_iter_140000.caffemodel')
+    faceModel.setPreferableBackend(cv2.dnn.DNN_BACKEND_CUDA)
+    faceModel.setPreferableTarget(cv2.dnn.DNN_TARGET_CUDA)
+    # # Mediapipe
+    # face_detection = mp.solutions.face_detection.FaceDetection(min_detection_confidence=0.1)
     prev_roi = img_as_float(img)
 
     ############## Reading frame by frame ##############
@@ -49,12 +55,25 @@ def preprocess_raw_video(video_file_path, dim=72, plot=True, face_crop=True):
         if len(invalid_frames) / totalFrames > 0.25:
             print('Too many invalid frames')
             break
-        if is_consecutive(invalid_frames, 25):
+        if is_consecutive(invalid_frames, 240):
             print('Invalid frames more than 1s')
             break
 
-        # vidLxL = cv2.resize(img_as_float(img[175:1216, :, :]), (dim, dim), interpolation = cv2.INTER_AREA)
-
+        img = cv2.rotate(img, cv2.ROTATE_90_COUNTERCLOCKWISE)
+        blob = cv2.dnn.blobFromImage(img, 1.0, (300, 300), (104, 0, 177.0, 123.0), swapRB=False, crop=False)
+        faceModel.setInput(blob)
+        predictions = faceModel.forward()
+        roi = 0
+        for i in range(0, predictions.shape[2]):
+            if predictions[0, 0, i, 2] > 0.5:
+                bbox = predictions[0, 0, i, 3:7] * np.array([height, width, height, width])
+                (xmin, ymin, xmax, ymax) = bbox.astype('int')
+                # cv2.rectangle(img, (xmin, ymin), (xmax, ymax), (0, 0, 255), 2)
+                roi = img_as_float(img[ymin:ymax, xmin:xmax, :])
+        # cv2.imshow('Frame', img)
+        # # Press 'q' to quit
+        # if cv2.waitKey(1) & 0xFF == ord('q'):
+        #     break
         ################### Add edge to the Img ###################
         # width_edge = 100
         # height_edge = height * (width_edge / width)
@@ -64,48 +83,60 @@ def preprocess_raw_video(video_file_path, dim=72, plot=True, face_crop=True):
         # matrix = cv2.getAffineTransform(original_cf, transed_cf)
         # img = cv2.warpAffine(img, matrix, (height, width))
 
-        ################### Face detection with OPENCV ###################
+        ################## Face detection with OPENCV ###################
         # gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-        # faces = face_cascade.detectMultiScale(gray, 1.01, 5)
-        # for (x, y, w, h) in faces:
-        #     if w < width/2:
-        #         print(f'Warning No Face Detected in {i}th frame')
+        # img_gpu = cv2.cuda_GpuMat(img)
+        # faces = face_cascade.detectMultiScale(img_gpu, 1.1, 4)
+        # faces = faces.download()
+        # roi = 0
+        # if faces.all():
+        #     for (x, y, w, h) in faces:
+        #         xmax = x+w
+        #         ymax = y+h
+        #         roi = img_as_float(img[y:y + h, x:x + w, :])
+        #         cv2.rectangle(img, (x, y), (xmax, ymax), (0, 255, 0), 2)
         #
+        # else:
+        #     roi = prev_roi
+        #     invalid_frames.append(i)
+        #     print(f'Warning No Face Detected in {i}th frame')
         #     ####### Video #######
         #     # cv2.rectangle(img, (x, y), (x + w, y + h), (0, 255, 0), 2)
+        # prev_roi = roi
+        # ################## Video ###################
+        # cv2.imshow('Frame', img)
+        # # Press 'q' to quit
+        # if cv2.waitKey(1) & 0xFF == ord('q'):
+        #     break
+
+        # ################### Face detection with MediaPipe ###################
+        # results = face_detection.process(img)
+        # roi = 0
+        # if results.detections:
+        #     for face in results.detections:
+        #         bbox = face.location_data.relative_bounding_box
+        #         xmin = int(bbox.xmin * img.shape[1])
+        #         ymin = int(bbox.ymin * img.shape[0])
+        #         xmax = int(bbox.xmin * img.shape[1] + bbox.width * img.shape[1])
+        #         ymax = int(bbox.ymin * img.shape[0] + 1.2 * bbox.height * img.shape[0])
         #
-        #     roi = img_as_float(img[y:y + h, x:x + w, :])
-        # img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-
-        ################### Face detection with MediaPipe ###################
-        results = face_detection.process(img)
-        roi = 0
-        if results.detections:
-            for face in results.detections:
-                bbox = face.location_data.relative_bounding_box
-                xmin = int(bbox.xmin * img.shape[1])
-                ymin = int(bbox.ymin * img.shape[0])
-                xmax = int(bbox.xmin * img.shape[1] + bbox.width * img.shape[1])
-                ymax = int(bbox.ymin * img.shape[0] + 1.2 * bbox.height * img.shape[0])
-
-                xmin = max(xmin, 0)
-
-                # cv2.rectangle(img, (x, int(y - 0.2 * h)), (x + w, y + h), (0, 255, 0), 2)
-                roi = img_as_float(img[ymin:ymax, xmin:xmax, :])
-            try:
-                vidLxL = cv2.resize(roi, (dim, dim), interpolation=cv2.INTER_AREA)
-            except:
-                print(f'in {video_file_path[-12:]} at {i}th Frame')
-                print(results.detections)
-                print(f'xmax{xmax},xmin{xmin},ymax{ymax},ymin{ymin}')
-            prev_roi = roi
-        else:
-            print(f'No Face Detected in {video_file_path[-12:]} at {i}th Frame')
-            invalid_frames.append(i)
-            vidLxL = cv2.resize(prev_roi, (dim, dim), interpolation=cv2.INTER_AREA)
-
-
-        ################### Video ###################
+        #         xmin = max(xmin, 0)
+        #
+        #         cv2.rectangle(img, (xmin, ymin), (xmax, ymax), (0, 255, 0), 2)
+        #         roi = img_as_float(img[ymin:ymax, xmin:xmax, :])
+        #     try:
+        #         vidLxL = cv2.resize(roi, (dim, dim), interpolation=cv2.INTER_AREA)
+        #     except:
+        #         print(f'in {video_file_path[-12:]} at {i}th Frame')
+        #         print(results.detections)
+        #         print(f'xmax{xmax},xmin{xmin},ymax{ymax},ymin{ymin}')
+        #     prev_roi = roi
+        # else:
+        #     print(f'No Face Detected in {video_file_path[-12:]} at {i}th Frame')
+        #     invalid_frames.append(i)
+        #     vidLxL = cv2.resize(prev_roi, (dim, dim), interpolation=cv2.INTER_AREA)
+        #
+        # ################## Video ###################
         # cv2.imshow('Frame', img)
         # # Press 'q' to quit
         # if cv2.waitKey(1) & 0xFF == ord('q'):
@@ -119,6 +150,8 @@ def preprocess_raw_video(video_file_path, dim=72, plot=True, face_crop=True):
         #     print(f'Exception triggered in {video_file_path[-12:]} at frame {i}')
         #     vidLxL = cv2.resize(prev_roi, (dim, dim), interpolation=cv2.INTER_AREA)
         # vidLxL = cv2.rotate(vidLxL, cv2.ROTATE_90_CLOCKWISE)
+
+        vidLxL = cv2.resize(roi, (dim, dim), interpolation=cv2.INTER_AREA)
         vidLxL = cv2.cvtColor(vidLxL.astype('float32'), cv2.COLOR_BGR2RGB)
         vidLxL[vidLxL > 1] = 1
         vidLxL[vidLxL < (1 / 255)] = 1 / 255
@@ -126,7 +159,7 @@ def preprocess_raw_video(video_file_path, dim=72, plot=True, face_crop=True):
 
         success, img = vidObj.read()
         i = i + 1
-    Xsub = Xsub[0:len(t)-1]
+    Xsub = Xsub[0:len(t) - 1]
     # ###### Video #######
     # # Release the video capture
     # vidObj.release()

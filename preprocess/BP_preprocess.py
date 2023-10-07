@@ -1,8 +1,9 @@
 import os
 import numpy as np
+import pandas as pd
 from statistics import mean
 import matplotlib.pyplot as plt
-from scipy.signal import find_peaks, medfilt
+from scipy.signal import find_peaks, medfilt, resample
 from joblib import Parallel, delayed
 from scipy.interpolate import interp1d
 from scipy.ndimage import gaussian_filter
@@ -139,6 +140,99 @@ def data_process(data_type, device_type, image=str(), dim=72):
     np.save(saving_path + data_type + '_BP_systolic.npy', BP_lf)
 
 
+def data_process_DC(device_type, image=str(), dim=72):
+    ############## Data folder path setting ##############
+    if device_type == 'local':
+        data_folder_path = "C:/Users/Zed/Desktop/DC/"
+    elif device_type == 'disk':
+        data_folder_path = 'D:/DC/'
+    else:
+        data_folder_path = "/edrive1/zechenzh/DC/"
+
+    video_folder_path = f'{data_folder_path}face/'
+    BP_folder_path = f'{data_folder_path}bp/'
+
+    ############## Video processing ##############
+    video_file_path = []
+    for path in sorted(os.listdir(video_folder_path)):
+        if os.path.isfile(os.path.join(video_folder_path, path)):
+            video_file_path.append(path)
+
+    video_file_path = video_file_path[0:1]
+    num_video = len(video_file_path)
+    print('Processing ' + str(num_video) + ' Videos')
+
+    videos = [Parallel(n_jobs=20)(
+        delayed(preprocess_raw_video)(video_folder_path + video, dim) for video in video_file_path)]
+    videos = videos[0]
+
+    tt_frame = 0
+    for i in range(num_video):
+        tt_frame += videos[i].shape[0] // 120 * 120
+
+    ############## Systolic BP Extraction ##############
+    BP_file_path = []
+    for path in sorted(os.listdir(BP_folder_path)):
+        if os.path.isfile(os.path.join(BP_folder_path, path)):
+            BP_file_path.append(path)
+
+    # BP_file_path = BP_file_path[0:1]
+    test_frames = tt_frame // 4
+    train_frames = test_frames * 3
+    frames_train = np.zeros(shape=(train_frames, 6, dim, dim))
+    frames_test = np.zeros(shape=(test_frames, 6, dim, dim))
+    BP_lf_train = np.zeros(shape=train_frames)
+    BP_lf_test = np.zeros(shape=test_frames)
+    frame_ind_train = 0
+    frame_ind_test = 0
+    for i in range(num_video):
+        print(f'BP process on {BP_file_path[i]}')
+        temp_BP = pd.read_csv(BP_folder_path + BP_file_path[i])['MeanBP']
+        lf_len = int(len(temp_BP) / 1000 * 240)
+        temp_BP_lf = resample(temp_BP, lf_len)
+        temp_BP_lf = gaussian_filter(temp_BP_lf, 40)
+
+        video_len = videos[i].shape[0]
+        current_frames = min(lf_len, video_len)
+        temp_BP_lf = temp_BP_lf[0:current_frames]
+
+        curr_test_frames = current_frames // 4
+        curr_train_frames = curr_test_frames * 3
+        ############# BP smoothing #############
+        BP_lf_train[frame_ind_train:frame_ind_train + curr_train_frames] = temp_BP_lf[0:curr_train_frames]
+        BP_lf_test[frame_ind_test:frame_ind_test + curr_train_frames] = \
+            temp_BP_lf[curr_train_frames:curr_train_frames+curr_test_frames]
+
+        ############# Video Batches #############
+        frames_train[frame_ind_train:frame_ind_train + curr_train_frames] = videos[i][0:curr_train_frames]
+        frames_test[frame_ind_test:frame_ind_test + curr_test_frames] = \
+            videos[i][curr_train_frames:curr_train_frames+curr_test_frames]
+
+        frame_ind_train += curr_train_frames
+        frame_ind_test += curr_test_frames
+
+    ind_BP_rest = np.where(BP_lf_train == 0)[0][0]
+    BP_lf_train = BP_lf_train[0:ind_BP_rest]
+    frames_train = frames_train[0:ind_BP_rest]
+
+    ind_BP_rest = np.where(BP_lf_test == 0)[0][0]
+    BP_lf_test = BP_lf_test[0:ind_BP_rest]
+    frames_test = frames_test[0:ind_BP_rest]
+
+    frames_train = frames_train.reshape((-1, 10, 6, dim, dim))
+    frames_test = frames_test.reshape((-1, 10, 6, dim, dim))
+
+    BP_lf_train = BP_lf_train.reshape((-1, 10))
+    BP_lf_test = BP_lf_test.reshape((-1, 10))
+
+    ############## Save the preprocessed model ##############
+    saving_path = '/edrive1/zechenzh/preprocessed_v4v/'
+    np.save(saving_path + 'train_frames_' + image + '.npy', frames_train)
+    np.save(saving_path + 'test_frames_' + image + '.npy', frames_test)
+    np.save(saving_path + 'train_BP_systolic.npy', BP_lf_train)
+    np.save(saving_path + '_BP_systolic.npy', BP_lf_test)
+
+
 def only_BP(data_type, device_type, image=str(), dim=36):
     ############## Data folder path setting ##############
     if device_type == "local":
@@ -246,8 +340,9 @@ def only_BP(data_type, device_type, image=str(), dim=36):
 
 if __name__ == '__main__':
     # data_process('valid', 'remote', 'face_large')
-    data_process('train', 'remote', 'face_large')
-    data_process('test', 'remote', 'face_large')
+    # data_process('train', 'remote', 'face_large')
+    # data_process('test', 'remote', 'face_large')
     # only_BP('train', 'remote', 'face_large')
     # only_BP('valid', 'remote', 'face_large')
     # only_BP('test', 'local', 'face_large')
+    data_process_DC('remote', 'face_large')

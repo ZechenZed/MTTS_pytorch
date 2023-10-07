@@ -289,7 +289,7 @@ class TSCAN_trainer:
 
 
 if __name__ == '__main__':
-    wandb.init(project='TSCAN', config=wandb.config)
+    wandb.init(project='TS_CAN', config=wandb.config)
     config = wandb.config
 
     parser = argparse.ArgumentParser()
