@@ -162,7 +162,7 @@ def data_process_DC(device_type, image=str(), dim=72):
     num_video = len(video_file_path)
     print('Processing ' + str(num_video) + ' Videos')
 
-    videos = [Parallel(n_jobs=1)(
+    videos = [Parallel(n_jobs=8)(
         delayed(preprocess_raw_video)(video_folder_path + video, dim) for video in video_file_path)]
     videos = videos[0]
 
@@ -345,4 +345,4 @@ if __name__ == '__main__':
     # only_BP('train', 'remote', 'face_large')
     # only_BP('valid', 'remote', 'face_large')
     # only_BP('test', 'local', 'face_large')
-    data_process_DC('local', 'face_large')
+    data_process_DC('remote', 'face_large')
