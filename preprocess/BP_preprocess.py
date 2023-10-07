@@ -162,7 +162,7 @@ def data_process_DC(device_type, image=str(), dim=72):
     num_video = len(video_file_path)
     print('Processing ' + str(num_video) + ' Videos')
 
-    videos = [Parallel(n_jobs=20)(
+    videos = [Parallel(n_jobs=1)(
         delayed(preprocess_raw_video)(video_folder_path + video, dim) for video in video_file_path)]
     videos = videos[0]
 
@@ -188,14 +188,14 @@ def data_process_DC(device_type, image=str(), dim=72):
     for i in range(num_video):
         print(f'BP process on {BP_file_path[i]}')
         temp_BP = pd.read_csv(BP_folder_path + BP_file_path[i])['MeanBP']
+
         lf_len = int(len(temp_BP) / 1000 * 240)
         temp_BP_lf = resample(temp_BP, lf_len)
         temp_BP_lf = gaussian_filter(temp_BP_lf, 40)
-
         video_len = videos[i].shape[0]
-        current_frames = min(lf_len, video_len)
-        temp_BP_lf = temp_BP_lf[0:current_frames]
 
+        current_frames = min(lf_len, video_len)
+        current_frames = current_frames // 120 * 120
         curr_test_frames = current_frames // 4
         curr_train_frames = curr_test_frames * 3
         ############# BP smoothing #############
@@ -345,4 +345,4 @@ if __name__ == '__main__':
     # only_BP('train', 'remote', 'face_large')
     # only_BP('valid', 'remote', 'face_large')
     # only_BP('test', 'local', 'face_large')
-    data_process_DC('remote', 'face_large')
+    data_process_DC('local', 'face_large')
