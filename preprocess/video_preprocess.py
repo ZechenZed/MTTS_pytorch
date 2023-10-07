@@ -41,8 +41,9 @@ def preprocess_raw_video(video_file_path, dim=72, plot=True, face_crop=True):
     # OpenCV
     face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
     # OpenCV Cuda
-    faceModel = cv2.dnn.readNetFromCaffe('res10_300x300_ssd_iter_140000.prototxt',
-                                         caffeModel='res10_300x300_ssd_iter_140000.caffemodel')
+    txt_path = '/home/zechenzh/MTTS_pytorch/preprocess/res10_300x300_ssd_iter_140000.prototxt'
+    model_path = '/home/zechenzh/MTTS_pytorch/preprocess/res10_300x300_ssd_iter_140000.caffemodel'
+    faceModel = cv2.dnn.readNetFromCaffe(txt_path,caffeModel=model_path)
     faceModel.setPreferableBackend(cv2.dnn.DNN_BACKEND_CUDA)
     faceModel.setPreferableTarget(cv2.dnn.DNN_TARGET_CUDA)
     # # Mediapipe
