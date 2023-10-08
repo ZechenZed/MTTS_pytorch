@@ -53,7 +53,7 @@ def preprocess_raw_video(video_file_path, dim=72, plot=True, face_crop=True):
     # faceModel.setPreferableTarget(cv2.dnn.DNN_TARGET_CUDA)
 
     # # Mediapipe
-
+    first = 0
     face_detection = mp.solutions.face_detection.FaceDetection(model_selection=1, min_detection_confidence=0.1)
     prev_roi = img_as_float(img)
 
@@ -124,6 +124,9 @@ def preprocess_raw_video(video_file_path, dim=72, plot=True, face_crop=True):
         results = face_detection.process(img)
         roi = 0
         if results.detections:
+            if first == 0:
+                first = i
+
             for face in results.detections:
                 bbox = face.location_data.relative_bounding_box
                 xmin = int(bbox.xmin * img.shape[1])
@@ -156,6 +159,7 @@ def preprocess_raw_video(video_file_path, dim=72, plot=True, face_crop=True):
 
         success, img = vidObj.read()
         i = i + 1
+    Xsub[0:first] = Xsub[first]
     Xsub = Xsub[0:len(t) - 1]
 
     ########################## Normalize raw frames in the appearance branch ##########################
