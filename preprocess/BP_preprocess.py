@@ -218,6 +218,9 @@ def data_process_DC(device_type, image=str(), dim=72):
     # ind_BP_rest = np.where(BP_lf_test == 0)[0][0]
     # BP_lf_test = BP_lf_test[0:ind_BP_rest]
     # frames_test = frames_test[0:ind_BP_rest]
+    plt.plot(BP_lf_train,label='train')
+    plt.plot(BP_lf_test,label='test')
+    plt.show()
 
     frames_train = frames_train.reshape((-1, 10, 6, dim, dim))
     frames_test = frames_test.reshape((-1, 10, 6, dim, dim))
