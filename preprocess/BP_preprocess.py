@@ -162,13 +162,13 @@ def data_process_DC(device_type, image=str(), dim=72):
     num_video = len(video_file_path)
     print('Processing ' + str(num_video) + ' Videos')
 
-    videos = [Parallel(n_jobs=8)(
+    videos = [Parallel(n_jobs=1)(
         delayed(preprocess_raw_video)(video_folder_path + video, dim) for video in video_file_path)]
     videos = videos[0]
 
     tt_frame = 0
     for i in range(num_video):
-        tt_frame += videos[i].shape[0] // 120 * 120
+        tt_frame += videos[i].shape[0] // 240 * 240
 
     ############## Systolic BP Extraction ##############
     BP_file_path = []
@@ -195,7 +195,7 @@ def data_process_DC(device_type, image=str(), dim=72):
         video_len = videos[i].shape[0]
 
         current_frames = min(lf_len, video_len)
-        current_frames = current_frames // 120 * 120
+        current_frames = current_frames // 240 * 240
         curr_test_frames = current_frames // 4
         curr_train_frames = curr_test_frames * 3
         ############# BP smoothing #############
@@ -211,13 +211,13 @@ def data_process_DC(device_type, image=str(), dim=72):
         frame_ind_train += curr_train_frames
         frame_ind_test += curr_test_frames
 
-    ind_BP_rest = np.where(BP_lf_train == 0)[0][0]
-    BP_lf_train = BP_lf_train[0:ind_BP_rest]
-    frames_train = frames_train[0:ind_BP_rest]
-
-    ind_BP_rest = np.where(BP_lf_test == 0)[0][0]
-    BP_lf_test = BP_lf_test[0:ind_BP_rest]
-    frames_test = frames_test[0:ind_BP_rest]
+    # ind_BP_rest = np.where(BP_lf_train == 0)[0][0]
+    # BP_lf_train = BP_lf_train[0:ind_BP_rest]
+    # frames_train = frames_train[0:ind_BP_rest]
+    #
+    # ind_BP_rest = np.where(BP_lf_test == 0)[0][0]
+    # BP_lf_test = BP_lf_test[0:ind_BP_rest]
+    # frames_test = frames_test[0:ind_BP_rest]
 
     frames_train = frames_train.reshape((-1, 10, 6, dim, dim))
     frames_test = frames_test.reshape((-1, 10, 6, dim, dim))
