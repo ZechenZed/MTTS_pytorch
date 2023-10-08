@@ -158,7 +158,7 @@ def data_process_DC(device_type, image=str(), dim=72):
         if os.path.isfile(os.path.join(video_folder_path, path)):
             video_file_path.append(path)
 
-    video_file_path = video_file_path[0:1]
+    # video_file_path = video_file_path[0:1]
     num_video = len(video_file_path)
     print('Processing ' + str(num_video) + ' Videos')
 
@@ -229,7 +229,7 @@ def data_process_DC(device_type, image=str(), dim=72):
     BP_lf_test = BP_lf_test.reshape((-1, 10))
 
     ############## Save the preprocessed model ##############
-    saving_path = '/edrive1/zechenzh/preprocessed_v4v/'
+    saving_path = '/edrive1/zechenzh/preprocessed_DC/'
     np.save(saving_path + 'train_frames_' + image + '.npy', frames_train)
     np.save(saving_path + 'test_frames_' + image + '.npy', frames_test)
     np.save(saving_path + 'train_BP_systolic.npy', BP_lf_train)
