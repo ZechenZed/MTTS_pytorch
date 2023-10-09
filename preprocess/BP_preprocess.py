@@ -200,7 +200,7 @@ def data_process_DC(device_type, image=str(), dim=72):
         curr_train_frames = curr_test_frames * 3
         ############# BP smoothing #############
         BP_lf_train[frame_ind_train:frame_ind_train + curr_train_frames] = temp_BP_lf[0:curr_train_frames]
-        BP_lf_test[frame_ind_test:frame_ind_test + curr_train_frames] = \
+        BP_lf_test[frame_ind_test:frame_ind_test + curr_test_frames] = \
             temp_BP_lf[curr_train_frames:curr_train_frames+curr_test_frames]
 
         ############# Video Batches #############
