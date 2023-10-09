@@ -162,7 +162,7 @@ def data_process_DC(device_type, image=str(), dim=72):
     num_video = len(video_file_path)
     print('Processing ' + str(num_video) + ' Videos')
 
-    videos = [Parallel(n_jobs=8)(
+    videos = [Parallel(n_jobs=16)(
         delayed(preprocess_raw_video)(video_folder_path + video, dim) for video in video_file_path)]
     videos = videos[0]
 
@@ -222,11 +222,11 @@ def data_process_DC(device_type, image=str(), dim=72):
     BP_lf_test = BP_lf_test[0:ind_BP_rest]
     frames_test = frames_test[0:ind_BP_rest]
 
-    plt.plot(BP_lf_train,label='training data')
-    plot_test = np.arange(train_frames,int(train_frames+test_frames))
-    plt.plot(plot_test, BP_lf_test,label='testing data')
-    plt.legend()
-    plt.show()
+    # plt.plot(BP_lf_train,label='training data')
+    # plot_test = np.arange(train_frames,int(train_frames+test_frames))
+    # plt.plot(plot_test, BP_lf_test,label='testing data')
+    # plt.legend()
+    # plt.show()
 
     frames_train = frames_train.reshape((-1, 10, 6, dim, dim))
     frames_test = frames_test.reshape((-1, 10, 6, dim, dim))
