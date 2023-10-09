@@ -140,7 +140,7 @@ def data_process(data_type, device_type, image=str(), dim=72):
     np.save(saving_path + data_type + '_BP_systolic.npy', BP_lf)
 
 
-def data_process_DC(device_type, image=str(), dim=72):
+def data_process_DC(device_type, image=str(), dim=36):
     ############## Data folder path setting ##############
     if device_type == 'local':
         data_folder_path = "C:/Users/Zed/Desktop/DC/"
@@ -162,7 +162,7 @@ def data_process_DC(device_type, image=str(), dim=72):
     num_video = len(video_file_path)
     print('Processing ' + str(num_video) + ' Videos')
 
-    videos = [Parallel(n_jobs=16)(
+    videos = [Parallel(n_jobs=1)(
         delayed(preprocess_raw_video)(video_folder_path + video, dim) for video in video_file_path)]
     videos = videos[0]
 
