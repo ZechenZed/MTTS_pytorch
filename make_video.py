@@ -29,8 +29,8 @@ def plot_BP():
     # BP = BP.reshape(-1)
     # plt.plot(BP)
     # plt.show()
-    BP_path = '/edrive1/zechenzh/preprocessed_DC/test_BP_systolic.npy'
-    frame_path = '/edrive1/zechenzh/preprocessed_DC/test_frames_face_large.npy'
+    BP_path = '/edrive1/zechenzh/preprocessed_DC/train_BP_systolic.npy'
+    frame_path = '/edrive1/zechenzh/preprocessed_DC/train_frames_face_large.npy'
     BP = np.load(BP_path)
     frame = np.load(frame_path)
     print(f'BP len:{len(BP)}, frame len:{len(frame)}')
