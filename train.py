@@ -306,13 +306,13 @@ if __name__ == '__main__':
 
     parser.add_argument('--nb_epoch', type=int, default=50,
                         help='nb_epoch')
-    parser.add_argument('--nb_batch', type=int, default=12,
+    parser.add_argument('--nb_batch', type=int, default=120,
                         help='nb_batch')
     parser.add_argument('--kernel', type=int, default=3,
                         help='Kernel size')
     parser.add_argument('--lr', type=float, default=0.001,
                         help='learning rate')
-    parser.add_argument('--frame_depth', type=int, default=100,
+    parser.add_argument('--frame_depth', type=int, default=10,
                         help='frame depth')
     parser.add_argument('--dropout_rate1', type=float, default=0.8128892135118411,
                         help='Drop rate 1')
