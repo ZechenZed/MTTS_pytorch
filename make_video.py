@@ -2,6 +2,7 @@ import cv2
 import numpy as np
 import matplotlib.pyplot as plt
 
+
 def make_video():
     test_array = np.load('C:/Users/Zed/Desktop/V4V/preprocessed_v4v/test_frames_face_large.npy')
     test_array = test_array.reshape((209 * 10, 6, 72, 72))[:, 3:, :, :]
@@ -22,5 +23,18 @@ def make_video():
     video_writer.release()
 
 
+def plot_BP():
+    # path = 'C:/Users/Zed/Desktop/preprocessed_DC/train_BP_systolic.npy'
+    # BP = np.load(path)
+    # BP = BP.reshape(-1)
+    # plt.plot(BP)
+    # plt.show()
+    BP_path = '/edrive1/zechenzh/preprocessed_DC/test_BP_systolic.npy'
+    frame_path = '/edrive1/zechenzh/preprocessed_DC/test_frames_face_large.npy'
+    BP = np.load(BP_path)
+    frame = np.load(frame_path)
+    print(f'BP len:{len(BP)}, frame len:{len(frame)}')
+
 if __name__ == '__main__':
-    make_video()
+    # make_video()
+    plot_BP()
