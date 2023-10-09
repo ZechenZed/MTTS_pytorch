@@ -306,7 +306,7 @@ if __name__ == '__main__':
 
     parser.add_argument('--nb_epoch', type=int, default=50,
                         help='nb_epoch')
-    parser.add_argument('--nb_batch', type=int, default=64,
+    parser.add_argument('--nb_batch', type=int, default=12,
                         help='nb_batch')
     parser.add_argument('--kernel', type=int, default=3,
                         help='Kernel size')
