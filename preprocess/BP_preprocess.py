@@ -162,7 +162,7 @@ def data_process_DC(device_type, image=str(), dim=72):
     num_video = len(video_file_path)
     print('Processing ' + str(num_video) + ' Videos')
 
-    videos = [Parallel(n_jobs=1)(
+    videos = [Parallel(n_jobs=8)(
         delayed(preprocess_raw_video)(video_folder_path + video, dim) for video in video_file_path)]
     videos = videos[0]
 
@@ -214,13 +214,13 @@ def data_process_DC(device_type, image=str(), dim=72):
         frame_ind_train += curr_train_frames
         frame_ind_test += curr_test_frames
     #
-    # ind_BP_rest = np.where(BP_lf_train == 0)[0][0]
-    # BP_lf_train = BP_lf_train[0:ind_BP_rest]
-    # frames_train = frames_train[0:ind_BP_rest]
-    #
-    # ind_BP_rest = np.where(BP_lf_test == 0)[0][0]
-    # BP_lf_test = BP_lf_test[0:ind_BP_rest]
-    # frames_test = frames_test[0:ind_BP_rest]
+    ind_BP_rest = np.where(BP_lf_train == 0)[0][0]
+    BP_lf_train = BP_lf_train[0:ind_BP_rest]
+    frames_train = frames_train[0:ind_BP_rest]
+
+    ind_BP_rest = np.where(BP_lf_test == 0)[0][0]
+    BP_lf_test = BP_lf_test[0:ind_BP_rest]
+    frames_test = frames_test[0:ind_BP_rest]
 
     plt.plot(BP_lf_train,label='training data')
     plot_test = np.arange(train_frames,int(train_frames+test_frames))
