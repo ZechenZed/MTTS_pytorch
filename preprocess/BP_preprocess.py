@@ -158,7 +158,7 @@ def data_process_DC(device_type, image=str(), dim=72):
         if os.path.isfile(os.path.join(video_folder_path, path)):
             video_file_path.append(path)
 
-    # video_file_path = video_file_path[0:1]
+    video_file_path = video_file_path[0:1]
     num_video = len(video_file_path)
     print('Processing ' + str(num_video) + ' Videos')
 
@@ -191,7 +191,10 @@ def data_process_DC(device_type, image=str(), dim=72):
 
         lf_len = int(len(temp_BP) / 1000 * 240)
         temp_BP_lf = resample(temp_BP, lf_len)
-        temp_BP_lf = gaussian_filter(temp_BP_lf, 40)
+        # plt.plot(temp_BP_lf,label='before')
+        temp_BP_lf = gaussian_filter(temp_BP_lf, 240)
+        # plt.plot(temp_BP_lf,label='after')
+        # plt.show()
         video_len = videos[i].shape[0]
 
         current_frames = min(lf_len, video_len)
@@ -210,7 +213,7 @@ def data_process_DC(device_type, image=str(), dim=72):
 
         frame_ind_train += curr_train_frames
         frame_ind_test += curr_test_frames
-
+    #
     # ind_BP_rest = np.where(BP_lf_train == 0)[0][0]
     # BP_lf_train = BP_lf_train[0:ind_BP_rest]
     # frames_train = frames_train[0:ind_BP_rest]
@@ -218,8 +221,11 @@ def data_process_DC(device_type, image=str(), dim=72):
     # ind_BP_rest = np.where(BP_lf_test == 0)[0][0]
     # BP_lf_test = BP_lf_test[0:ind_BP_rest]
     # frames_test = frames_test[0:ind_BP_rest]
-    plt.plot(BP_lf_train,label='train')
-    plt.plot(BP_lf_test,label='test')
+
+    plt.plot(BP_lf_train,label='training data')
+    plot_test = np.arange(train_frames,int(train_frames+test_frames))
+    plt.plot(plot_test, BP_lf_test,label='testing data')
+    plt.legend()
     plt.show()
 
     frames_train = frames_train.reshape((-1, 10, 6, dim, dim))
@@ -348,4 +354,4 @@ if __name__ == '__main__':
     # only_BP('train', 'remote', 'face_large')
     # only_BP('valid', 'remote', 'face_large')
     # only_BP('test', 'local', 'face_large')
-    data_process_DC('remote', 'face_large')
+    data_process_DC('local', 'face_large')
