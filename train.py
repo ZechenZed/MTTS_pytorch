@@ -33,7 +33,7 @@ class TSCAN_trainer:
         self.nb_epoch = setup.nb_epoch
         self.lr = setup.lr
         self.nb_dense = setup.nb_dense
-        self.criterion = L1Loss()
+        self.criterion = MSELoss()
         self.min_valid_loss = None
         self.best_epoch = setup.best
         self.base_len = setup.nb_device * self.frame_depth
