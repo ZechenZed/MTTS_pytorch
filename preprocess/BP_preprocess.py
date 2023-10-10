@@ -44,7 +44,7 @@ def data_process(data_type, device_type, image=str(), dim=36):
         if os.path.isfile(os.path.join(video_folder_path, path)):
             video_file_path.append(path)
 
-    # video_file_path = video_file_path[0:10]
+    video_file_path = video_file_path[0:10]
     num_video = len(video_file_path)
     print('Processing ' + str(num_video) + ' Videos')
 
@@ -123,7 +123,7 @@ def data_process(data_type, device_type, image=str(), dim=36):
 
         ############# BP smoothing #############
         plt.plot(temp_BP_lf_systolic_inter)
-        temp_BP_lf_systolic_inter = gaussian_filter(temp_BP_lf_systolic_inter, sigma=25)
+        temp_BP_lf_systolic_inter = gaussian_filter(temp_BP_lf_systolic_inter, sigma=20)
         plt.plot(temp_BP_lf_systolic_inter)
         plt.legend()
         plt.show()
@@ -133,9 +133,9 @@ def data_process(data_type, device_type, image=str(), dim=36):
         frames[frame_ind:frame_ind + current_frames] = videos[i][first_index:first_index + current_frames]
         frame_ind += current_frames
 
-    ind_BP_rest = np.where(BP_lf == 0)[0][0]
-    BP_lf = BP_lf[0:ind_BP_rest]
-    frames = frames[0:ind_BP_rest]
+    # ind_BP_rest = np.where(BP_lf == 0)[0][0]
+    # BP_lf = BP_lf[0:ind_BP_rest]
+    # frames = frames[0:ind_BP_rest]
 
     frames = frames.reshape((-1, 10, 6, dim, dim))
     BP_lf = BP_lf.reshape((-1, 10))
@@ -360,8 +360,8 @@ def only_BP(data_type, device_type, image=str(), dim=36):
 
 if __name__ == '__main__':
     # data_process('valid', 'remote', 'face_large')
-    data_process('train', 'remote', 'face_large')
-    data_process('test', 'remote', 'face_large')
+    data_process('train', 'local', 'face_large')
+    data_process('test', 'local', 'face_large')
     # only_BP('train', 'remote', 'face_large')
     # only_BP('valid', 'remote', 'face_large')
     # only_BP('test', 'local', 'face_large')

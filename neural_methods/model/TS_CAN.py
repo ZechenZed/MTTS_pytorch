@@ -3,9 +3,12 @@ Multi-Task Temporal Shift Attention Networks for On-Device Contactless Vitals Me
 NeurIPS, 2020
 Xin Liu, Josh Fromm, Shwetak Patel, Daniel McDuff
 """
-
+import matplotlib.pyplot as plt
 import torch
 import torch.nn as nn
+from data_loader import V4V_Dataset
+from torch.utils.data import DataLoader
+from tqdm import tqdm
 
 
 class Attention_mask(nn.Module):
@@ -130,7 +133,7 @@ class TSCAN(nn.Module):
         g1 = torch.sigmoid(self.apperance_att_conv1(r2))
         g1 = self.attn_mask_1(g1)
         gated1 = d2 * g1
-
+        # out = g1
         d3 = self.avg_pooling_1(gated1)
         d4 = self.dropout_1(d3)
 
@@ -148,14 +151,13 @@ class TSCAN(nn.Module):
         g2 = torch.sigmoid(self.apperance_att_conv2(r6))
         g2 = self.attn_mask_2(g2)
         gated2 = d6 * g2
-
+        # out = g2
         d7 = self.avg_pooling_3(gated2)
         d8 = self.dropout_3(d7)
         d9 = d7.view(d8.size(0), -1)
         d10 = torch.tanh(self.final_dense_1(d9))
         d11 = self.dropout_4(d10)
         out = self.final_dense_2(d11)
-
         return out
 
 
@@ -267,3 +269,29 @@ class TSCAN(nn.Module):
 #         out_r = self.final_dense_2_r(d11)
 #
 #         return out_y, out_r
+
+if __name__ == '__main__':
+    data_folder_path = 'C:/Users/Zed/Desktop/V4V/preprocessed_v4v/'
+
+    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+    model = TSCAN(frame_depth=10, img_size=36, dropout_rate1=0.1,
+                  dropout_rate2=0.1,  kernel_size=3, nb_dense=1024,
+                  pool_size=(2, 2), nb_filters1=64,
+                  nb_filters2=64).to(device)
+
+    v4v_data_train = V4V_Dataset(data_folder_path, 'train', 'face_large', 'systolic')
+    train_loader = DataLoader(dataset=v4v_data_train, batch_size=32, shuffle=False, num_workers=1)
+
+    tbar = tqdm(train_loader, ncols=80)
+
+    for idx, (data, labels) in enumerate(tbar):
+        data = data.to(device)
+        labels = labels.to(device)
+        N, D, C, H, W = data.shape
+        data = data.view(N * D, C, H, W)
+        labels = labels.view(-1, 1)
+        layer = model.forward(data)
+    layer = layer.detach().cpu().numpy()
+    plt.matshow(layer[0, 0, :, :])
+    plt.show()
+    print('Hi')
