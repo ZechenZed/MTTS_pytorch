@@ -61,7 +61,7 @@ class TSCAN_trainer:
 
         v4v_data_train = V4V_Dataset(data_folder_path, 'train', setup.image_type, setup.BP_type)
         self.train_loader = DataLoader(dataset=v4v_data_train, batch_size=self.batch_size,
-                                       shuffle=True, num_workers=1)
+                                       shuffle=False, num_workers=1)
         # v4v_data_valid = V4V_Dataset(data_folder_path, 'valid', setup.image_type, setup.BP_type)
         # self.valid_loader = DataLoader(dataset=v4v_data_valid, batch_size=self.batch_size,
         #                                shuffle=True, num_workers=1)
@@ -192,7 +192,7 @@ class TSCAN_trainer:
                 pred_ppg_train = self.model(data_train)
 
                 pred = pred_ppg_train.detach().cpu().numpy()
-                pred = gaussian_filter(pred, sigma=3)
+                pred = gaussian_filter(pred, sigma=25)
                 predictions.append(pred)
 
                 label = labels_train.detach().cpu().numpy()
@@ -266,7 +266,7 @@ class TSCAN_trainer:
                 pred_ppg_test = self.model(data_test)
 
                 pred = pred_ppg_test.detach().cpu().numpy()
-                pred = gaussian_filter(pred, sigma=3)
+                pred = gaussian_filter(pred, sigma=25)
                 predictions.append(pred)
 
                 label = labels_test.detach().cpu().numpy()
@@ -330,5 +330,5 @@ if __name__ == '__main__':
     print('input args:\n', json.dumps(vars(args), indent=4, separators=(',', ':')))  # pretty print args
 
     trainer = TSCAN_trainer(args)
-    trainer.train()
+    # trainer.train()
     trainer.test()

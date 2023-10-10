@@ -44,7 +44,7 @@ def data_process(data_type, device_type, image=str(), dim=36):
         if os.path.isfile(os.path.join(video_folder_path, path)):
             video_file_path.append(path)
 
-    # video_file_path = video_file_path[0:1]
+    # video_file_path = video_file_path[0:10]
     num_video = len(video_file_path)
     print('Processing ' + str(num_video) + ' Videos')
 
@@ -71,7 +71,7 @@ def data_process(data_type, device_type, image=str(), dim=36):
         print(f'BP process on {BP_file_path[i]}')
         temp_BP = np.loadtxt(BP_folder_path + BP_file_path[i])  # BP loading
         # plt.plot(temp_BP,label='opiginal')
-        temp_BP = gaussian_filter(temp_BP,10)
+        # temp_BP = gaussian_filter(temp_BP,10) # Smoothing before downsampling to better find the peaks
         # plt.plot(temp_BP,label='after')
         # plt.legend()
         # plt.show()
@@ -81,13 +81,17 @@ def data_process(data_type, device_type, image=str(), dim=36):
         ################# Down-sample BP 1000Hz --> 25Hz using moving mean window ################
         for j in range(0, len(temp_BP_lf)):
             temp_BP_lf[j] = np.average(temp_BP[j * 40:(j + 1) * 40])
+        # plt.plot(temp_BP_lf)
+        # temp_BP_lf = gaussian_filter(temp_BP_lf,1)
 
         video_len = videos[i].shape[0]
         current_frames = min(BP_lf_len, video_len)
         temp_BP_lf = temp_BP_lf[0:current_frames]
 
         ############# Systolic BP finding and linear interp #############
-        temp_BP_lf_systolic_peaks, _ = find_peaks(temp_BP_lf, distance=8)
+        temp_BP_lf_systolic_peaks, _ = find_peaks(temp_BP_lf, distance=15)
+        # plt.plot(temp_BP_lf_systolic_peaks,temp_BP_lf[temp_BP_lf_systolic_peaks],'o')
+        # plt.show()
 
         temp_BP_lf_systolic_inter = np.zeros(current_frames)
         first_index = temp_BP_lf_systolic_peaks[0]
@@ -118,20 +122,20 @@ def data_process(data_type, device_type, image=str(), dim=36):
             temp_BP_lf_systolic_inter = temp_BP_lf_systolic_inter[0:current_frames]
 
         ############# BP smoothing #############
-        # plt.plot(temp_BP_lf_systolic_inter)
-        temp_BP_lf_systolic_inter = gaussian_filter(temp_BP_lf_systolic_inter, sigma=3)
-        # plt.plot(temp_BP_lf_systolic_inter)
-        # plt.legend()
-        # plt.show()
+        plt.plot(temp_BP_lf_systolic_inter)
+        temp_BP_lf_systolic_inter = gaussian_filter(temp_BP_lf_systolic_inter, sigma=25)
+        plt.plot(temp_BP_lf_systolic_inter)
+        plt.legend()
+        plt.show()
         BP_lf[frame_ind:frame_ind + current_frames] = temp_BP_lf_systolic_inter
 
         ############# Video Batches #############
         frames[frame_ind:frame_ind + current_frames] = videos[i][first_index:first_index + current_frames]
         frame_ind += current_frames
 
-    # ind_BP_rest = np.where(BP_lf == 0)[0][0]
-    # BP_lf = BP_lf[0:ind_BP_rest]
-    # frames = frames[0:ind_BP_rest]
+    ind_BP_rest = np.where(BP_lf == 0)[0][0]
+    BP_lf = BP_lf[0:ind_BP_rest]
+    frames = frames[0:ind_BP_rest]
 
     frames = frames.reshape((-1, 10, 6, dim, dim))
     BP_lf = BP_lf.reshape((-1, 10))
@@ -241,6 +245,7 @@ def data_process_DC(device_type, image=str(), dim=128):
     BP_lf_test = BP_lf_test.reshape((-1, 10))
 
     ############## Save the preprocessed model ##############
+
     saving_path = '/edrive1/zechenzh/preprocessed_DC/'
     np.save(saving_path + 'train_frames_' + image + '.npy', frames_train)
     np.save(saving_path + 'test_frames_' + image + '.npy', frames_test)
@@ -360,4 +365,4 @@ if __name__ == '__main__':
     # only_BP('train', 'remote', 'face_large')
     # only_BP('valid', 'remote', 'face_large')
     # only_BP('test', 'local', 'face_large')
-    # data_process_DC('remote', 'face_large')
+    # data_process_DC('local', 'face_large')
