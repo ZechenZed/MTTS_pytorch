@@ -122,11 +122,11 @@ def data_process(data_type, device_type, image=str(), dim=72):
             temp_BP_lf_systolic_inter = temp_BP_lf_systolic_inter[0:current_frames]
 
         ############# BP smoothing #############
-        plt.plot(temp_BP_lf_systolic_inter)
+        # plt.plot(temp_BP_lf_systolic_inter)
         temp_BP_lf_systolic_inter = gaussian_filter(temp_BP_lf_systolic_inter, sigma=20)
-        plt.plot(temp_BP_lf_systolic_inter)
-        plt.legend()
-        plt.show()
+        # plt.plot(temp_BP_lf_systolic_inter)
+        # plt.legend()
+        # plt.show()
         BP_lf[frame_ind:frame_ind + current_frames] = temp_BP_lf_systolic_inter
 
         ############# Video Batches #############
