@@ -44,7 +44,7 @@ def data_process(data_type, device_type, image=str(), dim=32):
         if os.path.isfile(os.path.join(video_folder_path, path)):
             video_file_path.append(path)
 
-    video_file_path = video_file_path[0:1]
+    # video_file_path = video_file_path[0:1]
     num_video = len(video_file_path)
     print('Processing ' + str(num_video) + ' Videos')
 
@@ -355,8 +355,8 @@ def only_BP(data_type, device_type, image=str(), dim=36):
 
 if __name__ == '__main__':
     # data_process('valid', 'remote', 'face_large')
-    data_process('train', 'local', 'face_large')
-    # data_process('test', 'remote', 'face_large')
+    data_process('train', 'remote', 'face_large')
+    data_process('test', 'remote', 'face_large')
     # only_BP('train', 'remote', 'face_large')
     # only_BP('valid', 'remote', 'face_large')
     # only_BP('test', 'local', 'face_large')
