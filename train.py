@@ -310,19 +310,19 @@ if __name__ == '__main__':
                         help='nb_batch')
     parser.add_argument('--kernel', type=int, default=3,
                         help='Kernel size')
-    parser.add_argument('--lr', type=float, default=0.005,
+    parser.add_argument('--lr', type=float, default=0.0005,
                         help='learning rate')
     parser.add_argument('--frame_depth', type=int, default=10,
                         help='frame depth')
-    parser.add_argument('--dropout_rate1', type=float, default=0.21799616425047497,
+    parser.add_argument('--dropout_rate1', type=float, default=0.41552849539388115,
                         help='Drop rate 1')
-    parser.add_argument('--dropout_rate2', type=float, default=0.8901743210052684,
+    parser.add_argument('--dropout_rate2', type=float, default=0.4404590557107495,
                         help='Drop rate 2')
-    parser.add_argument('--nb_filter1', type=int, default=8,
+    parser.add_argument('--nb_filter1', type=int, default=256,
                         help='number of filter 1')
     parser.add_argument('--nb_filter2', type=int, default=64,
                         help='number of filter 2')
-    parser.add_argument('--nb_dense', type=int, default=512,
+    parser.add_argument('--nb_dense', type=int, default=1024,
                         help='Number of dense layer')
     parser.add_argument('--best', type=int, default=19,
                         help='Best Epoch')
