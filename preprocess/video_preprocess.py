@@ -176,7 +176,8 @@ def preprocess_raw_video(video_file_path, dim=72, plot=True, face_crop=True):
     ##########################  Video array transpose ##########################
     transposed_arr = np.transpose(dXsub, (0, 3, 1, 2))
     dXsub = transposed_arr.reshape((normalized_len, 6, dim, dim))
-    # plt.matshow(dXsub[300, 3, :, :])
+    # plt.matshow(dXsub[200, 5, :, :])
+    # plt.matshow(dXsub[200, 2, :, :])
     # plt.show()
     return dXsub
 
