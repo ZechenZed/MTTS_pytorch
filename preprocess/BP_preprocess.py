@@ -12,7 +12,7 @@ from video_preprocess import preprocess_raw_video, count_frames
 os.environ['CUDA_VISIBLE_DEVICES'] = '0'
 
 
-def data_process(data_type, device_type, image=str(), dim=72):
+def data_process(data_type, device_type, image=str(), dim=128):
     ############## Data folder path setting ##############
     if device_type == 'local':
         data_folder_path = "C:/Users/Zed/Desktop/V4V/"
@@ -70,6 +70,11 @@ def data_process(data_type, device_type, image=str(), dim=72):
     for i in range(num_video):
         print(f'BP process on {BP_file_path[i]}')
         temp_BP = np.loadtxt(BP_folder_path + BP_file_path[i])  # BP loading
+        # plt.plot(temp_BP,label='opiginal')
+        temp_BP = gaussian_filter(temp_BP,10)
+        # plt.plot(temp_BP,label='after')
+        # plt.legend()
+        # plt.show()
         BP_lf_len = len(temp_BP) // 40
         temp_BP_lf = np.zeros(BP_lf_len)  # Create new lf BP
 
@@ -99,7 +104,7 @@ def data_process(data_type, device_type, image=str(), dim=72):
         temp_BP_lf_systolic_inter = temp_BP_lf_systolic_inter[first_index:-1]
 
         ################ Find incorrect BP values ################
-        invalid_index_BP = np.where((temp_BP_lf_systolic_inter < 70) | (temp_BP_lf_systolic_inter > 220))[0]
+        invalid_index_BP = np.where((temp_BP_lf_systolic_inter < 60) | (temp_BP_lf_systolic_inter > 250))[0]
 
         if len(invalid_index_BP) != 0:
             current_frames = invalid_index_BP[0] // 120 * 120
@@ -113,10 +118,11 @@ def data_process(data_type, device_type, image=str(), dim=72):
             temp_BP_lf_systolic_inter = temp_BP_lf_systolic_inter[0:current_frames]
 
         ############# BP smoothing #############
-        plt.plot(temp_BP_lf_systolic_inter)
+        # plt.plot(temp_BP_lf_systolic_inter)
         temp_BP_lf_systolic_inter = gaussian_filter(temp_BP_lf_systolic_inter, sigma=3)
-        plt.plot(temp_BP_lf_systolic_inter)
-        plt.show()
+        # plt.plot(temp_BP_lf_systolic_inter)
+        # plt.legend()
+        # plt.show()
         BP_lf[frame_ind:frame_ind + current_frames] = temp_BP_lf_systolic_inter
 
         ############# Video Batches #############
@@ -140,7 +146,7 @@ def data_process(data_type, device_type, image=str(), dim=72):
     np.save(saving_path + data_type + '_BP_systolic.npy', BP_lf)
 
 
-def data_process_DC(device_type, image=str(), dim=36):
+def data_process_DC(device_type, image=str(), dim=128):
     ############## Data folder path setting ##############
     if device_type == 'local':
         data_folder_path = "C:/Users/Zed/Desktop/DC/"
@@ -239,7 +245,7 @@ def data_process_DC(device_type, image=str(), dim=36):
     np.save(saving_path + 'train_frames_' + image + '.npy', frames_train)
     np.save(saving_path + 'test_frames_' + image + '.npy', frames_test)
     np.save(saving_path + 'train_BP_systolic.npy', BP_lf_train)
-    np.save(saving_path + '_BP_systolic.npy', BP_lf_test)
+    np.save(saving_path + 'test_BP_systolic.npy', BP_lf_test)
 
 
 def only_BP(data_type, device_type, image=str(), dim=36):
@@ -349,9 +355,9 @@ def only_BP(data_type, device_type, image=str(), dim=36):
 
 if __name__ == '__main__':
     # data_process('valid', 'remote', 'face_large')
-    # data_process('train', 'remote', 'face_large')
-    # data_process('test', 'remote', 'face_large')
+    data_process('train', 'remote', 'face_large')
+    data_process('test', 'remote', 'face_large')
     # only_BP('train', 'remote', 'face_large')
     # only_BP('valid', 'remote', 'face_large')
     # only_BP('test', 'local', 'face_large')
-    data_process_DC('remote', 'face_large')
+    # data_process_DC('remote', 'face_large')
