@@ -159,8 +159,8 @@ def preprocess_raw_video(video_file_path, dim=72, plot=True, face_crop=True):
 
         success, img = vidObj.read()
         i = i + 1
-    # Xsub[0:first] = Xsub[first]
-    # Xsub = Xsub[0:len(t) - 1]
+    Xsub[0:first] = Xsub[first]
+    Xsub = Xsub[0:len(t) - 1]
 
     ########################## Normalize raw frames in the appearance branch ##########################
     normalized_len = len(t) - 1
