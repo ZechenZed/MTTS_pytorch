@@ -44,7 +44,7 @@ def data_process(data_type, device_type, image=str(), dim=36):
         if os.path.isfile(os.path.join(video_folder_path, path)):
             video_file_path.append(path)
 
-    video_file_path = video_file_path[0:10]
+    # video_file_path = video_file_path[0:10]
     num_video = len(video_file_path)
     print('Processing ' + str(num_video) + ' Videos')
 
@@ -121,32 +121,32 @@ def data_process(data_type, device_type, image=str(), dim=36):
             temp_BP_lf_systolic_inter = temp_BP_lf_systolic_inter[0:current_frames]
 
         ############# BP smoothing #############
-        plt.plot(temp_BP_lf_systolic_inter)
+        # plt.plot(temp_BP_lf_systolic_inter)
         temp_BP_lf_systolic_inter = gaussian_filter(temp_BP_lf_systolic_inter, sigma=3)
-        plt.plot(temp_BP_lf_systolic_inter)
-        plt.legend()
-        plt.show()
+        # plt.plot(temp_BP_lf_systolic_inter)
+        # plt.legend()
+        # plt.show()
         BP_lf[frame_ind:frame_ind + current_frames] = temp_BP_lf_systolic_inter
 
         ############# Video Batches #############
         frames[frame_ind:frame_ind + current_frames] = videos[i][first_index:first_index + current_frames]
         frame_ind += current_frames
 
-    # ind_BP_rest = np.where(BP_lf == 0)[0][0]
-    # BP_lf = BP_lf[0:ind_BP_rest]
-    # frames = frames[0:ind_BP_rest]
-    #
-    # frames = frames.reshape((-1, 10, 6, dim, dim))
-    # BP_lf = BP_lf.reshape((-1, 10))
-    #
-    # ############## Save the preprocessed model ##############
-    # saving_path = ''
-    # if device_type == 'remote':
-    #     saving_path = '/edrive1/zechenzh/preprocessed_v4v/'
-    # elif device_type == 'local':
-    #     saving_path = 'C:/Users/Zed/Desktop/V4V/preprocessed_v4v/'
-    # np.save(saving_path + data_type + '_frames_' + image + '.npy', frames)
-    # np.save(saving_path + data_type + '_BP_systolic.npy', BP_lf)
+    ind_BP_rest = np.where(BP_lf == 0)[0][0]
+    BP_lf = BP_lf[0:ind_BP_rest]
+    frames = frames[0:ind_BP_rest]
+
+    frames = frames.reshape((-1, 10, 6, dim, dim))
+    BP_lf = BP_lf.reshape((-1, 10))
+
+    ############## Save the preprocessed model ##############
+    saving_path = ''
+    if device_type == 'remote':
+        saving_path = '/edrive1/zechenzh/preprocessed_v4v/'
+    elif device_type == 'local':
+        saving_path = 'C:/Users/Zed/Desktop/V4V/preprocessed_v4v/'
+    np.save(saving_path + data_type + '_frames_' + image + '.npy', frames)
+    np.save(saving_path + data_type + '_BP_systolic.npy', BP_lf)
 
 
 def data_process_DC(device_type, image=str(), dim=128):
