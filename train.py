@@ -61,7 +61,7 @@ class TSCAN_trainer:
 
         v4v_data_train = V4V_Dataset(data_folder_path, 'train', setup.image_type, setup.BP_type)
         self.train_loader = DataLoader(dataset=v4v_data_train, batch_size=self.batch_size,
-                                       shuffle=True, num_workers=1)
+                                       shuffle=False, num_workers=1)
         # v4v_data_valid = V4V_Dataset(data_folder_path, 'valid', setup.image_type, setup.BP_type)
         # self.valid_loader = DataLoader(dataset=v4v_data_valid, batch_size=self.batch_size,
         #                                shuffle=True, num_workers=1)
@@ -314,11 +314,12 @@ if __name__ == '__main__':
                         help='learning rate')
     parser.add_argument('--frame_depth', type=int, default=10,
                         help='frame depth')
-    parser.add_argument('--dropout_rate1', type=float, default=0.41552849539388115,
+    parser.add_argument('--dropout_rate1', type=float, default=0.33314876551945455
+,
                         help='Drop rate 1')
-    parser.add_argument('--dropout_rate2', type=float, default=0.4404590557107495,
+    parser.add_argument('--dropout_rate2', type=float, default=0.7808742337042479,
                         help='Drop rate 2')
-    parser.add_argument('--nb_filter1', type=int, default=256,
+    parser.add_argument('--nb_filter1', type=int, default=64,
                         help='number of filter 1')
     parser.add_argument('--nb_filter2', type=int, default=64,
                         help='number of filter 2')
