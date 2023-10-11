@@ -293,7 +293,7 @@ if __name__ == '__main__':
     config = wandb.config
 
     parser = argparse.ArgumentParser()
-    parser.add_argument('-device', '--device_type', type=str, default='local',
+    parser.add_argument('-device', '--device_type', type=str, default='remote',
                         help='Local / Remote device')
 
     parser.add_argument('--nb_device', type=int, default=1,
@@ -314,18 +314,17 @@ if __name__ == '__main__':
                         help='learning rate')
     parser.add_argument('--frame_depth', type=int, default=10,
                         help='frame depth')
-    parser.add_argument('--dropout_rate1', type=float, default=0.33314876551945455
-,
+    parser.add_argument('--dropout_rate1', type=float, default=0.752712082971978,
                         help='Drop rate 1')
-    parser.add_argument('--dropout_rate2', type=float, default=0.7808742337042479,
+    parser.add_argument('--dropout_rate2', type=float, default=0.10743432945514313,
                         help='Drop rate 2')
-    parser.add_argument('--nb_filter1', type=int, default=64,
+    parser.add_argument('--nb_filter1', type=int, default=16,
                         help='number of filter 1')
     parser.add_argument('--nb_filter2', type=int, default=64,
                         help='number of filter 2')
     parser.add_argument('--nb_dense', type=int, default=1024,
                         help='Number of dense layer')
-    parser.add_argument('--best', type=int, default=19,
+    parser.add_argument('--best', type=int, default=11,
                         help='Best Epoch')
     args = parser.parse_args()
     print('input args:\n', json.dumps(vars(args), indent=4, separators=(',', ':')))  # pretty print args
