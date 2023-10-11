@@ -192,7 +192,7 @@ class TSCAN_trainer:
                 pred_ppg_train = self.model(data_train)
 
                 pred = pred_ppg_train.detach().cpu().numpy()
-                pred = gaussian_filter(pred, sigma=20)
+                pred = gaussian_filter(pred, sigma=3)
                 predictions.append(pred)
 
                 label = labels_train.detach().cpu().numpy()
@@ -266,7 +266,7 @@ class TSCAN_trainer:
                 pred_ppg_test = self.model(data_test)
 
                 pred = pred_ppg_test.detach().cpu().numpy()
-                pred = gaussian_filter(pred, sigma=20)
+                pred = gaussian_filter(pred, sigma=3)
                 predictions.append(pred)
 
                 label = labels_test.detach().cpu().numpy()
@@ -293,7 +293,7 @@ if __name__ == '__main__':
     config = wandb.config
 
     parser = argparse.ArgumentParser()
-    parser.add_argument('-device', '--device_type', type=str, default='remote',
+    parser.add_argument('-device', '--device_type', type=str, default='local',
                         help='Local / Remote device')
 
     parser.add_argument('--nb_device', type=int, default=1,
