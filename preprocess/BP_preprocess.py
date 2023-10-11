@@ -64,6 +64,7 @@ def data_process(data_type, device_type, image=str(), dim=36):
 
     # BP_file_path = BP_file_path[0:1]
 
+    print(tt_frame)
     frames = np.zeros(shape=(tt_frame, 6, dim, dim))
     BP_lf = np.zeros(shape=tt_frame)
     frame_ind = 0
@@ -133,6 +134,7 @@ def data_process(data_type, device_type, image=str(), dim=36):
         frame_ind += current_frames
 
     ind_BP_rest = np.where(BP_lf == 0)[0][0]
+    print(ind_BP_rest)
     BP_lf = BP_lf[0:ind_BP_rest]
     frames = frames[0:ind_BP_rest]
 
