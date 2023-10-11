@@ -1,9 +1,9 @@
 program: train.py
-method: bayes
+method: random
 project: TS_CAN
-metric:
-  name: Test_pearson
-  goal: maximize
+#metric:
+#  name: Test_pearson
+#  goal: maximize
 parameters:
   lr:
     values: [1e-2,1e-3,5e-4]
@@ -14,7 +14,7 @@ parameters:
     min: 0.05
     max: 0.95
   nb_filter1:
-    values: [8,16,32,64,128]
+    values: [8,16,32,64,128,256]
   nb_dense:
-    values: [128,256,512,1024]
+    values: [128,256,512,1024,2048]
 
