@@ -24,8 +24,9 @@ def make_video():
 
 
 def plot_BP():
-    path = 'C:/Users/Zed/Desktop/V4V/preprocessed_v4v/test_BP_systolic.npy'
+    path = 'C:/Users/Zed/Desktop/V4V/preprocessed_v4v/train_BP_systolic.npy'
     BP = np.load(path)
+    print(BP.shape)
     BP = BP.reshape(-1)
     plt.plot(BP)
     plt.show()

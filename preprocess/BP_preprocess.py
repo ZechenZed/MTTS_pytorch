@@ -134,13 +134,13 @@ def data_process(data_type, device_type, image=str(), dim=36):
         frame_ind += current_frames
 
     ind_BP_rest = np.where(BP_lf == 0)[0][0]
-    print(ind_BP_rest)
+    print(f'Valid train dataset length:{ind_BP_rest}')
     BP_lf = BP_lf[0:ind_BP_rest]
     frames = frames[0:ind_BP_rest]
 
     frames = frames.reshape((-1, 10, 6, dim, dim))
     BP_lf = BP_lf.reshape((-1, 10))
-
+    print(f'Shape of BP_lf{BP_lf.shape}')
     ############## Save the preprocessed model ##############
     saving_path = ''
     if device_type == 'remote':
