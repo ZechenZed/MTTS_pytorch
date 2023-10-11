@@ -6,7 +6,7 @@ project: TS_CAN
 #  goal: maximize
 parameters:
   lr:
-    values: [1e-2,1e-3,5e-4]
+    values: [1e-2,5e-3,1e-3,5e-4]
   dropout_rate1:
     min: 0.05
     max: 0.95
