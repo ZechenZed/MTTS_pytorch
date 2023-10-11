@@ -270,28 +270,28 @@ class TSCAN(nn.Module):
 #
 #         return out_y, out_r
 
-if __name__ == '__main__':
-    data_folder_path = 'C:/Users/Zed/Desktop/V4V/preprocessed_v4v/'
-
-    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-    model = TSCAN(frame_depth=10, img_size=36, dropout_rate1=0.1,
-                  dropout_rate2=0.1,  kernel_size=3, nb_dense=1024,
-                  pool_size=(2, 2), nb_filters1=64,
-                  nb_filters2=64).to(device)
-
-    v4v_data_train = V4V_Dataset(data_folder_path, 'train', 'face_large', 'systolic')
-    train_loader = DataLoader(dataset=v4v_data_train, batch_size=32, shuffle=False, num_workers=1)
-
-    tbar = tqdm(train_loader, ncols=80)
-
-    for idx, (data, labels) in enumerate(tbar):
-        data = data.to(device)
-        labels = labels.to(device)
-        N, D, C, H, W = data.shape
-        data = data.view(N * D, C, H, W)
-        labels = labels.view(-1, 1)
-        layer = model.forward(data)
-    layer = layer.detach().cpu().numpy()
-    plt.matshow(layer[0, 0, :, :])
-    plt.show()
-    print('Hi')
+# if __name__ == '__main__':
+#     data_folder_path = 'C:/Users/Zed/Desktop/V4V/preprocessed_v4v/'
+#
+#     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+#     model = TSCAN(frame_depth=10, img_size=36, dropout_rate1=0.1,
+#                   dropout_rate2=0.1,  kernel_size=3, nb_dense=1024,
+#                   pool_size=(2, 2), nb_filters1=64,
+#                   nb_filters2=64).to(device)
+#
+#     v4v_data_train = V4V_Dataset(data_folder_path, 'train', 'face_large', 'systolic')
+#     train_loader = DataLoader(dataset=v4v_data_train, batch_size=32, shuffle=False, num_workers=1)
+#
+#     tbar = tqdm(train_loader, ncols=80)
+#
+#     for idx, (data, labels) in enumerate(tbar):
+#         data = data.to(device)
+#         labels = labels.to(device)
+#         N, D, C, H, W = data.shape
+#         data = data.view(N * D, C, H, W)
+#         labels = labels.view(-1, 1)
+#         layer = model.forward(data)
+#     layer = layer.detach().cpu().numpy()
+#     plt.matshow(layer[0, 0, :, :])
+#     plt.show()
+#     print('Hi')
