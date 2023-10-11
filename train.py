@@ -61,13 +61,13 @@ class TSCAN_trainer:
 
         v4v_data_train = V4V_Dataset(data_folder_path, 'train', setup.image_type, setup.BP_type)
         self.train_loader = DataLoader(dataset=v4v_data_train, batch_size=self.batch_size,
-                                       shuffle=False, num_workers=1)
+                                       shuffle=True, num_workers=1)
         # v4v_data_valid = V4V_Dataset(data_folder_path, 'valid', setup.image_type, setup.BP_type)
         # self.valid_loader = DataLoader(dataset=v4v_data_valid, batch_size=self.batch_size,
         #                                shuffle=True, num_workers=1)
         v4v_data_test = V4V_Dataset(data_folder_path, 'test', setup.image_type, setup.BP_type)
         self.test_loader = DataLoader(dataset=v4v_data_test, batch_size=self.batch_size,
-                                      shuffle=True, num_workers=1)
+                                      shuffle=False, num_workers=1)
 
         if self.train_loader and self.test_loader:
             print('Successfully loaded')
@@ -314,15 +314,15 @@ if __name__ == '__main__':
                         help='learning rate')
     parser.add_argument('--frame_depth', type=int, default=10,
                         help='frame depth')
-    parser.add_argument('--dropout_rate1', type=float, default=0.752712082971978,
+    parser.add_argument('--dropout_rate1', type=float, default=0.21799616425047497,
                         help='Drop rate 1')
-    parser.add_argument('--dropout_rate2', type=float, default=0.10743432945514313,
+    parser.add_argument('--dropout_rate2', type=float, default=0.8901743210052684,
                         help='Drop rate 2')
-    parser.add_argument('--nb_filter1', type=int, default=16,
+    parser.add_argument('--nb_filter1', type=int, default=8,
                         help='number of filter 1')
     parser.add_argument('--nb_filter2', type=int, default=64,
                         help='number of filter 2')
-    parser.add_argument('--nb_dense', type=int, default=1024,
+    parser.add_argument('--nb_dense', type=int, default=512,
                         help='Number of dense layer')
     parser.add_argument('--best', type=int, default=11,
                         help='Best Epoch')
@@ -330,5 +330,5 @@ if __name__ == '__main__':
     print('input args:\n', json.dumps(vars(args), indent=4, separators=(',', ':')))  # pretty print args
 
     trainer = TSCAN_trainer(args)
-    # trainer.train()
+    trainer.train()
     trainer.test()
