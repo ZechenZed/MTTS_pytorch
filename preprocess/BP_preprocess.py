@@ -123,7 +123,7 @@ def data_process(data_type, device_type, image=str(), dim=36):
 
         ############# BP smoothing #############
         # plt.plot(temp_BP_lf_systolic_inter)
-        temp_BP_lf_systolic_inter = gaussian_filter(temp_BP_lf_systolic_inter, sigma=3)
+        temp_BP_lf_systolic_inter = gaussian_filter(temp_BP_lf_systolic_inter, sigma=13)
         # plt.plot(temp_BP_lf_systolic_inter)
         # plt.legend()
         # plt.show()
@@ -361,7 +361,7 @@ def only_BP(data_type, device_type, image=str(), dim=36):
 
 if __name__ == '__main__':
     # data_process('valid', 'remote', 'face_large')
-    # data_process('train', 'remote', 'face_large')
+    data_process('train', 'remote', 'face_large')
     data_process('test', 'remote', 'face_large')
     # only_BP('train', 'remote', 'face_large')
     # only_BP('valid', 'remote', 'face_large')
