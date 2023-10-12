@@ -8,11 +8,13 @@ parameters:
   lr:
     values: [1e-2,5e-3,1e-3,5e-4]
   dropout_rate1:
-    min: 0.05
-    max: 0.95
+#    min: 0.05
+#    max: 0.95
+    values: [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]
   dropout_rate2:
-    min: 0.05
-    max: 0.95
+#    min: 0.05
+#    max: 0.95
+    values: [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9 ]
   nb_filter1:
     values: [8,16,32,64,128]
   nb_dense:
