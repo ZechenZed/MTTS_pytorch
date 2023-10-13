@@ -61,7 +61,7 @@ class TSCAN_trainer:
 
         v4v_data_train = V4V_Dataset(data_folder_path, 'train', setup.image_type, setup.BP_type)
         self.train_loader = DataLoader(dataset=v4v_data_train, batch_size=self.batch_size,
-                                       shuffle=False, num_workers=1)
+                                       shuffle=True, num_workers=1)
 
         # v4v_data_valid = V4V_Dataset(data_folder_path, 'valid', setup.image_type, setup.BP_type)
         # self.valid_loader = DataLoader(dataset=v4v_data_valid, batch_size=self.batch_size,
