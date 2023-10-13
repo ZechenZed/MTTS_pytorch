@@ -61,7 +61,7 @@ class TSCAN_trainer:
 
         v4v_data_train = V4V_Dataset(data_folder_path, 'train', setup.image_type, setup.BP_type)
         self.train_loader = DataLoader(dataset=v4v_data_train, batch_size=self.batch_size,
-                                       shuffle=True, num_workers=1)
+                                       shuffle=False, num_workers=1)
 
         # v4v_data_valid = V4V_Dataset(data_folder_path, 'valid', setup.image_type, setup.BP_type)
         # self.valid_loader = DataLoader(dataset=v4v_data_valid, batch_size=self.batch_size,
@@ -81,11 +81,10 @@ class TSCAN_trainer:
     def train(self):
         for epoch in range(self.nb_epoch):
             print('')
-            print(f"====Training Epoch: {epoch}====")
+            print(f"==== Training Epoch: {epoch} ====")
             running_loss = 0.0
             train_loss = []
             self.model.train()
-            # Model Training
             tbar = tqdm(self.train_loader, ncols=80)
             for idx, (data, labels) in enumerate(tbar):
                 # print(ind, type(data), type(labels))
@@ -101,6 +100,7 @@ class TSCAN_trainer:
                 pred_ppg = self.model(data)
                 loss = self.criterion(pred_ppg, labels)
                 loss.backward()
+
                 self.optimizer.step()
                 self.scheduler.step()
                 running_loss += loss.item()
@@ -110,6 +110,7 @@ class TSCAN_trainer:
                     running_loss = 0.0
                 train_loss.append(loss.item())
                 tbar.set_postfix(loss=loss.item())
+
             self.save_model(epoch)
             # valid_loss = self.valid()
             # print('validation loss: ', valid_loss)
@@ -159,7 +160,7 @@ class TSCAN_trainer:
         torch.save(self.model.state_dict(), model_path)
         print('Saved Model Path: ', model_path)
 
-    def test(self):
+    def test(self, sig=3):
         print('')
         print("===Testing===")
         if self.USE_LAST_EPOCH:
@@ -185,6 +186,7 @@ class TSCAN_trainer:
                 data_train = data_train.to(self.device)
                 labels_train = train_labels.to(self.device)
                 N, D, C, H, W = data_train.shape
+
                 data_train = data_train.view(N * D, C, H, W)
                 labels_train = labels_train.view(-1, 1)
 
@@ -194,7 +196,7 @@ class TSCAN_trainer:
                 pred_ppg_train = self.model(data_train)
 
                 pred = pred_ppg_train.detach().cpu().numpy()
-                pred = gaussian_filter(pred, sigma=3)
+                pred = gaussian_filter(pred, sigma=sig)
                 predictions.append(pred)
 
                 label = labels_train.detach().cpu().numpy()
@@ -268,7 +270,7 @@ class TSCAN_trainer:
                 pred_ppg_test = self.model(data_test)
 
                 pred = pred_ppg_test.detach().cpu().numpy()
-                pred = gaussian_filter(pred, sigma=3)
+                pred = gaussian_filter(pred, sigma=sig)
                 predictions.append(pred)
 
                 label = labels_test.detach().cpu().numpy()
@@ -316,15 +318,15 @@ if __name__ == '__main__':
                         help='learning rate')
     parser.add_argument('--frame_depth', type=int, default=10,
                         help='frame depth')
-    parser.add_argument('--dropout_rate1', type=float, default=0.21799616425047497,
+    parser.add_argument('--dropout_rate1', type=float, default=0.3,
                         help='Drop rate 1')
-    parser.add_argument('--dropout_rate2', type=float, default=0.8901743210052684,
+    parser.add_argument('--dropout_rate2', type=float, default=0.4,
                         help='Drop rate 2')
     parser.add_argument('--nb_filter1', type=int, default=8,
                         help='number of filter 1')
     parser.add_argument('--nb_filter2', type=int, default=64,
                         help='number of filter 2')
-    parser.add_argument('--nb_dense', type=int, default=512,
+    parser.add_argument('--nb_dense', type=int, default=256,
                         help='Number of dense layer')
     parser.add_argument('--best', type=int, default=11,
                         help='Best Epoch')

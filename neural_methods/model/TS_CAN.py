@@ -52,7 +52,7 @@ class TSCAN(nn.Module):
         """Definition of TS_CAN.
         Args:
           in_channels: the number of input channel. Default: 3
-          frame_depth: the number of frame (window size) used in temport shift. Default: 20
+          frame_depth: the number of frame (window size) used in temporal shift. Default: 20
           img_size: height/width of each frame. Default: 36.
         Returns:
           TS_CAN model.
@@ -118,7 +118,7 @@ class TSCAN(nn.Module):
             raise Exception('Unsupported image size')
         self.final_dense_2 = nn.Linear(self.nb_dense, 1, bias=True)
 
-    def forward(self, inputs, params=None):
+    def forward(self, inputs):
         diff_input = inputs[:, :3, :, :]
         raw_input = inputs[:, 3:, :, :]
 
@@ -133,7 +133,7 @@ class TSCAN(nn.Module):
         g1 = torch.sigmoid(self.apperance_att_conv1(r2))
         g1 = self.attn_mask_1(g1)
         gated1 = d2 * g1
-        # out = g1
+
         d3 = self.avg_pooling_1(gated1)
         d4 = self.dropout_1(d3)
 
@@ -151,13 +151,14 @@ class TSCAN(nn.Module):
         g2 = torch.sigmoid(self.apperance_att_conv2(r6))
         g2 = self.attn_mask_2(g2)
         gated2 = d6 * g2
-        # out = g2
+
         d7 = self.avg_pooling_3(gated2)
         d8 = self.dropout_3(d7)
         d9 = d7.view(d8.size(0), -1)
         d10 = torch.tanh(self.final_dense_1(d9))
         d11 = self.dropout_4(d10)
         out = self.final_dense_2(d11)
+
         return out
 
 
