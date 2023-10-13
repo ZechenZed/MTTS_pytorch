@@ -1,4 +1,5 @@
 import os
+import cv2
 import numpy as np
 import pandas as pd
 from statistics import mean
@@ -12,7 +13,7 @@ from video_preprocess import preprocess_raw_video, count_frames
 os.environ['CUDA_VISIBLE_DEVICES'] = '0'
 
 
-def data_process(data_type, device_type, image=str(), dim=72):
+def data_process(data_type, device_type, image=str(), dim=72, chunk_len=150):
     ############## Data folder path setting ##############
     if device_type == 'local':
         data_folder_path = "C:/Users/Zed/Desktop/V4V/"
@@ -54,15 +55,14 @@ def data_process(data_type, device_type, image=str(), dim=72):
 
     tt_frame = 0
     for i in range(num_video):
-        tt_frame += videos[i].shape[0] // 120 * 120
+        tt_frame += videos[i].shape[0] // chunk_len * chunk_len
 
     ############## Systolic BP Extraction ##############
     BP_file_path = []
     for path in sorted(os.listdir(BP_folder_path)):
         if os.path.isfile(os.path.join(BP_folder_path, path)):
             BP_file_path.append(path)
-
-    # BP_file_path = BP_file_path[0:1]
+    # BP_file_path = BP_file_path[200:201]
 
     print(tt_frame)
     frames = np.zeros(shape=(tt_frame, 6, dim, dim))
@@ -72,7 +72,7 @@ def data_process(data_type, device_type, image=str(), dim=72):
         print(f'BP process on {BP_file_path[i]}')
         temp_BP = np.loadtxt(BP_folder_path + BP_file_path[i])  # BP loading
         # plt.plot(temp_BP,label='opiginal')
-        temp_BP = gaussian_filter(temp_BP,10) # Smoothing before downsampling to better find the peaks
+        temp_BP = gaussian_filter(temp_BP, 10)  # Smoothing before downsampling to better find the peaks
         # plt.plot(temp_BP,label='after')
         # plt.legend()
         # plt.show()
@@ -111,9 +111,9 @@ def data_process(data_type, device_type, image=str(), dim=72):
         invalid_index_BP = np.where((temp_BP_lf_systolic_inter < 60) | (temp_BP_lf_systolic_inter > 250))[0]
 
         if len(invalid_index_BP) != 0:
-            current_frames = invalid_index_BP[0] // 120 * 120
+            current_frames = invalid_index_BP[0] // chunk_len * chunk_len
         else:
-            current_frames = len(temp_BP_lf_systolic_inter) // 120 * 120
+            current_frames = len(temp_BP_lf_systolic_inter) // chunk_len * chunk_len
 
         if current_frames == 0 or current_frames < 0:
             print(f'Skip video: {BP_file_path[i]}')
@@ -133,13 +133,23 @@ def data_process(data_type, device_type, image=str(), dim=72):
         frames[frame_ind:frame_ind + current_frames] = videos[i][first_index:first_index + current_frames]
         frame_ind += current_frames
 
-    ind_BP_rest = np.where(BP_lf == 0)[0][0]
-    print(f'Valid train dataset length:{ind_BP_rest}')
-    BP_lf = BP_lf[0:ind_BP_rest]
-    frames = frames[0:ind_BP_rest]
+    # ind_BP_rest = np.where(BP_lf == 0)[0][0]
+    # print(f'Valid train dataset length:{ind_BP_rest}')
+    # BP_lf = BP_lf[0:ind_BP_rest]
+    # frames = frames[0:ind_BP_rest]
 
-    frames = frames.reshape((-1, 10, 6, dim, dim))
-    BP_lf = BP_lf.reshape((-1, 10))
+    # for i in range(frames.shape[0]):
+    #     img = frames[i, 0:3, :, :]
+    #     transposed_arr = np.transpose(img, (1, 2, 0))
+    #     img = transposed_arr.reshape((dim, dim, 3))
+    #
+    #     plt.matshow(img)
+    #     # Press 'q' to quit
+    #     plt.pause(0.5)
+    # plt.show()
+
+    frames = frames.reshape((-1, chunk_len, 6, dim, dim))
+    BP_lf = BP_lf.reshape((-1, chunk_len))
     print(f'Shape of BP_lf{BP_lf.shape}')
     ############## Save the preprocessed model ##############
     saving_path = ''
@@ -215,12 +225,12 @@ def data_process_DC(device_type, image=str(), dim=128):
         ############# BP smoothing #############
         BP_lf_train[frame_ind_train:frame_ind_train + curr_train_frames] = temp_BP_lf[0:curr_train_frames]
         BP_lf_test[frame_ind_test:frame_ind_test + curr_test_frames] = \
-            temp_BP_lf[curr_train_frames:curr_train_frames+curr_test_frames]
+            temp_BP_lf[curr_train_frames:curr_train_frames + curr_test_frames]
 
         ############# Video Batches #############
         frames_train[frame_ind_train:frame_ind_train + curr_train_frames] = videos[i][0:curr_train_frames]
         frames_test[frame_ind_test:frame_ind_test + curr_test_frames] = \
-            videos[i][curr_train_frames:curr_train_frames+curr_test_frames]
+            videos[i][curr_train_frames:curr_train_frames + curr_test_frames]
 
         frame_ind_train += curr_train_frames
         frame_ind_test += curr_test_frames
@@ -361,9 +371,11 @@ def only_BP(data_type, device_type, image=str(), dim=36):
 
 if __name__ == '__main__':
     # data_process('valid', 'remote', 'face_large')
-    # data_process('train', 'remote', 'face_large')
+    data_process('train', 'remote', 'face_large')
     data_process('test', 'remote', 'face_large')
+
     # only_BP('train', 'remote', 'face_large')
     # only_BP('valid', 'remote', 'face_large')
     # only_BP('test', 'local', 'face_large')
+
     # data_process_DC('local', 'face_large')
