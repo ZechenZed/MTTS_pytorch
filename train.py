@@ -196,14 +196,17 @@ class TSCAN_trainer:
                 pred_ppg_train = self.model(data_train)
 
                 pred = pred_ppg_train.detach().cpu().numpy()
-                pred = gaussian_filter(pred, sigma=sig)
-                predictions.append(pred)
+                for pr in pred:
+                    predictions.append(pr[0])
 
                 label = labels_train.detach().cpu().numpy()
-                labels.append(label)
+                for la in label:
+                    labels.append(la[0])
 
-            predictions = np.array(predictions).reshape(-1)
             labels = np.array(labels).reshape(-1)
+            predictions = np.array(predictions).reshape(-1)
+            predictions = gaussian_filter(predictions, sigma=sig)
+
             cMAE = sum(abs(predictions - labels)) / predictions.shape[0]
             ro = pearsonr(predictions, labels)[0]
             if np.isnan(ro):
@@ -270,13 +273,15 @@ class TSCAN_trainer:
                 pred_ppg_test = self.model(data_test)
 
                 pred = pred_ppg_test.detach().cpu().numpy()
-                pred = gaussian_filter(pred, sigma=sig)
-                predictions.append(pred)
+                for pr in pred:
+                    predictions.append(pr[0])
 
                 label = labels_test.detach().cpu().numpy()
-                labels.append(label)
+                for la in label:
+                    labels.append(la[0])
 
             predictions = np.array(predictions).reshape(-1)
+            predictions = gaussian_filter(predictions, sigma=sig)
             labels = np.array(labels).reshape(-1)
             cMAE = sum(abs(predictions - labels)) / predictions.shape[0]
             ro = pearsonr(predictions, labels)[0]
@@ -297,7 +302,7 @@ if __name__ == '__main__':
     config = wandb.config
 
     parser = argparse.ArgumentParser()
-    parser.add_argument('-device', '--device_type', type=str, default='remote',
+    parser.add_argument('-device', '--device_type', type=str, default='local',
                         help='Local / Remote device')
 
     parser.add_argument('--nb_device', type=int, default=1,
@@ -314,19 +319,19 @@ if __name__ == '__main__':
                         help='nb_batch')
     parser.add_argument('--kernel', type=int, default=3,
                         help='Kernel size')
-    parser.add_argument('--lr', type=float, default=0.0005,
+    parser.add_argument('--lr', type=float, default=0.001,
                         help='learning rate')
     parser.add_argument('--frame_depth', type=int, default=10,
                         help='frame depth')
-    parser.add_argument('--dropout_rate1', type=float, default=0.3,
+    parser.add_argument('--dropout_rate1', type=float, default=0.9,
                         help='Drop rate 1')
-    parser.add_argument('--dropout_rate2', type=float, default=0.4,
+    parser.add_argument('--dropout_rate2', type=float, default=0.8,
                         help='Drop rate 2')
-    parser.add_argument('--nb_filter1', type=int, default=8,
+    parser.add_argument('--nb_filter1', type=int, default=32,
                         help='number of filter 1')
     parser.add_argument('--nb_filter2', type=int, default=64,
                         help='number of filter 2')
-    parser.add_argument('--nb_dense', type=int, default=256,
+    parser.add_argument('--nb_dense', type=int, default=1024,
                         help='Number of dense layer')
     parser.add_argument('--best', type=int, default=11,
                         help='Best Epoch')
@@ -334,5 +339,5 @@ if __name__ == '__main__':
     print('input args:\n', json.dumps(vars(args), indent=4, separators=(',', ':')))  # pretty print args
 
     trainer = TSCAN_trainer(args)
-    trainer.train()
+    # trainer.train()
     trainer.test()
