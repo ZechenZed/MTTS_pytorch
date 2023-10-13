@@ -133,10 +133,10 @@ def data_process(data_type, device_type, image=str(), dim=72, chunk_len=150):
         frames[frame_ind:frame_ind + current_frames] = videos[i][first_index:first_index + current_frames]
         frame_ind += current_frames
 
-    # ind_BP_rest = np.where(BP_lf == 0)[0][0]
-    # print(f'Valid train dataset length:{ind_BP_rest}')
-    # BP_lf = BP_lf[0:ind_BP_rest]
-    # frames = frames[0:ind_BP_rest]
+    ind_BP_rest = np.where(BP_lf == 0)[0][0] // chunk_len * chunk_len
+    print(f'Valid train dataset length:{ind_BP_rest}')
+    BP_lf = BP_lf[0:ind_BP_rest]
+    frames = frames[0:ind_BP_rest]
 
     # for i in range(frames.shape[0]):
     #     img = frames[i, 0:3, :, :]
