@@ -30,15 +30,18 @@ def is_consecutive(l, n):
 
 def preprocess_raw_video(video_file_path, dim=72, plot=True, face_crop=True):
     # set up
-    print("***********Processing " + video_file_path[-12:] + "***********")
+    print("*********** Processing " + video_file_path[-12:] + " ***********")
     t = []
     i = 0
     invalid_frames = []
+
     vidObj = cv2.VideoCapture(video_file_path)
+    fps = int(vidObj.get(cv2.CAP_PROP_FPS))
     totalFrames = int(vidObj.get(cv2.CAP_PROP_FRAME_COUNT))
     Xsub = np.zeros((totalFrames, dim, dim, 3), dtype=np.float32)
+
     success, img = vidObj.read()
-    # height, width = img.shape[:2]
+    height, width = img.shape[:2]
 
     # # OpenCV
     # face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
@@ -59,12 +62,17 @@ def preprocess_raw_video(video_file_path, dim=72, plot=True, face_crop=True):
 
     ############## Reading frame by frame ##############
     while success:
+        # cv2.imshow('img', img)
+        # cv2.waitKey()
+        img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+        # cv2.imshow('img', img)
+        # cv2.waitKey()
         t.append(vidObj.get(cv2.CAP_PROP_POS_MSEC))
         if len(invalid_frames) / totalFrames > 0.25:
             print('Too many invalid frames')
             break
-        if is_consecutive(invalid_frames, 50):
-            print('Invalid frames more than 2s')
+        if is_consecutive(invalid_frames, fps * 1):
+            print('Invalid frames more than 1s')
             break
 
         # # Opencv Cuda
@@ -126,15 +134,12 @@ def preprocess_raw_video(video_file_path, dim=72, plot=True, face_crop=True):
         if results.detections:
             if first == 0:
                 first = i
-
             for face in results.detections:
                 bbox = face.location_data.relative_bounding_box
-                xmin = int(bbox.xmin * img.shape[1])
-                ymin = int(bbox.ymin * img.shape[0])
-                xmax = int(bbox.xmin * img.shape[1] + bbox.width * img.shape[1])
-                ymax = int(bbox.ymin * img.shape[0] + 1.2 * bbox.height * img.shape[0])
-
-                xmin = max(xmin, 0)
+                xmin = max(0, int(bbox.xmin * img.shape[1] - 0.1 * bbox.width * img.shape[1]))
+                ymin = max(0, int(bbox.ymin * img.shape[0] - 0.1 * bbox.height * img.shape[0]))
+                xmax = min(int(bbox.xmin * img.shape[1] + 1.1 * bbox.width * img.shape[1]), width)
+                ymax = min(int(bbox.ymin * img.shape[0] + 1.1 * bbox.height * img.shape[0]), height)
 
                 cv2.rectangle(img, (xmin, ymin), (xmax, ymax), (0, 255, 0), 2)
                 roi = img_as_float(img[ymin:ymax, xmin:xmax, :])
@@ -144,6 +149,8 @@ def preprocess_raw_video(video_file_path, dim=72, plot=True, face_crop=True):
         else:
             # print(f'No Face Detected in {video_file_path[-12:]} at {i}th Frame')
             invalid_frames.append(i)
+            # plt.matshow(prev_roi)
+            # plt.show()
             vidLxL = cv2.resize(prev_roi, (dim, dim), interpolation=cv2.INTER_AREA)
 
         # ################## Video ###################
@@ -152,33 +159,56 @@ def preprocess_raw_video(video_file_path, dim=72, plot=True, face_crop=True):
         # if cv2.waitKey(1) & 0xFF == ord('q'):
         #     break
 
-        vidLxL = cv2.cvtColor(vidLxL.astype('float32'), cv2.COLOR_BGR2RGB)
-        vidLxL[vidLxL > 1] = 1
-        vidLxL[vidLxL < (1 / 255)] = 1 / 255
-        Xsub[i, :, :, :] = vidLxL
+        # vidLxL = np.round(vidLxL.astype('uint8'))
+        # vidLxL = cv2.cvtColor(vidLxL, cv2.COLOR_RGB2BGR)
+        # vidLxL[vidLxL > 1] = 1
+        # vidLxL[vidLxL < (1 / 255)] = 1 / 255
 
+        Xsub[i, :, :, :] = vidLxL
         success, img = vidObj.read()
         i = i + 1
+
     Xsub[0:first] = Xsub[first]
     Xsub = Xsub[0:len(t) - 1]
 
+    # cv2.imshow('Ima', Xsub[200, :, :, :])
+    # cv2.waitKey()
     ########################## Normalize raw frames in the appearance branch ##########################
     normalized_len = len(t) - 1
     dXsub = np.zeros((normalized_len, dim, dim, 3), dtype=np.float32)
+    diffnormalized_data_padding = np.zeros((1, dim, dim, 3), dtype=np.float32)
+
     for j in range(normalized_len - 1):
-        dXsub[j, :, :, :] = (Xsub[j + 1, :, :, :] - Xsub[j, :, :, :]) / (Xsub[j + 1, :, :, :] + Xsub[j, :, :, :])
+        dXsub[j, :, :, :] = (Xsub[j + 1, :, :, :] - Xsub[j, :, :, :]) / (Xsub[j + 1, :, :, :] + Xsub[j, :, :, :] + 1e-7)
     dXsub = dXsub / np.std(dXsub)
-    Xsub = Xsub - np.mean(Xsub)
     Xsub = Xsub / np.std(Xsub)
-    Xsub = Xsub[:totalFrames - 1, :, :, :]
+
+    dXsub = np.append(dXsub, diffnormalized_data_padding, axis=0)
+    Xsub = np.append(Xsub, diffnormalized_data_padding, axis=0)
+
+    dXsub[np.isnan(dXsub)] = 0
+    dXsub = (np.round(dXsub * 255)).astype(dtype=np.uint8)
+
+    Xsub[np.isnan(Xsub)] = 0
+    Xsub = (np.round(Xsub * 255)).astype(dtype=np.uint8)
+
+    # test = cv2.cvtColor(Xsub[200, :, :, :], cv2.COLOR_BGR2RGB)
+    # cv2.imshow('IMA', dXsub[200, :, :, :])
+    # cv2.imshow('IMG', test)
+    # cv2.waitKey()
+    # dXsub = np.concatenate(dXsub, axis=-1)
+
     dXsub = np.concatenate((dXsub, Xsub), axis=3)
 
     ##########################  Video array transpose ##########################
     transposed_arr = np.transpose(dXsub, (0, 3, 1, 2))
-    dXsub = transposed_arr.reshape((normalized_len, 6, dim, dim))
-    # plt.matshow(dXsub[200, 5, :, :])
-    # plt.matshow(dXsub[200, 2, :, :])
-    # plt.show()
+    dXsub = transposed_arr.reshape((normalized_len + 1, 6, dim, dim))
+    dXsub = dXsub.astype(dtype=np.uint8)
+
+    # cv2.imshow('Img', dXsub[200, :, :, :])
+    # cv2.imshow('Diff', dXsub[200, :, :, :])
+    # cv2.waitKey()
+
     return dXsub
 
 
