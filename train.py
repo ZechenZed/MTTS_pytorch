@@ -302,7 +302,7 @@ if __name__ == '__main__':
     config = wandb.config
 
     parser = argparse.ArgumentParser()
-    parser.add_argument('-device', '--device_type', type=str, default='local',
+    parser.add_argument('-device', '--device_type', type=str, default='remote',
                         help='Local / Remote device')
 
     parser.add_argument('--nb_device', type=int, default=1,
@@ -313,7 +313,7 @@ if __name__ == '__main__':
     parser.add_argument('-BP', '--BP_type', type=str, default='systolic',
                         help='Choose type of BP from mean, systolic and diastolic')
 
-    parser.add_argument('--nb_epoch', type=int, default=12,
+    parser.add_argument('--nb_epoch', type=int, default=15,
                         help='nb_epoch')
     parser.add_argument('--nb_batch', type=int, default=12,
                         help='nb_batch')
@@ -333,7 +333,7 @@ if __name__ == '__main__':
                         help='number of filter 2')
     parser.add_argument('--nb_dense', type=int, default=1024,
                         help='Number of dense layer')
-    parser.add_argument('--best', type=int, default=11,
+    parser.add_argument('--best', type=int, default=14,
                         help='Best Epoch')
     args = parser.parse_args()
     print('input args:\n', json.dumps(vars(args), indent=4, separators=(',', ':')))  # pretty print args
