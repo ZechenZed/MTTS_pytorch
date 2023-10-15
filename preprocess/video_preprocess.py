@@ -187,10 +187,10 @@ def preprocess_raw_video(video_file_path, dim=72, plot=True, face_crop=True):
     Xsub = np.append(Xsub, diffnormalized_data_padding, axis=0)
 
     dXsub[np.isnan(dXsub)] = 0
-    dXsub = (np.round(dXsub * 255)).astype(dtype=np.uint8)
+    dXsub = np.round(dXsub * 255)
 
     Xsub[np.isnan(Xsub)] = 0
-    Xsub = (np.round(Xsub * 255)).astype(dtype=np.uint8)
+    Xsub = np.round(Xsub * 255)
 
     # test = cv2.cvtColor(Xsub[200, :, :, :], cv2.COLOR_BGR2RGB)
     # cv2.imshow('IMA', dXsub[200, :, :, :])
@@ -203,7 +203,7 @@ def preprocess_raw_video(video_file_path, dim=72, plot=True, face_crop=True):
     ##########################  Video array transpose ##########################
     transposed_arr = np.transpose(dXsub, (0, 3, 1, 2))
     dXsub = transposed_arr.reshape((normalized_len + 1, 6, dim, dim))
-    dXsub = dXsub.astype(dtype=np.uint8)
+    dXsub = dXsub.astype(dtype=np.float32)
 
     # cv2.imshow('Img', dXsub[200, :, :, :])
     # cv2.imshow('Diff', dXsub[200, :, :, :])

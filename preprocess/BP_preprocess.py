@@ -8,6 +8,7 @@ from scipy.signal import find_peaks, medfilt, resample
 from joblib import Parallel, delayed
 from scipy.interpolate import interp1d
 from scipy.ndimage import gaussian_filter
+from scipy.stats import pearsonr
 from video_preprocess import preprocess_raw_video, count_frames
 
 os.environ['CUDA_VISIBLE_DEVICES'] = '0'
@@ -179,7 +180,7 @@ def data_process_DC(device_type, image=str(), dim=128):
         if os.path.isfile(os.path.join(video_folder_path, path)):
             video_file_path.append(path)
 
-    # video_file_path = video_file_path[0:1]
+    video_file_path = video_file_path[0:1]
     num_video = len(video_file_path)
     print('Processing ' + str(num_video) + ' Videos')
 
@@ -208,60 +209,90 @@ def data_process_DC(device_type, image=str(), dim=128):
     frame_ind_test = 0
     for i in range(num_video):
         print(f'BP process on {BP_file_path[i]}')
-        temp_BP = pd.read_csv(BP_folder_path + BP_file_path[i])['MeanBP']
+        temp_BP_mean = pd.read_csv(BP_folder_path + BP_file_path[i])['MeanBP']
+        temp_PPG = pd.read_csv(BP_folder_path + BP_file_path[i])['PPG']
+        temp_HR_PPG = pd.read_csv(BP_folder_path + BP_file_path[i])['PulseRatePPG']
+        temp_HR_BP = pd.read_csv(BP_folder_path + BP_file_path[i])['PulseRateBP']
 
-        lf_len = int(len(temp_BP) / 1000 * 240)
-        temp_BP_lf = resample(temp_BP, lf_len)
-        # plt.plot(temp_BP_lf,label='before')
-        temp_BP_lf = gaussian_filter(temp_BP_lf, 240)
-        # plt.plot(temp_BP_lf,label='after')
-        # plt.show()
+        lf_len = int(len(temp_BP_mean) / 1000 * 240)
+        temp_BP_mean_lf = resample(temp_BP_mean, lf_len)
+        temp_BP_mean_lf = gaussian_filter(temp_BP_mean_lf, 240)
+
+        lf_len = int(len(temp_PPG) / 1000 * 240)
+        temp_PPG_lf = resample(temp_PPG, lf_len)
+        temp_PPG_lf = gaussian_filter(temp_PPG_lf, 240)
+
+        lf_len = int(len(temp_HR_PPG) / 1000 * 240)
+        temp_HR_PPG_lf = resample(temp_HR_PPG, lf_len)
+        temp_HR_PPG_lf = gaussian_filter(temp_HR_PPG_lf, 240)
+
+        lf_len = int(len(temp_HR_BP) / 1000 * 240)
+        temp_HR_BP_lf = resample(temp_HR_BP, lf_len)
+        temp_HR_BP_lf = gaussian_filter(temp_HR_BP_lf, 240)
+
+        s_BP_mean_lf = temp_BP_mean_lf / np.std(temp_BP_mean_lf)
+        s_PPG_lf = temp_PPG_lf / np.std(temp_PPG_lf)
+        s_HR_PPG_lf = temp_HR_PPG_lf / np.std(temp_HR_PPG_lf)
+        s_HR_BP_lf = temp_HR_BP_lf / np.std(temp_HR_BP_lf)
+
+        # s_BP_lf = (temp_BP_mean_lf - min(temp_BP_mean_lf)) / (max(temp_BP_mean_lf - min(temp_BP_mean_lf)))
+        # s_PPG_lf = (temp_PPG_lf - min(temp_PPG_lf)) / (max(temp_PPG_lf - min(temp_PPG_lf)))
+        # s_HR_PPG_lf = (temp_HR_PPG_lf - min(temp_HR_PPG_lf)) / (max(temp_HR_PPG_lf - min(temp_HR_PPG_lf)))
+
+        plt.plot(s_PPG_lf, label='PPG')
+        plt.plot(s_BP_mean_lf, label='Mean BP')
+        plt.plot(s_HR_PPG_lf, label='HR from PPG')
+        plt.plot(s_HR_BP_lf, label='HR from BP')
+        plt.legend()
+        plt.show()
+        ro = pearsonr(s_BP_mean_lf, s_HR_BP_lf)[0]
+        print(ro)
         video_len = videos[i].shape[0]
 
-        current_frames = min(lf_len, video_len)
-        current_frames = current_frames // 240 * 240
-        curr_test_frames = current_frames // 4
-        curr_train_frames = curr_test_frames * 3
-        ############# BP smoothing #############
-        BP_lf_train[frame_ind_train:frame_ind_train + curr_train_frames] = temp_BP_lf[0:curr_train_frames]
-        BP_lf_test[frame_ind_test:frame_ind_test + curr_test_frames] = \
-            temp_BP_lf[curr_train_frames:curr_train_frames + curr_test_frames]
-
-        ############# Video Batches #############
-        frames_train[frame_ind_train:frame_ind_train + curr_train_frames] = videos[i][0:curr_train_frames]
-        frames_test[frame_ind_test:frame_ind_test + curr_test_frames] = \
-            videos[i][curr_train_frames:curr_train_frames + curr_test_frames]
-
-        frame_ind_train += curr_train_frames
-        frame_ind_test += curr_test_frames
+    #     current_frames = min(lf_len, video_len)
+    #     current_frames = current_frames // 240 * 240
+    #     curr_test_frames = current_frames // 4
+    #     curr_train_frames = curr_test_frames * 3
+    #     ############# BP smoothing #############
+    #     BP_lf_train[frame_ind_train:frame_ind_train + curr_train_frames] = temp_BP_lf[0:curr_train_frames]
+    #     BP_lf_test[frame_ind_test:frame_ind_test + curr_test_frames] = \
+    #         temp_BP_lf[curr_train_frames:curr_train_frames + curr_test_frames]
     #
-    ind_BP_rest = np.where(BP_lf_train == 0)[0][0]
-    BP_lf_train = BP_lf_train[0:ind_BP_rest]
-    frames_train = frames_train[0:ind_BP_rest]
-
-    ind_BP_rest = np.where(BP_lf_test == 0)[0][0]
-    BP_lf_test = BP_lf_test[0:ind_BP_rest]
-    frames_test = frames_test[0:ind_BP_rest]
-
-    # plt.plot(BP_lf_train,label='training data')
-    # plot_test = np.arange(train_frames,int(train_frames+test_frames))
-    # plt.plot(plot_test, BP_lf_test,label='testing data')
-    # plt.legend()
-    # plt.show()
-
-    frames_train = frames_train.reshape((-1, 10, 6, dim, dim))
-    frames_test = frames_test.reshape((-1, 10, 6, dim, dim))
-
-    BP_lf_train = BP_lf_train.reshape((-1, 10))
-    BP_lf_test = BP_lf_test.reshape((-1, 10))
-
-    ############## Save the preprocessed model ##############
-
-    saving_path = '/edrive1/zechenzh/preprocessed_DC/'
-    np.save(saving_path + 'train_frames_' + image + '.npy', frames_train)
-    np.save(saving_path + 'test_frames_' + image + '.npy', frames_test)
-    np.save(saving_path + 'train_BP_systolic.npy', BP_lf_train)
-    np.save(saving_path + 'test_BP_systolic.npy', BP_lf_test)
+    #     ############# Video Batches #############
+    #     frames_train[frame_ind_train:frame_ind_train + curr_train_frames] = videos[i][0:curr_train_frames]
+    #     frames_test[frame_ind_test:frame_ind_test + curr_test_frames] = \
+    #         videos[i][curr_train_frames:curr_train_frames + curr_test_frames]
+    #
+    #     frame_ind_train += curr_train_frames
+    #     frame_ind_test += curr_test_frames
+    # #
+    # ind_BP_rest = np.where(BP_lf_train == 0)[0][0]
+    # BP_lf_train = BP_lf_train[0:ind_BP_rest]
+    # frames_train = frames_train[0:ind_BP_rest]
+    #
+    # ind_BP_rest = np.where(BP_lf_test == 0)[0][0]
+    # BP_lf_test = BP_lf_test[0:ind_BP_rest]
+    # frames_test = frames_test[0:ind_BP_rest]
+    #
+    # # plt.plot(BP_lf_train,label='training data')
+    # # plot_test = np.arange(train_frames,int(train_frames+test_frames))
+    # # plt.plot(plot_test, BP_lf_test,label='testing data')
+    # # plt.legend()
+    # # plt.show()
+    #
+    # frames_train = frames_train.reshape((-1, 10, 6, dim, dim))
+    # frames_test = frames_test.reshape((-1, 10, 6, dim, dim))
+    #
+    # BP_lf_train = BP_lf_train.reshape((-1, 10))
+    # BP_lf_test = BP_lf_test.reshape((-1, 10))
+    #
+    # ############## Save the preprocessed model ##############
+    #
+    # saving_path = '/edrive1/zechenzh/preprocessed_DC/'
+    # np.save(saving_path + 'train_frames_' + image + '.npy', frames_train)
+    # np.save(saving_path + 'test_frames_' + image + '.npy', frames_test)
+    # np.save(saving_path + 'train_BP_systolic.npy', BP_lf_train)
+    # np.save(saving_path + 'test_BP_systolic.npy', BP_lf_test)
 
 
 def only_BP(data_type, device_type, image=str(), dim=36):
