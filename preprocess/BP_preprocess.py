@@ -14,7 +14,7 @@ from video_preprocess import preprocess_raw_video, count_frames
 os.environ['CUDA_VISIBLE_DEVICES'] = '0'
 
 
-def data_process(data_type, device_type, image=str(), dim=72, chunk_len=150):
+def data_process(data_type, device_type, image=str(), dim=72, chunk_len=200):
     ############## Data folder path setting ##############
     if device_type == 'local':
         data_folder_path = "C:/Users/Zed/Desktop/V4V/"
@@ -124,7 +124,7 @@ def data_process(data_type, device_type, image=str(), dim=72, chunk_len=150):
 
         ############# BP smoothing #############
         # plt.plot(temp_BP_lf_systolic_inter)
-        temp_BP_lf_systolic_inter = gaussian_filter(temp_BP_lf_systolic_inter, sigma=13)
+        temp_BP_lf_systolic_inter = gaussian_filter(temp_BP_lf_systolic_inter, sigma=50)
         # plt.plot(temp_BP_lf_systolic_inter)
         # plt.legend()
         # plt.show()
