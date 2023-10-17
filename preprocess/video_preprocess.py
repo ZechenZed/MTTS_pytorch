@@ -142,8 +142,10 @@ def preprocess_raw_video(video_file_path, dim=72, plot=True, face_crop=True):
 
                 # cv2.rectangle(img, (xmin, ymin), (xmax, ymax), (0, 255, 0), 2)
                 roi = img_as_float(img[ymin:ymax, xmin:xmax, :])
-
-            vidLxL = cv2.resize(roi, (dim, dim), interpolation=cv2.INTER_AREA)
+            try:
+                vidLxL = cv2.resize(roi, (dim, dim), interpolation=cv2.INTER_AREA)
+            except:
+                vidLxL = cv2.resize(prev_roi, (dim, dim), interpolation=cv2.INTER_AREA)
             prev_roi = roi
         else:
             # print(f'No Face Detected in {video_file_path[-12:]} at {i}th Frame')
