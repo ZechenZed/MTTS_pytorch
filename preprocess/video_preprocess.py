@@ -37,6 +37,7 @@ def preprocess_raw_video(video_file_path, dim=72, plot=True, face_crop=True):
 
     vidObj = cv2.VideoCapture(video_file_path)
     fps = int(vidObj.get(cv2.CAP_PROP_FPS))
+    print(f'Current fps:{fps}')
     totalFrames = int(vidObj.get(cv2.CAP_PROP_FRAME_COUNT))
     Xsub = np.zeros((totalFrames, dim, dim, 3), dtype=np.float32)
 
@@ -62,17 +63,15 @@ def preprocess_raw_video(video_file_path, dim=72, plot=True, face_crop=True):
 
     ############## Reading frame by frame ##############
     while success:
-        # cv2.imshow('img', img)
-        # cv2.waitKey()
         img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-        # cv2.imshow('img', img)
-        # cv2.waitKey()
+        img = cv2.rotate(img, cv2.ROTATE_90_COUNTERCLOCKWISE)
+
         t.append(vidObj.get(cv2.CAP_PROP_POS_MSEC))
         if len(invalid_frames) / totalFrames > 0.25:
             print('Too many invalid frames')
             break
-        if is_consecutive(invalid_frames, fps * 1):
-            print('Invalid frames more than 1s')
+        if is_consecutive(invalid_frames, fps * 5):
+            print(f'Invalid frames more than 5s, breaking at {i}th frame')
             break
 
         # # Opencv Cuda
@@ -153,11 +152,11 @@ def preprocess_raw_video(video_file_path, dim=72, plot=True, face_crop=True):
             # plt.show()
             vidLxL = cv2.resize(prev_roi, (dim, dim), interpolation=cv2.INTER_AREA)
 
-        # ################## Video ###################
-        # cv2.imshow('Frame', img)
-        # # Press 'q' to quit
-        # if cv2.waitKey(1) & 0xFF == ord('q'):
-        #     break
+        ################## Video ###################
+        cv2.imshow('Frame', img)
+        # Press 'q' to quit
+        if cv2.waitKey(1) & 0xFF == ord('q'):
+            break
 
         # vidLxL = np.round(vidLxL.astype('uint8'))
         # vidLxL = cv2.cvtColor(vidLxL, cv2.COLOR_RGB2BGR)
@@ -179,9 +178,9 @@ def preprocess_raw_video(video_file_path, dim=72, plot=True, face_crop=True):
     diffnormalized_data_padding = np.zeros((1, dim, dim, 3), dtype=np.float32)
 
     for j in range(normalized_len - 1):
-        dXsub[j, :, :, :] = (Xsub[j + 1, :, :, :] - Xsub[j, :, :, :]) / (Xsub[j + 1, :, :, :] + Xsub[j, :, :, :] + 1e-7)
-    dXsub = dXsub / np.std(dXsub)
-    Xsub = Xsub / np.std(Xsub)
+        dXsub[j, :, :, :] = (Xsub[j + 1, :, :, :] - Xsub[j, :, :, :]) / (Xsub[j + 1, :, :, :] + Xsub[j, :, :, :] + 1e-8)
+    dXsub = dXsub / (np.std(dXsub)+1e-8)
+    Xsub = Xsub / (np.std(Xsub)+1e-8)
 
     dXsub = np.append(dXsub, diffnormalized_data_padding, axis=0)
     Xsub = np.append(Xsub, diffnormalized_data_padding, axis=0)
