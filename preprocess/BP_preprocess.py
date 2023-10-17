@@ -180,7 +180,7 @@ def data_process_DC(device_type, chunk_len=1200, dim=128):
         if os.path.isfile(os.path.join(video_folder_path, path)):
             video_file_path.append(path)
 
-    video_file_path = video_file_path[0:1]
+    # video_file_path = video_file_path[0:1]
     num_video = len(video_file_path)
     print('Processing ' + str(num_video) + ' Videos')
 
@@ -414,4 +414,4 @@ if __name__ == '__main__':
     # only_BP('valid', 'remote', 'face_large')
     # only_BP('test', 'local', 'face_large')
 
-    data_process_DC('local')
+    data_process_DC('remote')
