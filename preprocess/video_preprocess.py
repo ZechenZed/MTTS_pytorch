@@ -37,7 +37,7 @@ def preprocess_raw_video(video_file_path, dim=72, plot=True, face_crop=True):
 
     vidObj = cv2.VideoCapture(video_file_path)
     fps = int(vidObj.get(cv2.CAP_PROP_FPS))
-    print(f'Current fps:{fps}')
+    # print(f'Current fps:{fps}')
     totalFrames = int(vidObj.get(cv2.CAP_PROP_FRAME_COUNT))
     Xsub = np.zeros((totalFrames, dim, dim, 3), dtype=np.float32)
 
@@ -140,7 +140,7 @@ def preprocess_raw_video(video_file_path, dim=72, plot=True, face_crop=True):
                 xmax = min(int(bbox.xmin * img.shape[1] + 1.1 * bbox.width * img.shape[1]), width)
                 ymax = min(int(bbox.ymin * img.shape[0] + 1.1 * bbox.height * img.shape[0]), height)
 
-                cv2.rectangle(img, (xmin, ymin), (xmax, ymax), (0, 255, 0), 2)
+                # cv2.rectangle(img, (xmin, ymin), (xmax, ymax), (0, 255, 0), 2)
                 roi = img_as_float(img[ymin:ymax, xmin:xmax, :])
 
             vidLxL = cv2.resize(roi, (dim, dim), interpolation=cv2.INTER_AREA)
@@ -152,11 +152,11 @@ def preprocess_raw_video(video_file_path, dim=72, plot=True, face_crop=True):
             # plt.show()
             vidLxL = cv2.resize(prev_roi, (dim, dim), interpolation=cv2.INTER_AREA)
 
-        ################## Video ###################
-        cv2.imshow('Frame', img)
-        # Press 'q' to quit
-        if cv2.waitKey(1) & 0xFF == ord('q'):
-            break
+        # ################## Video ###################
+        # cv2.imshow('Frame', img)
+        # # Press 'q' to quit
+        # if cv2.waitKey(1) & 0xFF == ord('q'):
+        #     break
 
         # vidLxL = np.round(vidLxL.astype('uint8'))
         # vidLxL = cv2.cvtColor(vidLxL, cv2.COLOR_RGB2BGR)
