@@ -180,7 +180,7 @@ def data_process_DC(device_type, chunk_len=1200, dim=128):
         if os.path.isfile(os.path.join(video_folder_path, path)):
             video_file_path.append(path)
 
-    video_file_path = video_file_path[0:1]
+    # video_file_path = video_file_path[0:1]
     num_video = len(video_file_path)
     print('Processing ' + str(num_video) + ' Videos')
 
