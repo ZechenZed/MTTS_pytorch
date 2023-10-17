@@ -414,4 +414,4 @@ if __name__ == '__main__':
     # only_BP('valid', 'remote', 'face_large')
     # only_BP('test', 'local', 'face_large')
 
-    data_process_DC('local')
+    data_process_DC('remote')
