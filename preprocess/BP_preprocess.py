@@ -180,11 +180,11 @@ def data_process_DC(device_type, chunk_len=1200, dim=128):
         if os.path.isfile(os.path.join(video_folder_path, path)):
             video_file_path.append(path)
 
-    # video_file_path = video_file_path[0:1]
+    video_file_path = video_file_path[0:1]
     num_video = len(video_file_path)
     print('Processing ' + str(num_video) + ' Videos')
 
-    videos = [Parallel(n_jobs=16)(
+    videos = [Parallel(n_jobs=8)(
         delayed(preprocess_raw_video)(video_folder_path + video, dim) for video in video_file_path)]
     videos = videos[0]
 
@@ -218,9 +218,9 @@ def data_process_DC(device_type, chunk_len=1200, dim=128):
         temp_BP_mean_lf = resample(temp_BP_mean, lf_len)
         temp_BP_mean_lf = gaussian_filter(temp_BP_mean_lf, 240*5)
         temp_BP_lf = temp_BP_mean_lf
-        # x = np.arange(len(temp_BP_lf)) / 240
-        # plt.plot(x, temp_BP_lf)
-        # plt.show()
+        x = np.arange(len(temp_BP_lf)) / 240
+        plt.plot(x, temp_BP_lf)
+        plt.show()
 
         # lf_len = int(len(temp_PPG) / 1000 * 240)
         # temp_PPG_lf = resample(temp_PPG, lf_len)
@@ -414,4 +414,4 @@ if __name__ == '__main__':
     # only_BP('valid', 'remote', 'face_large')
     # only_BP('test', 'local', 'face_large')
 
-    data_process_DC('remote')
+    data_process_DC('local')
