@@ -16,7 +16,7 @@ from sklearn.metrics import mean_squared_error, mean_absolute_error
 from scipy.ndimage import gaussian_filter
 from scipy.stats import pearsonr
 import wandb
-from evaluation.ICC import two_anova
+from evaluation.ICC import one_anova
 
 
 class TSCAN_trainer:
@@ -212,8 +212,9 @@ class TSCAN_trainer:
             ro = pearsonr(predictions, labels)[0]
             if np.isnan(ro):
                 ro = -1
-            p = two_anova(labels, predictions)
-
+            p = one_anova(labels, predictions)
+            if np.isnan(p):
+                p = 1
             wandb.log({'Test_cMAE': cMAE, 'Test_pearson': ro, 'p': p})
             print(f'Two-way ANOVA-p:{p}')
             print(f'Test Pearson correlation: {ro}')
@@ -292,8 +293,9 @@ class TSCAN_trainer:
             ro = pearsonr(predictions, labels)[0]
             if np.isnan(ro):
                 ro = -1
-            p = two_anova(labels, predictions)
-
+            p = one_anova(labels, predictions)
+            if np.isnan(p):
+                p = 1
             wandb.log({'Test_cMAE': cMAE, 'Test_pearson': ro, 'p': p})
             print(f'Two-way ANOVA-p:{p}')
             print(f'Test Pearson correlation: {ro}')
