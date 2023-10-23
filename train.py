@@ -16,6 +16,7 @@ from sklearn.metrics import mean_squared_error, mean_absolute_error
 from scipy.ndimage import gaussian_filter
 from scipy.stats import pearsonr
 import wandb
+from evaluation.ICC import two_anova
 
 
 class TSCAN_trainer:
@@ -211,9 +212,12 @@ class TSCAN_trainer:
             ro = pearsonr(predictions, labels)[0]
             if np.isnan(ro):
                 ro = -1
-            wandb.log({'Train_cMAE': cMAE, 'Train_pearson': ro})
-            print(f'Train Pearson correlation: {ro}')
-            print(f'Train cMAE: {cMAE}')
+            p = two_anova(labels, predictions)
+
+            wandb.log({'Test_cMAE': cMAE, 'Test_pearson': ro, 'p': p})
+            print(f'Two-way ANOVA-p:{p}')
+            print(f'Test Pearson correlation: {ro}')
+            print(f'Test cMAE: {cMAE}')
             if self.plot_pred:
                 plt.plot(predictions, 'r', label='Prediction')
                 plt.plot(labels, 'g', label='Ground truth')
@@ -283,11 +287,15 @@ class TSCAN_trainer:
             predictions = np.array(predictions).reshape(-1)
             predictions = gaussian_filter(predictions, sigma=sig)
             labels = np.array(labels).reshape(-1)
+
             cMAE = sum(abs(predictions - labels)) / predictions.shape[0]
             ro = pearsonr(predictions, labels)[0]
             if np.isnan(ro):
                 ro = -1
-            wandb.log({'Test_cMAE': cMAE, 'Test_pearson': ro})
+            p = two_anova(labels, predictions)
+
+            wandb.log({'Test_cMAE': cMAE, 'Test_pearson': ro, 'p': p})
+            print(f'Two-way ANOVA-p:{p}')
             print(f'Test Pearson correlation: {ro}')
             print(f'Test cMAE: {cMAE}')
             if self.plot_pred:

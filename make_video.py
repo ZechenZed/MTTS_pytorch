@@ -23,18 +23,40 @@ def make_video():
     video_writer.release()
 
 
-def plot_BP():
-    path = 'C:/Users/Zed/Desktop/V4V/preprocessed_v4v/train_BP_systolic.npy'
-    BP = np.load(path)
-    print(BP.shape)
-    BP = BP.reshape(-1)
-    plt.plot(BP)
+def plot_BP(dim=72):
+    path = 'C:/Users/Zed/Desktop/V4V/preprocessed_v4v/test_BP_systolic.npy'
+    BP = np.load(path).astype(np.float32)
+    BP_flat = BP.reshape(-1)
+    var = np.var(BP_flat)
+    std = np.std(BP.flat)
+    print(f'var:{var}, std:{std}')
+
+    x_axis = np.arange(BP.shape[1]) / 25
+    i = 0
+    for temp in BP[0:200:5]:
+        i+=1
+        plt.plot(x_axis, temp,label=f'Chunk:{i}')
+    plt.legend()
     plt.show()
     # BP_path = '/edrive1/zechenzh/preprocessed_DC/train_BP_systolic.npy'
     # frame_path = '/edrive1/zechenzh/preprocessed_DC/train_frames_face_large.npy'
     # BP = np.load(BP_path)
     # frame = np.load(frame_path)
     # print(f'BP len:{len(BP)}, frame len:{len(frame)}')
+
+    # video_file_path = 'C:/Users/Zed/Desktop/V4V/preprocessed_v4v/train_frames_face_large.npy'
+    # video_file = np.load(video_file_path).reshape((-1, 6, dim, dim))
+    #
+    # t = []
+    # i = 0
+    #
+    # ############## Reading frame by frame ##############
+    # for i in range(video_file.shape[0]):
+    #     img = video_file[i, :, :, 0:3]
+    #     cv2.imshow('Frame', img)
+    #     # Press 'q' to quit
+    #     if cv2.waitKey(1) & 0xFF == ord('q'):
+    #         break
 
 
 if __name__ == '__main__':
