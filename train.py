@@ -212,9 +212,14 @@ class TSCAN_trainer:
             ro = pearsonr(predictions, labels)[0]
             if np.isnan(ro):
                 ro = -1
-            p = one_anova(labels, predictions)
-            if np.isnan(p):
-                p = 1
+            p = []
+            for i in range(0, len(labels), 200):
+                temp_p = one_anova(labels[i:i+200], predictions[i:i+200])
+                if temp_p == np.nan:
+                    p.append(-1)
+                else:
+                    p.append(temp_p)
+            p = np.mean(p)
             wandb.log({'Test_cMAE': cMAE, 'Test_pearson': ro, 'p': p})
             print(f'Two-way ANOVA-p:{p}')
             print(f'Test Pearson correlation: {ro}')
@@ -293,9 +298,15 @@ class TSCAN_trainer:
             ro = pearsonr(predictions, labels)[0]
             if np.isnan(ro):
                 ro = -1
-            p = one_anova(labels, predictions)
-            if np.isnan(p):
-                p = 1
+
+            p = []
+            for i in range(0, len(labels), 200):
+                temp_p = one_anova(labels[i:i+200], predictions[i:i+200])
+                if temp_p == np.nan:
+                    p.append(-1)
+                else:
+                    p.append(temp_p)
+            p = np.mean(p)
             wandb.log({'Test_cMAE': cMAE, 'Test_pearson': ro, 'p': p})
             print(f'Two-way ANOVA-p:{p}')
             print(f'Test Pearson correlation: {ro}')
