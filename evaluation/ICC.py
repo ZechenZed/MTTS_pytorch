@@ -3,6 +3,7 @@ from statsmodels.formula.api import ols
 import statsmodels.stats.anova as anova
 import pandas as pd
 import time
+import numpy as np
 
 
 def one_anova(gt, pred):
@@ -16,8 +17,10 @@ def one_anova(gt, pred):
     end = time.time()
     # print(f'Time Used: {end - start}s')
     # print(result)
-
-    return result['PR(>F)'][0]
+    if result['PR(>F)'][0] is np.nan:
+        return 1
+    else:
+        return result['PR(>F)'][0]
 
 #
 # if __name__ == '__main__':
