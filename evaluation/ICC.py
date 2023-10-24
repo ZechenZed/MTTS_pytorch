@@ -8,14 +8,14 @@ import time
 def one_anova(gt, pred):
     dataframe = pd.DataFrame({'Prediction': gt,
                               'GroundTruth': pred})
-    print(dataframe)
+    # print(dataframe)
 
     start = time.time()
     model = ols('GroundTruth ~ C(Prediction)', data=dataframe).fit()
     result = anova.anova_lm(model)
     end = time.time()
-    print(f'Time Used: {end - start}s')
-    print(result)
+    # print(f'Time Used: {end - start}s')
+    # print(result)
 
     return result['PR(>F)'][0]
 
