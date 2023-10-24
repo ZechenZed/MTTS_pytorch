@@ -17,7 +17,7 @@ from scipy.ndimage import gaussian_filter
 from scipy.stats import pearsonr
 import wandb
 from evaluation.ICC import one_anova
-
+from joblib import Parallel, delayed
 
 class TSCAN_trainer:
     def __init__(self, setup):
@@ -213,12 +213,17 @@ class TSCAN_trainer:
             if np.isnan(ro):
                 ro = -1
             p = []
-            for i in range(0, len(labels), 200):
-                temp_p = one_anova(labels[i:i+200], predictions[i:i+200])
-                if temp_p == np.nan:
-                    p.append(-1)
-                else:
-                    p.append(temp_p)
+            p = [Parallel(n_jobs=12)(
+                delayed(one_anova)(labels[i:i+200], predictions[i:i+200]) for i in range(0, len(labels), 200))]
+            print(p)
+            p = p[0]
+
+            # for i in range(0, len(labels), 200):
+            #     temp_p = one_anova(labels[i:i+200], predictions[i:i+200])
+            #     if temp_p == np.nan:
+            #         p.append(-1)
+            #     else:
+            #         p.append(temp_p)
             p = np.mean(p)
             wandb.log({'Test_cMAE': cMAE, 'Test_pearson': ro, 'p': p})
             print(f'Two-way ANOVA-p:{p}')
@@ -299,13 +304,18 @@ class TSCAN_trainer:
             if np.isnan(ro):
                 ro = -1
 
-            p = []
-            for i in range(0, len(labels), 200):
-                temp_p = one_anova(labels[i:i+200], predictions[i:i+200])
-                if temp_p == np.nan:
-                    p.append(-1)
-                else:
-                    p.append(temp_p)
+            p = [Parallel(n_jobs=12)(
+                delayed(one_anova)(labels[i:i+200], predictions[i:i+200]) for i in range(0, len(labels), 200))]
+            print(p)
+            p = p[0]
+
+            # p = []
+            # for i in range(0, len(labels), 200):
+            #     temp_p = one_anova(labels[i:i+200], predictions[i:i+200])
+            #     if temp_p == np.nan:
+            #         p.append(-1)
+            #     else:
+            #         p.append(temp_p)
             p = np.mean(p)
             wandb.log({'Test_cMAE': cMAE, 'Test_pearson': ro, 'p': p})
             print(f'Two-way ANOVA-p:{p}')
