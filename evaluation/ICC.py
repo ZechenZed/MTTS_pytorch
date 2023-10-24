@@ -17,7 +17,7 @@ def one_anova(gt, pred):
     end = time.time()
     # print(f'Time Used: {end - start}s')
     # print(result)
-    if result['PR(>F)'][0] is np.nan:
+    if np.isnan(result['PR(>F)'][0]):
         return 1
     else:
         return result['PR(>F)'][0]

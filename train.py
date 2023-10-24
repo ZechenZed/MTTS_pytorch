@@ -212,12 +212,11 @@ class TSCAN_trainer:
             ro = pearsonr(predictions, labels)[0]
             if np.isnan(ro):
                 ro = -1
-            p = []
+
             p = [Parallel(n_jobs=12)(
                 delayed(one_anova)(labels[i:i+200], predictions[i:i+200]) for i in range(0, len(labels), 200))]
-            print(p)
             p = p[0]
-
+            print(p)
             # for i in range(0, len(labels), 200):
             #     temp_p = one_anova(labels[i:i+200], predictions[i:i+200])
             #     if temp_p == np.nan:
@@ -306,9 +305,8 @@ class TSCAN_trainer:
 
             p = [Parallel(n_jobs=12)(
                 delayed(one_anova)(labels[i:i+200], predictions[i:i+200]) for i in range(0, len(labels), 200))]
-            print(p)
             p = p[0]
-
+            print(p)
             # p = []
             # for i in range(0, len(labels), 200):
             #     temp_p = one_anova(labels[i:i+200], predictions[i:i+200])
