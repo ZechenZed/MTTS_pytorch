@@ -224,10 +224,10 @@ class TSCAN_trainer:
             #     else:
             #         p.append(temp_p)
             p = np.mean(p)
-            wandb.log({'Test_cMAE': cMAE, 'Test_pearson': ro, 'p': p})
+            wandb.log({'Train_cMAE': cMAE, 'Train_pearson': ro, 'p': p})
             print(f'Two-way ANOVA-p:{p}')
-            print(f'Test Pearson correlation: {ro}')
-            print(f'Test cMAE: {cMAE}')
+            print(f'TrainPearson correlation: {ro}')
+            print(f'Train cMAE: {cMAE}')
             if self.plot_pred:
                 plt.plot(predictions, 'r', label='Prediction')
                 plt.plot(labels, 'g', label='Ground truth')
