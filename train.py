@@ -214,9 +214,12 @@ class TSCAN_trainer:
             if np.isnan(ro):
                 ro = -1
 
-            data_train_gtNpred = [predictions, labels]
-            np.save('/edrive1/zechenzh/model_ckpts/data_Train.txt', data_train_gtNpred)
-            wandb.log({'Train_cMAE': cMAE, 'Train_pearson': ro})
+            ICC_1 = np.std(labels)**2 /(np.std(labels)**2+np.std(predictions)**2)
+            print(ICC_1)
+
+            # data_train_gtNpred = [predictions, labels]
+            # np.save('/edrive1/zechenzh/model_ckpts/data_Train.txt', data_train_gtNpred)
+            wandb.log({'Train_cMAE': cMAE, 'Train_pearson': ro,'Train_ICC_1':ICC_1})
             print(f'TrainPearson correlation: {ro}')
             print(f'Train cMAE: {cMAE}')
             if self.plot_pred:
@@ -294,10 +297,13 @@ class TSCAN_trainer:
             if np.isnan(ro):
                 ro = -1
 
-            data_test_gtNpred = [predictions, labels]
-            np.save('/edrive1/zechenzh/model_ckpts/data_Test.txt', data_test_gtNpred)
+            ICC_1 = np.std(labels)**2 /(np.std(labels)**2+np.std(predictions)**2)
+            print(ICC_1)
+            # data_test_gtNpred = [predictions, labels]
+            # np.save('/edrive1/zechenzh/model_ckpts/data_Test.txt', data_test_gtNpred)
 
-            wandb.log({'Test_cMAE': cMAE, 'Test_pearson': ro})
+            wandb.log({'Test_cMAE': cMAE, 'Test_pearson': ro,'Test_ICC_1': ICC_1})
+            print(f'Test ICC_1: {ICC_1}')
             print(f'Test Pearson correlation: {ro}')
             print(f'Test cMAE: {cMAE}')
             if self.plot_pred:
