@@ -140,7 +140,7 @@ def preprocess_raw_video(video_file_path, dim=72, plot=True, face_crop=True):
                 xmax = min(int(bbox.xmin * img.shape[1] + 1.1 * bbox.width * img.shape[1]), width)
                 ymax = min(int(bbox.ymin * img.shape[0] + 1.1 * bbox.height * img.shape[0]), height)
 
-                cv2.rectangle(img, (xmin, ymin), (xmax, ymax), (0, 255, 0), 2)
+                # cv2.rectangle(img, (xmin, ymin), (xmax, ymax), (0, 255, 0), 2)
                 roi = img_as_float(img[ymin:ymax, xmin:xmax, :])
             try:
                 vidLxL = cv2.resize(roi, (dim, dim), interpolation=cv2.INTER_AREA)
@@ -150,15 +150,15 @@ def preprocess_raw_video(video_file_path, dim=72, plot=True, face_crop=True):
         else:
             # print(f'No Face Detected in {video_file_path[-12:]} at {i}th Frame')
             invalid_frames.append(i)
-            plt.matshow(prev_roi)
-            plt.show()
+            # plt.matshow(prev_roi)
+            # plt.show()
             vidLxL = cv2.resize(prev_roi, (dim, dim), interpolation=cv2.INTER_AREA)
 
         ################## Video ###################
-        cv2.imshow('Frame', img)
-        # Press 'q' to quit
-        if cv2.waitKey(1) & 0xFF == ord('q'):
-            break
+        # cv2.imshow('Frame', img)
+        # # Press 'q' to quit
+        # if cv2.waitKey(1) & 0xFF == ord('q'):
+        #     break
 
         # vidLxL = np.round(vidLxL.astype('uint8'))
         # vidLxL = cv2.cvtColor(vidLxL, cv2.COLOR_RGB2BGR)
