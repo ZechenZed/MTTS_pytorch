@@ -64,14 +64,14 @@ def preprocess_raw_video(video_file_path, dim=72, plot=True, face_crop=True):
     ############## Reading frame by frame ##############
     while success:
         img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-        img = cv2.rotate(img, cv2.ROTATE_90_COUNTERCLOCKWISE)
+        # img = cv2.rotate(img, cv2.ROTATE_90_COUNTERCLOCKWISE)
 
         t.append(vidObj.get(cv2.CAP_PROP_POS_MSEC))
         if len(invalid_frames) / totalFrames > 0.25:
             print('Too many invalid frames')
             break
         if is_consecutive(invalid_frames, fps * 5) or i == fps * 5:
-            print(f'Invalid frames more than 5s, breaking at {i}th frame')
+            print(f'Invalid frames more than 5s, breaking at {i}th frame in video: {video_file_path[-12:]}')
             break
 
         # # Opencv Cuda
@@ -140,7 +140,7 @@ def preprocess_raw_video(video_file_path, dim=72, plot=True, face_crop=True):
                 xmax = min(int(bbox.xmin * img.shape[1] + 1.1 * bbox.width * img.shape[1]), width)
                 ymax = min(int(bbox.ymin * img.shape[0] + 1.1 * bbox.height * img.shape[0]), height)
 
-                # cv2.rectangle(img, (xmin, ymin), (xmax, ymax), (0, 255, 0), 2)
+                cv2.rectangle(img, (xmin, ymin), (xmax, ymax), (0, 255, 0), 2)
                 roi = img_as_float(img[ymin:ymax, xmin:xmax, :])
             try:
                 vidLxL = cv2.resize(roi, (dim, dim), interpolation=cv2.INTER_AREA)
@@ -150,15 +150,15 @@ def preprocess_raw_video(video_file_path, dim=72, plot=True, face_crop=True):
         else:
             # print(f'No Face Detected in {video_file_path[-12:]} at {i}th Frame')
             invalid_frames.append(i)
-            # plt.matshow(prev_roi)
-            # plt.show()
+            plt.matshow(prev_roi)
+            plt.show()
             vidLxL = cv2.resize(prev_roi, (dim, dim), interpolation=cv2.INTER_AREA)
 
-        # ################## Video ###################
-        # cv2.imshow('Frame', img)
-        # # Press 'q' to quit
-        # if cv2.waitKey(1) & 0xFF == ord('q'):
-        #     break
+        ################## Video ###################
+        cv2.imshow('Frame', img)
+        # Press 'q' to quit
+        if cv2.waitKey(1) & 0xFF == ord('q'):
+            break
 
         # vidLxL = np.round(vidLxL.astype('uint8'))
         # vidLxL = cv2.cvtColor(vidLxL, cv2.COLOR_RGB2BGR)
@@ -355,3 +355,6 @@ def detrend(signal, Lambda):
     D = spdiags(diags_data, diags_index, (signal_length - 2), signal_length).toarray()
     filtered_signal = np.dot((H - np.linalg.inv(H + (Lambda ** 2) * np.dot(D.T, D))), signal)
     return filtered_signal
+
+if __name__ == '__main__':
+    preprocess_raw_video('C:/Users/Zechen Zhang/Desktop/dataset/F001_T10.mkv')
