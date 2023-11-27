@@ -70,8 +70,8 @@ def preprocess_raw_video(video_file_path, dim=72, plot=True, face_crop=True):
         if len(invalid_frames) / totalFrames > 0.25:
             print('Too many invalid frames')
             break
-        if is_consecutive(invalid_frames, fps * 5) or i == fps * 5:
-            print(f'Invalid frames more than 5s, breaking at {i}th frame in video: {video_file_path[-12:]}')
+        if is_consecutive(invalid_frames, fps * 5) or len(invalid_frames) == fps * 5:
+            print(f'Invalid frames more than 5s in video: {video_file_path[-12:]}')
             break
 
         # # Opencv Cuda
