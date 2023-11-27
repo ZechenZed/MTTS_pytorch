@@ -50,7 +50,7 @@ def data_process(data_type, device_type, image=str(), dim=72, chunk_len=200):
     num_video = len(video_file_path)
     print('Processing ' + str(num_video) + ' Videos')
 
-    videos = [Parallel(n_jobs=8)(
+    videos = [Parallel(n_jobs=6)(
         delayed(preprocess_raw_video)(video_folder_path + video, dim) for video in video_file_path)]
     videos = videos[0]
 
