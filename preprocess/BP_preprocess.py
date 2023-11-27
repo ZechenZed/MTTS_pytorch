@@ -159,8 +159,8 @@ def data_process(data_type, device_type, image=str(), dim=72, chunk_len=200):
         saving_path = '/edrive1/zechenzh/preprocessed_v4v/'
     elif device_type == 'local':
         saving_path = 'C:/Users/Zed/Desktop/V4V/preprocessed_v4v/'
-    np.save(saving_path + data_type + '_frames_female' + image + '.npy', frames)
-    np.save(saving_path + data_type + '_BP_female.npy', BP_lf)
+    np.save(saving_path + data_type + '_male_female' + image + '.npy', frames)
+    np.save(saving_path + data_type + '_BP_male.npy', BP_lf)
 
 
 def data_process_DC(device_type, chunk_len=1200, dim=128):
