@@ -61,7 +61,7 @@ class TSCAN_trainer:
                            nb_filters2=self.nb_filters2).to(self.device)
         # self.model = torch.nn.DataParallel(self.model, device_ids=list(range(setup.nb_device)))
 
-        v4v_data_train = V4V_Dataset(data_folder_path, 'train', 'male', setup.image_type)
+        v4v_data_train = V4V_Dataset(data_folder_path, 'train', setup.image_type, 'male')
         self.train_loader = DataLoader(dataset=v4v_data_train, batch_size=self.batch_size,
                                        shuffle=True, num_workers=1)
 
@@ -69,7 +69,7 @@ class TSCAN_trainer:
         # self.valid_loader = DataLoader(dataset=v4v_data_valid, batch_size=self.batch_size,
         #                                shuffle=True, num_workers=1)
 
-        v4v_data_test = V4V_Dataset(data_folder_path, 'test', 'male', setup.image_type)
+        v4v_data_test = V4V_Dataset(data_folder_path, 'test', setup.image_type, 'male')
         self.test_loader = DataLoader(dataset=v4v_data_test, batch_size=self.batch_size,
                                       shuffle=False, num_workers=1)
 
