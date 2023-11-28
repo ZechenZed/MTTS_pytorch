@@ -1,7 +1,8 @@
 import cv2
 import numpy as np
 import matplotlib.pyplot as plt
-
+import matlab.engine
+# from evaluation.ICC_C_1 import
 
 def make_video():
     test_array = np.load('C:/Users/Zed/Desktop/V4V/preprocessed_v4v/test_frames_face_large.npy')
@@ -34,8 +35,8 @@ def plot_BP(dim=72):
     x_axis = np.arange(BP.shape[1]) / 25
     i = 0
     for temp in BP[0:200:5]:
-        i+=1
-        plt.plot(x_axis, temp,label=f'Chunk:{i}')
+        i += 1
+        plt.plot(x_axis, temp, label=f'Chunk:{i}')
     plt.legend()
     plt.show()
     # BP_path = '/edrive1/zechenzh/preprocessed_DC/train_BP_systolic.npy'
@@ -59,6 +60,13 @@ def plot_BP(dim=72):
     #         break
 
 
+def ICC_matlab():
+    eng = matlab.engine.start_matlab()
+    print('check')
+    # y = eng.feval('ICC_C_1.m')
+
+
 if __name__ == '__main__':
     # make_video()
-    plot_BP()
+    # plot_BP()
+    ICC_matlab()

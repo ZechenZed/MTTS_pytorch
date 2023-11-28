@@ -355,6 +355,6 @@ def detrend(signal, Lambda):
     D = spdiags(diags_data, diags_index, (signal_length - 2), signal_length).toarray()
     filtered_signal = np.dot((H - np.linalg.inv(H + (Lambda ** 2) * np.dot(D.T, D))), signal)
     return filtered_signal
-
-if __name__ == '__main__':
-    preprocess_raw_video('C:/Users/Zechen Zhang/Desktop/dataset/F001_T10.mkv')
+#
+# if __name__ == '__main__':
+#     preprocess_raw_video('C:/Users/Zechen Zhang/Desktop/dataset/F001_T10.mkv')
