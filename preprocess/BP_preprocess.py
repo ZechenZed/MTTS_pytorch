@@ -46,11 +46,11 @@ def data_process(data_type, device_type, image=str(), dim=72, chunk_len=200):
         if os.path.isfile(os.path.join(video_folder_path, path)):
             video_file_path.append(path)
 
-    video_file_path = video_file_path[426:]
+    video_file_path = video_file_path[0:142]
     num_video = len(video_file_path)
     print('Processing ' + str(num_video) + ' Videos')
 
-    videos = [Parallel(n_jobs=6)(
+    videos = [Parallel(n_jobs=10)(
         delayed(preprocess_raw_video)(video_folder_path + video, dim) for video in video_file_path)]
     videos = videos[0]
 
@@ -64,7 +64,7 @@ def data_process(data_type, device_type, image=str(), dim=72, chunk_len=200):
         if os.path.isfile(os.path.join(BP_folder_path, path)):
             BP_file_path.append(path)
 
-    BP_file_path = BP_file_path[426:]
+    BP_file_path = BP_file_path[0:142]
 
     print(tt_frame)
     frames = np.zeros(shape=(tt_frame, 6, dim, dim))
@@ -159,8 +159,8 @@ def data_process(data_type, device_type, image=str(), dim=72, chunk_len=200):
         saving_path = '/edrive1/zechenzh/preprocessed_v4v/'
     elif device_type == 'local':
         saving_path = 'C:/Users/Zed/Desktop/V4V/preprocessed_v4v/'
-    np.save(saving_path + data_type + '_male_female' + image + '.npy', frames)
-    np.save(saving_path + data_type + '_BP_male.npy', BP_lf)
+    np.save(saving_path + data_type + '_frames_female' + image + '.npy', frames)
+    np.save(saving_path + data_type + '_BP_female.npy', BP_lf)
 
 
 def data_process_DC(device_type, chunk_len=1200, dim=128):
@@ -411,8 +411,8 @@ def only_BP(data_type, device_type, image=str(), dim=36):
 
 
 if __name__ == '__main__':
-    data_process('train', 'remote', 'face_large')
-    # data_process('valid', 'remote', 'face_large')
+    # data_process('train', 'remote', 'face_large')
+    data_process('valid', 'remote', 'face_large')
     # data_process('test', 'remote', 'face_large')
 
     # only_BP('train', 'remote', 'face_large')
