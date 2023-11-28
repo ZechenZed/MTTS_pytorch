@@ -61,7 +61,7 @@ class TSCAN_trainer:
                            nb_filters2=self.nb_filters2).to(self.device)
         # self.model = torch.nn.DataParallel(self.model, device_ids=list(range(setup.nb_device)))
 
-        v4v_data_train = V4V_Dataset(data_folder_path, 'train', setup.image_type, setup.BP_type)
+        v4v_data_train = V4V_Dataset(data_folder_path, 'train', 'male', setup.image_type)
         self.train_loader = DataLoader(dataset=v4v_data_train, batch_size=self.batch_size,
                                        shuffle=True, num_workers=1)
 
@@ -69,7 +69,7 @@ class TSCAN_trainer:
         # self.valid_loader = DataLoader(dataset=v4v_data_valid, batch_size=self.batch_size,
         #                                shuffle=True, num_workers=1)
 
-        v4v_data_test = V4V_Dataset(data_folder_path, 'test', setup.image_type, setup.BP_type)
+        v4v_data_test = V4V_Dataset(data_folder_path, 'test', 'male', setup.image_type)
         self.test_loader = DataLoader(dataset=v4v_data_test, batch_size=self.batch_size,
                                       shuffle=False, num_workers=1)
 
@@ -214,13 +214,19 @@ class TSCAN_trainer:
             if np.isnan(ro):
                 ro = -1
 
-            ICC_1 = np.std(labels)**2 /(np.std(labels)**2+np.std(predictions)**2)
-
-
-            # data_train_gtNpred = [predictions, labels]
-            # np.save('/edrive1/zechenzh/model_ckpts/data_Train.txt', data_train_gtNpred)
-            wandb.log({'Train_cMAE': cMAE, 'Train_pearson': ro,'Train_ICC_1':ICC_1})
-            print(f'ICC_1: {ICC_1}')
+            p = [Parallel(n_jobs=12)(
+                delayed(one_anova)(labels[i:i + 200], predictions[i:i + 200]) for i in range(0, len(labels), 200))]
+            p = p[0]
+            # print(p)
+            # for i in range(0, len(labels), 200):
+            #     temp_p = one_anova(labels[i:i+200], predictions[i:i+200])
+            #     if temp_p == np.nan:
+            #         p.append(-1)
+            #     else:
+            #         p.append(temp_p)
+            p = np.mean(p)
+            wandb.log({'Train_cMAE': cMAE, 'Train_pearson': ro, 'Train_p': p})
+            print(f'Two-way ANOVA-p:{p}')
             print(f'TrainPearson correlation: {ro}')
             print(f'Train cMAE: {cMAE}')
             if self.plot_pred:
@@ -298,12 +304,20 @@ class TSCAN_trainer:
             if np.isnan(ro):
                 ro = -1
 
-            ICC_1 = np.std(labels)**2 /(np.std(labels)**2+np.std(predictions)**2)
-            # data_test_gtNpred = [predictions, labels]
-            # np.save('/edrive1/zechenzh/model_ckpts/data_Test.txt', data_test_gtNpred)
-
-            wandb.log({'Test_cMAE': cMAE, 'Test_pearson': ro,'Test_ICC_1': ICC_1})
-            print(f'Test ICC_1: {ICC_1}')
+            p = [Parallel(n_jobs=12)(
+                delayed(one_anova)(labels[i:i + 200], predictions[i:i + 200]) for i in range(0, len(labels), 200))]
+            p = p[0]
+            # print(p)
+            # p = []
+            # for i in range(0, len(labels), 200):
+            #     temp_p = one_anova(labels[i:i+200], predictions[i:i+200])
+            #     if temp_p == np.nan:
+            #         p.append(-1)
+            #     else:
+            #         p.append(temp_p)
+            p = np.mean(p)
+            wandb.log({'Test_cMAE': cMAE, 'Test_pearson': ro, 'Test_p': p})
+            print(f'Two-way ANOVA-p:{p}')
             print(f'Test Pearson correlation: {ro}')
             print(f'Test cMAE: {cMAE}')
             if self.plot_pred:
@@ -335,15 +349,15 @@ if __name__ == '__main__':
                         help='nb_batch')
     parser.add_argument('--kernel', type=int, default=3,
                         help='Kernel size')
-    parser.add_argument('--lr', type=float, default=0.01,
+    parser.add_argument('--lr', type=float, default=0.001,
                         help='learning rate')
     parser.add_argument('--frame_depth', type=int, default=10,
                         help='frame depth')
-    parser.add_argument('--dropout_rate1', type=float, default=0.8,
+    parser.add_argument('--dropout_rate1', type=float, default=0.9,
                         help='Drop rate 1')
-    parser.add_argument('--dropout_rate2', type=float, default=0.5,
+    parser.add_argument('--dropout_rate2', type=float, default=0.8,
                         help='Drop rate 2')
-    parser.add_argument('--nb_filter1', type=int, default=128,
+    parser.add_argument('--nb_filter1', type=int, default=32,
                         help='number of filter 1')
     parser.add_argument('--nb_filter2', type=int, default=64,
                         help='number of filter 2')
