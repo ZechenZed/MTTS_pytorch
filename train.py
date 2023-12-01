@@ -16,7 +16,7 @@ from sklearn.metrics import mean_squared_error, mean_absolute_error
 from scipy.ndimage import gaussian_filter
 from scipy.stats import pearsonr
 import wandb
-from evaluation.ICC import one_anova
+from evaluation.ICC import ICC
 from joblib import Parallel, delayed
 
 
@@ -215,7 +215,7 @@ class TSCAN_trainer:
                 ro = -1
 
             p = [Parallel(n_jobs=12)(
-                delayed(one_anova)(labels[i:i + 200], predictions[i:i + 200]) for i in range(0, len(labels), 200))]
+                delayed(ICC)(labels[i:i + 200], predictions[i:i + 200]) for i in range(0, len(labels), 200))]
             p = p[0]
             # print(p)
             # for i in range(0, len(labels), 200):
@@ -305,7 +305,7 @@ class TSCAN_trainer:
                 ro = -1
 
             p = [Parallel(n_jobs=12)(
-                delayed(one_anova)(labels[i:i + 200], predictions[i:i + 200]) for i in range(0, len(labels), 200))]
+                delayed(ICC)(labels[i:i + 200], predictions[i:i + 200]) for i in range(0, len(labels), 200))]
             p = p[0]
             # print(p)
             # p = []
