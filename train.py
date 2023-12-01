@@ -332,7 +332,7 @@ if __name__ == '__main__':
     config = wandb.config
 
     parser = argparse.ArgumentParser()
-    parser.add_argument('-device', '--device_type', type=str, default='local',
+    parser.add_argument('-device', '--device_type', type=str, default='remote',
                         help='Local / Remote device')
 
     parser.add_argument('--nb_device', type=int, default=1,
