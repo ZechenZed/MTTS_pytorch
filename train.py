@@ -226,7 +226,7 @@ class TSCAN_trainer:
             #         p.append(temp_p)
             p = np.mean(p)
             wandb.log({'Train_cMAE': cMAE, 'Train_pearson': ro, 'Train_p': p})
-            print(f'Two-way ANOVA-p:{p}')
+            print(f'Train ICC:{p}')
             print(f'TrainPearson correlation: {ro}')
             print(f'Train cMAE: {cMAE}')
             if self.plot_pred:
@@ -317,7 +317,7 @@ class TSCAN_trainer:
             #         p.append(temp_p)
             p = np.mean(p)
             wandb.log({'Test_cMAE': cMAE, 'Test_pearson': ro, 'Test_p': p})
-            print(f'Two-way ANOVA-p:{p}')
+            print(f'Test ICC:{p}')
             print(f'Test Pearson correlation: {ro}')
             print(f'Test cMAE: {cMAE}')
             if self.plot_pred:
