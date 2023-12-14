@@ -351,7 +351,7 @@ if __name__ == '__main__':
                         help='Kernel size')
     parser.add_argument('--lr', type=float, default=0.0005,
                         help='learning rate')
-    parser.add_argument('--frame_depth', type=int, default=10,
+    parser.add_argument('--frame_depth', type=int, default=200,
                         help='frame depth')
     parser.add_argument('--dropout_rate1', type=float, default=0.4481476982233055,
                         help='Drop rate 1')
