@@ -11,12 +11,9 @@ from tqdm import tqdm
 from torch.optim.lr_scheduler import OneCycleLR
 from torch.nn import MSELoss, L1Loss
 import matplotlib.pyplot as plt
-from sklearn.metrics import mean_squared_error, mean_absolute_error
 from scipy.ndimage import gaussian_filter
-from scipy.stats import pearsonr
 import wandb
-from evaluation.ICC import ICC
-from joblib import Parallel, delayed
+from evaluation.metrics import ICC, cMAE, pearson
 
 
 class TSCAN_trainer:
@@ -34,7 +31,7 @@ class TSCAN_trainer:
         self.nb_epoch = setup.nb_epoch
         self.lr = setup.lr
         self.nb_dense = setup.nb_dense
-        self.criterion = MSELoss()
+        self.criterion = L1Loss()
         self.min_valid_loss = None
         self.best_epoch = setup.best
         self.base_len = setup.nb_device * self.frame_depth
@@ -48,26 +45,31 @@ class TSCAN_trainer:
         self.USE_LAST_EPOCH = True
         self.plot_pred = True
 
-        ################### Load data ###################
+        ################### Load data & Model ###################
         if setup.device_type == 'local':
             data_folder_path = 'C:/Users/Zed/Desktop/V4V/preprocessed_v4v/'
         else:
             data_folder_path = '/edrive1/zechenzh/preprocessed_v4v/'
 
+        # TS_CAN Initialization
         self.model = TSCAN(frame_depth=self.frame_depth, img_size=72, dropout_rate1=self.drop_rate1,
                            dropout_rate2=self.drop_rate2, kernel_size=self.kernel, nb_dense=self.nb_dense,
                            pool_size=self.pool_size, nb_filters1=self.nb_filters1,
                            nb_filters2=self.nb_filters2).to(self.device)
+        # # Parallelization
         # self.model = torch.nn.DataParallel(self.model, device_ids=list(range(setup.nb_device)))
 
+        # train data
         v4v_data_train = V4V_Dataset(data_folder_path, 'train', setup.image_type, 'male')
         self.train_loader = DataLoader(dataset=v4v_data_train, batch_size=self.batch_size,
                                        shuffle=True, num_workers=1)
 
+        # # validation data
         # v4v_data_valid = V4V_Dataset(data_folder_path, 'valid', setup.image_type, setup.BP_type)
         # self.valid_loader = DataLoader(dataset=v4v_data_valid, batch_size=self.batch_size,
         #                                shuffle=True, num_workers=1)
 
+        # # test data
         v4v_data_test = V4V_Dataset(data_folder_path, 'test', setup.image_type, 'male')
         self.test_loader = DataLoader(dataset=v4v_data_test, batch_size=self.batch_size,
                                       shuffle=False, num_workers=1)
@@ -111,8 +113,9 @@ class TSCAN_trainer:
                     running_loss = 0.0
                 train_loss.append(loss.item())
                 tbar.set_postfix(loss=loss.item())
-
             self.save_model(epoch)
+
+            # # validation
             # valid_loss = self.valid()
             # print('validation loss: ', valid_loss)
             # if self.min_valid_loss is None:
@@ -161,9 +164,9 @@ class TSCAN_trainer:
         torch.save(self.model.state_dict(), model_path)
         print('Saved Model Path: ', model_path)
 
-    def test(self, sig=3):
+    def test(self, sig=50):
         print('')
-        print("===Testing===")
+        print("==========Testing==========")
         if self.USE_LAST_EPOCH:
             last_epoch_model_path = os.path.join(
                 self.model_dir, self.model_file_name + '_Epoch' + str(self.nb_epoch - 1) + '.pth')
@@ -187,47 +190,31 @@ class TSCAN_trainer:
                 data_train = data_train.to(self.device)
                 labels_train = train_labels.to(self.device)
                 N, D, C, H, W = data_train.shape
-
                 data_train = data_train.view(N * D, C, H, W)
                 labels_train = labels_train.view(-1, 1)
-
                 data_train = data_train[:(N * D) // self.base_len * self.base_len]
                 labels_train = labels_train[:(N * D) // self.base_len * self.base_len]
-
                 pred_ppg_train = self.model(data_train)
 
                 pred = pred_ppg_train.detach().cpu().numpy()
                 for pr in pred:
                     predictions.append(pr[0])
-
                 label = labels_train.detach().cpu().numpy()
                 for la in label:
                     labels.append(la[0])
 
-            labels = np.array(labels).reshape(-1)
             predictions = np.array(predictions).reshape(-1)
             predictions = gaussian_filter(predictions, sigma=sig)
+            labels = np.array(labels).reshape(-1)
 
-            cMAE = sum(abs(predictions - labels)) / predictions.shape[0]
-            ro = pearsonr(predictions, labels)[0]
-            if np.isnan(ro):
-                ro = -1
+            train_cMAE = cMAE(labels, predictions)
+            ro = pearson(labels, predictions)
+            train_icc = ICC(labels, predictions)
 
-            p = [Parallel(n_jobs=12)(
-                delayed(ICC)(labels[i:i + 200], predictions[i:i + 200]) for i in range(0, len(labels), 200))]
-            p = p[0]
-            # print(p)
-            # for i in range(0, len(labels), 200):
-            #     temp_p = one_anova(labels[i:i+200], predictions[i:i+200])
-            #     if temp_p == np.nan:
-            #         p.append(-1)
-            #     else:
-            #         p.append(temp_p)
-            p = np.mean(p)
-            wandb.log({'Train_cMAE': cMAE, 'Train_pearson': ro, 'Train_p': p})
-            print(f'Train ICC:{p}')
+            wandb.log({'Train_cMAE': train_cMAE, 'Train_pearson': ro, 'Train_ICC': train_icc})
+            print(f'Train cMAE: {train_cMAE}')
             print(f'TrainPearson correlation: {ro}')
-            print(f'Train cMAE: {cMAE}')
+            print(f'Train ICC:{train_icc}')
             if self.plot_pred:
                 plt.plot(predictions, 'r', label='Prediction')
                 plt.plot(labels, 'g', label='Ground truth')
@@ -298,27 +285,14 @@ class TSCAN_trainer:
             predictions = gaussian_filter(predictions, sigma=sig)
             labels = np.array(labels).reshape(-1)
 
-            cMAE = sum(abs(predictions - labels)) / predictions.shape[0]
-            ro = pearsonr(predictions, labels)[0]
-            if np.isnan(ro):
-                ro = -1
+            test_cMAE = cMAE(labels, predictions)
+            ro = pearson(labels, predictions)
+            test_icc = ICC(labels, predictions)
 
-            p = [Parallel(n_jobs=12)(
-                delayed(ICC)(labels[i:i + 200], predictions[i:i + 200]) for i in range(0, len(labels), 200))]
-            p = p[0]
-            # print(p)
-            # p = []
-            # for i in range(0, len(labels), 200):
-            #     temp_p = one_anova(labels[i:i+200], predictions[i:i+200])
-            #     if temp_p == np.nan:
-            #         p.append(-1)
-            #     else:
-            #         p.append(temp_p)
-            p = np.mean(p)
-            wandb.log({'Test_cMAE': cMAE, 'Test_pearson': ro, 'Test_p': p})
-            print(f'Test ICC:{p}')
+            wandb.log({'Test_cMAE': test_cMAE, 'Test_pearson': ro, 'Test_p': test_icc})
+            print(f'Test cMAE: {test_cMAE}')
             print(f'Test Pearson correlation: {ro}')
-            print(f'Test cMAE: {cMAE}')
+            print(f'Test ICC:{test_icc}')
             if self.plot_pred:
                 plt.plot(predictions, 'r', label='Prediction')
                 plt.plot(labels, 'g', label='Ground truth')
