@@ -4,8 +4,6 @@ import matplotlib.pyplot as plt
 import matlab.engine
 
 
-# from evaluation.ICC_C_1 import
-
 def make_video():
     test_array = np.load('C:/Users/Zed/Desktop/V4V/preprocessed_v4v/test_frames_face_large.npy')
     test_array = test_array.reshape((209 * 10, 6, 72, 72))[:, 3:, :, :]

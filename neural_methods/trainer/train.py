@@ -5,9 +5,6 @@ import argparse
 import numpy as np
 import torch.optim as optim
 from torch.utils.data import DataLoader
-import sys
-sys.path.append('../model/')
-from TS_CAN import TSCAN
 from data_loader import V4V_Dataset
 from tqdm import tqdm
 from torch.optim.lr_scheduler import OneCycleLR
@@ -15,7 +12,12 @@ from torch.nn import MSELoss, L1Loss
 import matplotlib.pyplot as plt
 from scipy.ndimage import gaussian_filter
 import wandb
-from evaluation.metrics import ICC, cMAE, pearson
+
+import sys
+sys.path.append('neural_methods/model/')
+from TS_CAN import TSCAN
+sys.path.append('evaluation/')
+from metrics import ICC, cMAE, pearson
 
 
 class TSCAN_trainer:
