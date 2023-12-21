@@ -5,7 +5,9 @@ import argparse
 import numpy as np
 import torch.optim as optim
 from torch.utils.data import DataLoader
-from neural_methods.model.TS_CAN import TSCAN
+import sys
+sys.path.append('../model/')
+from TS_CAN import TSCAN
 from data_loader import V4V_Dataset
 from tqdm import tqdm
 from torch.optim.lr_scheduler import OneCycleLR
