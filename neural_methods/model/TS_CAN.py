@@ -3,12 +3,8 @@ Multi-Task Temporal Shift Attention Networks for On-Device Contactless Vitals Me
 NeurIPS, 2020
 Xin Liu, Josh Fromm, Shwetak Patel, Daniel McDuff
 """
-import matplotlib.pyplot as plt
 import torch
 import torch.nn as nn
-from data_loader import V4V_Dataset
-from torch.utils.data import DataLoader
-from tqdm import tqdm
 
 
 class Attention_mask(nn.Module):
