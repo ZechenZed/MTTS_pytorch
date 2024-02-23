@@ -14,7 +14,7 @@ from joblib import Parallel, delayed
 #     p = p[0]
 #     p = np.mean(p)
 #     return p if p != 1 else -1
-def Icc_A_1(data):
+def ICC_A_1(data):
     """
     Calculate the single rater agreement intraclass correlation coefficient (ICC) and its confidence interval.
 
