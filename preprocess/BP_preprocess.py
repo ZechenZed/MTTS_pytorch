@@ -9,6 +9,7 @@ from joblib import Parallel, delayed
 from scipy.interpolate import interp1d
 from scipy.ndimage import gaussian_filter
 from scipy.stats import pearsonr
+from matplotlib.animation import FuncAnimation
 from video_preprocess import preprocess_raw_video, count_frames
 
 os.environ['CUDA_VISIBLE_DEVICES'] = '0'
@@ -46,7 +47,7 @@ def data_process(data_type, device_type, image=str(), dim=72, chunk_len=200):
         if os.path.isfile(os.path.join(video_folder_path, path)):
             video_file_path.append(path)
 
-    video_file_path = video_file_path[0:10]
+    video_file_path = video_file_path[0:1]
     num_video = len(video_file_path)
     print('Processing ' + str(num_video) + ' Videos')
 
@@ -107,6 +108,24 @@ def data_process(data_type, device_type, image=str(), dim=72, chunk_len=200):
         for l in range(prev_index, current_frames):
             temp_BP_lf_systolic_inter[l] = y_interp(l)
         temp_BP_lf_systolic_inter = temp_BP_lf_systolic_inter[first_index:-1]
+
+        ############################################################
+        temp_BP_lf_systolic_inter = gaussian_filter(temp_BP_lf_systolic_inter, sigma=50)
+        fig, ax = plt.subplots()
+        t = np.linspace(0, 1, len(temp_BP_lf_systolic_inter))
+
+        line = ax.plot(t[0], temp_BP_lf_systolic_inter[0],label='Systolic BP Prediction')[0]
+        ax.legend()
+        def animate(frame):
+            line.set_xdata(t[:frame])
+            line.set_ydata(temp_BP_lf_systolic_inter[:frame])
+            return line
+
+        # Create the animation
+        anim = FuncAnimation(fig, animate, frames=200, interval=50)  # Adjust interval for speed
+
+        plt.show()
+        #############################################################
 
         ################ Find incorrect BP values ################
         invalid_index_BP = np.where((temp_BP_lf_systolic_inter < 60) | (temp_BP_lf_systolic_inter > 250))[0]
@@ -415,8 +434,8 @@ if __name__ == '__main__':
     # data_process('test', 'remote', 'face_large')
 
     data_process('valid', 'local', 'face_large')
-    data_process('train', 'local', 'face_large')
-    data_process('test', 'local', 'face_large')
+    # data_process('train', 'local', 'face_large')
+    # data_process('test', 'local', 'face_large')
 
     # only_BP('train', 'remote', 'face_large')
     # only_BP('valid', 'remote', 'face_large')

@@ -17,7 +17,7 @@ import sys
 sys.path.append('neural_methods/model/')
 from TS_CAN import TSCAN
 sys.path.append('evaluation/')
-from metrics import ICC, cMAE, pearson
+from metrics import ICC_A_1, cMAE, pearson
 
 
 class TSCAN_trainer:
@@ -213,7 +213,8 @@ class TSCAN_trainer:
 
             train_cMAE = cMAE(labels, predictions)
             ro = pearson(labels, predictions)
-            train_icc = ICC(labels, predictions)
+            data = np.array([labels, predictions]).T
+            train_icc = ICC_A_1(data)
 
             wandb.log({'Train_cMAE': train_cMAE, 'Train_pearson': ro, 'Train_ICC': train_icc})
             print(f'Train cMAE: {train_cMAE}')
@@ -291,7 +292,8 @@ class TSCAN_trainer:
 
             test_cMAE = cMAE(labels, predictions)
             ro = pearson(labels, predictions)
-            test_icc = ICC(labels, predictions)
+            data = np.array([labels, predictions]).T
+            test_icc = ICC_A_1(data)
 
             wandb.log({'Test_cMAE': test_cMAE, 'Test_pearson': ro, 'Test_p': test_icc})
             print(f'Test cMAE: {test_cMAE}')
